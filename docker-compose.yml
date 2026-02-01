@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  # 1. Backend Service
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ies-ev-backend
+    ports:
+      - "${API_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - ies-network
+    restart: unless-stopped
+
+  # 2. Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ies-ev-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - ies-network
+    restart: unless-stopped
+
+  # 3. Database Service
+  db:
+    image: postgres:15-alpine
+    container_name: ies-ev-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ies_ev_db}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ies-network
+    restart: unless-stopped
+
+  # 4. Redis Service
+  redis:
+    image: redis:7-alpine
+    container_name: ies-ev-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ies-network
+    restart: unless-stopped
+
+  # 5. Prometheus (Monitoring)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ies-ev-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - ies-network
+    restart: unless-stopped
+
+  # 6. Grafana (Visualization)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ies-ev-grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - ies-network
+    restart: unless-stopped
+
+  # 7. Adminer (Database Management)
+  adminer:
+    image: adminer
+    container_name: ies-ev-adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - ies-network
+    restart: unless-stopped
+
+networks:
+  ies-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  grafana_data:

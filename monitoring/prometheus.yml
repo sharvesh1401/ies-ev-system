@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "backend"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["backend:8000"]
+
+  - job_name: "redis_exporter"
+    # Assuming redis comes with metrics or using sidecar, but for Phase 0 basic check
+    # If not present, this job might be removed or kept as placeholder
+    # For now, just backend and prometheus ensures "functional"
+    static_configs:
+      - targets: ["redis:6379"]
