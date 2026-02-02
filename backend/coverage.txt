@@ -1,0 +1,59 @@
+﻿...F....F..............                                                  [100%]
+================================== FAILURES ===================================
+____________ TestEnergyConservation.test_flat_road_constant_speed _____________
+
+self = <test_comprehensive_validation.TestEnergyConservation object at 0x000001C1BBA83610>
+standard_params = (VehicleParameters(mass_kg=1500.0, drag_coefficient=0.28, frontal_area_m2=2.2, rolling_resistance_coefficient=0.012, b...=27.78), EnvironmentParameters(temperature_c=25.0, wind_speed_mps=0.0, wind_direction_deg=0.0, road_grade_percent=0.0))
+
+>   ???
+E   AssertionError: Energy error 17.76% exceeds 10% threshold
+E   assert 17.759989234819194 < 10.0
+
+C:\Users\5h4rv\Downloads\ies-ev-system\backend\tests\simulation\test_comprehensive_validation.py:99: AssertionError
+---------------------------- Captured stdout call -----------------------------
+
+  Expected battery energy: 1.467 kWh
+  Actual battery energy:   1.727 kWh
+  Error: 17.76%
+_________________ TestBatteryPhysics.test_charge_conservation _________________
+
+self = <test_comprehensive_validation.TestBatteryPhysics object at 0x000001C1BBB09450>
+
+>   ???
+E   AssertionError: Charge conservation violated
+E   assert 12.164593880665702 < 5.0
+
+C:\Users\5h4rv\Downloads\ies-ev-system\backend\tests\simulation\test_comprehensive_validation.py:333: AssertionError
+---------------------------- Captured stdout call -----------------------------
+
+  Energy delivered to load: 30.00 kWh
+  Energy from battery (with losses): 30.07 kWh
+  Expected SOC decrease: 40.09%
+  Actual SOC decrease:   44.97%
+  Error: 12.16%
+=============================== tests coverage ================================
+_______________ coverage: platform win32, python 3.14.2-final-0 _______________
+
+Name                                                    Stmts   Miss  Cover
+---------------------------------------------------------------------------
+app\simulation\__init__.py                                  0      0   100%
+app\simulation\battery_model.py                            41      1    98%
+app\simulation\confidence_scorer.py                        30      1    97%
+app\simulation\energy_calculator.py                        44      3    93%
+app\simulation\environment.py                              45     31    31%
+app\simulation\integrated_engine.py                        62      2    97%
+app\simulation\schemas.py                                  29      0   100%
+app\simulation\telemetry.py                                31     23    26%
+app\simulation\tests\test_battery_model.py                 25      0   100%
+app\simulation\tests\test_comprehensive_validation.py     249      5    98%
+app\simulation\tests\test_integration.py                   26      0   100%
+app\simulation\tests\test_validation.py                    11      0   100%
+app\simulation\tests\test_vehicle_dynamics.py              28      0   100%
+app\simulation\validation.py                               73      9    88%
+app\simulation\vehicle_dynamics.py                         48     16    67%
+---------------------------------------------------------------------------
+TOTAL                                                     742     91    88%
+=========================== short test summary info ===========================
+FAILED app/simulation/tests/test_comprehensive_validation.py::TestEnergyConservation::test_flat_road_constant_speed
+FAILED app/simulation/tests/test_comprehensive_validation.py::TestBatteryPhysics::test_charge_conservation
+2 failed, 21 passed in 0.72s
