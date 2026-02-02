@@ -30,7 +30,7 @@ class TestBatteryModel:
         v_ocv = battery.calculate_ocv(soc)
         
         expected_i_approx = (power_kw * 1000) / v_ocv
-        current = battery.calculate_current(power_kw, soc)
+        current = battery.calculate_current_from_power(power_kw, soc)
         
         # Current should be slightly higher than approx due to internal resistance loss
         assert current > expected_i_approx

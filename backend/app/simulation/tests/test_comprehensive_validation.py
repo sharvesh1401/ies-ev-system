@@ -19,6 +19,7 @@ from app.simulation import schemas
 from app.simulation.vehicle_dynamics import VehicleDynamicsEngine
 from app.simulation.battery_model import BatteryModel
 from app.simulation.energy_calculator import EnergyCalculator
+from app.simulation.efficiency import EfficiencyModel
 
 
 class TestEnergyConservation:
@@ -76,8 +77,12 @@ class TestEnergyConservation:
         distance_m = route.distance_km * 1000
         
         # Expected energy (mechanical): E = (F_aero + F_roll) × distance
+        # NOTE: Simulation starts from 0, so we must account for Kinetic Energy gain
+        E_kinetic_j = 0.5 * vehicle.mass_kg * (v ** 2)
+        E_kinetic_kwh = E_kinetic_j / 3_600_000
+        
         E_mechanical_expected_j = (F_aero + F_roll) * distance_m
-        E_mechanical_expected_kwh = E_mechanical_expected_j / 3_600_000
+        E_mechanical_expected_kwh = (E_mechanical_expected_j / 3_600_000) + E_kinetic_kwh
         
         # Add auxiliary energy
         time_s = distance_m / v
@@ -87,7 +92,10 @@ class TestEnergyConservation:
         E_total_expected_kwh = E_mechanical_expected_kwh + E_aux_kwh
         
         # Account for motor efficiency
-        E_battery_expected_kwh = E_total_expected_kwh / vehicle.motor_efficiency
+        # E_battery_expected_kwh = E_total_expected_kwh / vehicle.motor_efficiency
+        # Use centralized efficiency model
+        eff_model = EfficiencyModel()
+        E_battery_expected_kwh = E_total_expected_kwh / eff_model.eta_drive
         
         # Check battery energy consumption
         error_percent = abs(result.total_energy_kwh - E_battery_expected_kwh) / E_battery_expected_kwh * 100
@@ -405,7 +413,7 @@ class TestBatteryPhysics:
         
         # Test at different power levels
         for power_kw in [10, 30, 50, 70]:
-            current = battery.calculate_current(power_kw, soc)
+            current = battery.calculate_current_from_power(power_kw, soc)
             V_terminal = V_ocv - current * battery.R_int
             
             # Verify P = V × I
