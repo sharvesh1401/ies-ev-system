@@ -29,6 +29,7 @@ app.add_middleware(
 # Include Routers
 app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
+app.include_router(simulation_router, prefix="/api/simulation", tags=["Simulation"])
 
 # Monitoring
 Instrumentator().instrument(app).expose(app)
