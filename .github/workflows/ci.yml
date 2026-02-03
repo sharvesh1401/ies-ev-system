@@ -2,18 +2,23 @@ name: IES_EV CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "develop", "phase1"]
   pull_request:
     branches: ["main"]
+  schedule:
+    - cron: "0 0 * * *" # Daily at midnight
 
 jobs:
   backend-test:
+    name: Backend Tests & Validation
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.11
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -22,19 +27,55 @@ jobs:
           cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install pytest pytest-cov
 
-      - name: Run Tests
+      - name: Run unit tests
         run: |
           cd backend
-          pytest
+          python -m pytest app/simulation/tests/ -v
+
+      - name: Run tests with coverage
+        run: |
+          cd backend
+          python -m pytest app/simulation/tests/ --cov=app/simulation --cov-report=xml --cov-report=term
+
+      - name: Validate metrics
+        run: |
+          cd backend
+          python scripts/validate_metrics.py
+
+      - name: Check phase gate
+        run: |
+          cd backend
+          python scripts/check_phase_gate.py
+
+      - name: Generate report
+        if: always()
+        run: |
+          cd backend
+          python scripts/generate_report.py
+
+      - name: Upload validation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-reports
+          path: backend/reports/
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports
+          path: backend/coverage.xml
 
   frontend-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Node.js 18
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "18"
 

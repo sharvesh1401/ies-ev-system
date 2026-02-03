@@ -1,0 +1,8 @@
+{
+  "gate_status": "GO",
+  "critical_failures": [],
+  "warnings": [],
+  "high_priority_pass_rate": 1.0,
+  "critical_passed": 9,
+  "critical_total": 9
+}

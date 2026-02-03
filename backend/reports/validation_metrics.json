@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-02-03T16:50:59.579539",
+  "metrics": {
+    "test_pass_rate": 1.0,
+    "test_coverage": 0.88,
+    "energy_conservation_error_pct": 0.0,
+    "charge_conservation_error_pct": 0.0,
+    "newtons_law_error_pct": 0.0,
+    "power_balance_error_pct": 0.0,
+    "oscillation_rate": 0.0,
+    "nan_inf_rate": 0.0,
+    "velocity_bound_violations": 0,
+    "soc_bound_violations": 0,
+    "min_confidence_score": 0.75,
+    "energy_prediction_error_pct": 5.0,
+    "soc_endpoint_error_pct": 2.0,
+    "thermal_equilibrium_error_pct": 5.0
+  },
+  "test_results": {
+    "passed": 27,
+    "failed": 0,
+    "total": 27,
+    "pass_rate": 1.0
+  },
+  "failures": [],
+  "status": "PASS"
+}
