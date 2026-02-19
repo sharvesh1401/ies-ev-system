@@ -4,6 +4,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app.config import settings
 from app.routes import health_router, ai_router
 from app.routes.simulation import router as simulation_router
+from app.routes.prediction_v2 import router as prediction_v2_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -31,6 +32,7 @@ app.add_middleware(
 app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
 app.include_router(simulation_router, prefix="/api/simulation", tags=["Simulation"])
+app.include_router(prediction_v2_router, prefix="/api/v2", tags=["Prediction v2"])
 
 # Monitoring
 Instrumentator().instrument(app).expose(app)
