@@ -1,176 +1,248 @@
 @import "tailwindcss";
 
-/* ===== Ivory + Ice Blue Theme ===== */
+/* ═══ IES_EV Futuristic Dark Theme ═══ */
 @theme {
-  --color-brand-primary: #5aa9e6;
-  --color-brand-secondary: #3d7bc9;
-  --color-brand-accent: #2563eb;
-  --color-brand-bg: #f7f5f0;
-  --color-ivory: #faf8f3;
-  --color-ivory-warm: #f5f0e6;
-  --color-ice: #e8f4f8;
-  --color-ice-deep: #d0ecf4;
-  --color-surface-50: #fdfcfa;
-  --color-surface-100: #f8f6f1;
-  --color-surface-200: #efece5;
-  --color-surface-800: #2c3e50;
-  --color-surface-900: #1a2332;
-  --color-accent-success: #2ecc71;
-  --color-accent-warning: #f1c40f;
-  --color-accent-danger: #e74c3c;
-  --font-headline: "Public Sans", sans-serif;
-  --font-body: "Public Sans", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-bg: var(--brand-bg);
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-red: var(--neon-red);
+  --color-neon-green: var(--neon-green);
+  --color-neon-purple: var(--neon-purple);
+  --color-neon-yellow: var(--neon-yellow);
+  --color-surface-50: var(--surface-50);
+  --color-surface-100: var(--surface-100);
+  --color-surface-200: var(--surface-200);
+  --color-surface-300: var(--surface-300);
+  --color-surface-800: var(--surface-800);
+  --color-surface-900: var(--surface-900);
+  --color-accent-success: var(--accent-success);
+  --color-accent-warning: var(--accent-warning);
+  --color-accent-danger: var(--accent-danger);
+  --color-text-primary: var(--text-primary);
+  --font-headline: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
 }
 
-/* ===== Base Styles ===== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ═══ Theme Variables ═══ */
+:root {
+  /* Deep Space Dark Theme (Default) */
+  --brand-primary: #00E5CC;
+  --brand-secondary: #008B82;
+  --brand-accent: #00FFF5;
+  --brand-bg: #0A0E1A;
+  --neon-cyan: #00E5CC;
+  --neon-red: #FF3D00;
+  --neon-green: #00E676;
+  --neon-purple: #7B2FF7;
+  --neon-yellow: #FFD600;
+  --surface-50: #0D1220;
+  --surface-100: #121825;
+  --surface-200: #1A2332;
+  --surface-300: #243044;
+  --surface-800: #8A95A8;
+  --surface-900: #E8EDF5;
+  --accent-success: #00E676;
+  --accent-warning: #FFB300;
+  --accent-danger: #FF3D00;
+  --text-primary: #E8EDF5;
+  --glass-dark-bg: rgba(18, 24, 37, 0.75);
+  --glass-dark-border: rgba(0, 229, 204, 0.1);
+  --glass-panel-bg: rgba(26, 35, 50, 0.6);
+  --glass-ivory-bg: rgba(18, 24, 37, 0.85);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
+  --map-bg: #0A0E1A;
 }
+
+:root.light {
+  /* Light Mode */
+  --brand-primary: #009688;
+  --brand-secondary: #00796B;
+  --brand-accent: #00BFA5;
+  --brand-bg: #F0F4F8;
+  --neon-cyan: #009688;
+  --neon-red: #D32F2F;
+  --neon-green: #2E7D32;
+  --neon-purple: #6A1B9A;
+  --neon-yellow: #F57F17;
+  --surface-50: #FFFFFF;
+  --surface-100: #F5F7FA;
+  --surface-200: #E8ECF0;
+  --surface-300: #D0D7E0;
+  --surface-800: #4A5568;
+  --surface-900: #1A202C;
+  --accent-success: #2E7D32;
+  --accent-warning: #F57F17;
+  --accent-danger: #D32F2F;
+  --text-primary: #1A202C;
+  --glass-dark-bg: rgba(255, 255, 255, 0.8);
+  --glass-dark-border: rgba(0, 150, 136, 0.15);
+  --glass-panel-bg: rgba(245, 247, 250, 0.7);
+  --glass-ivory-bg: rgba(255, 255, 255, 0.92);
+  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
+  --map-bg: #F0F4F8;
+}
+
+/* ═══ Base ═══ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: var(--font-body);
-  background: var(--color-brand-bg);
-  color: #2c3e50;
+  background: var(--brand-bg);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* ===== Glass Utilities ===== */
-.glass-ivory {
-  background: rgba(250, 248, 243, 0.85);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.04);
-}
-
-.glass-ice {
-  background: rgba(232, 244, 248, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(90, 169, 230, 0.15);
-}
-
+/* ═══ Glass Cards ═══ */
 .glass-dark {
-  background: rgba(26, 35, 50, 0.75);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--glass-dark-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-dark-border);
+  box-shadow: var(--glass-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* ===== Soft Glow Effects ===== */
-.glow-ice {
-  box-shadow: 0 0 20px rgba(90, 169, 230, 0.15), 0 4px 20px rgba(0, 0, 0, 0.04);
+.glass-panel {
+  background: var(--glass-panel-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-dark-border);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-.glow-warm {
-  box-shadow: 0 4px 30px rgba(245, 240, 230, 0.8), 0 2px 10px rgba(0, 0, 0, 0.03);
+.glass-ivory {
+  background: var(--glass-ivory-bg);
+  backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-dark-border);
+  box-shadow: var(--glass-shadow);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
+
+/* ═══ Glow Effects ═══ */
+.glow-cyan {
+  box-shadow: 0 0 20px rgba(0, 229, 204, 0.15), 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.glow-neon {
+  box-shadow: 0 0 25px rgba(0, 229, 204, 0.18), 0 0 60px rgba(0, 229, 204, 0.06);
+}
+
+/* Legacy alias */
+.glow-blue { box-shadow: 0 0 20px rgba(0, 229, 204, 0.15), 0 4px 20px rgba(0, 0, 0, 0.1); }
 
 .card-hover {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
 }
-
 .card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(90, 169, 230, 0.15);
+  box-shadow: 0 8px 40px rgba(0, 229, 204, 0.18), 0 0 20px rgba(0, 229, 204, 0.08);
+  border-color: rgba(0, 229, 204, 0.2);
 }
 
-/* ===== Page Transition ===== */
-.page-enter {
-  animation: fadeSlideIn 0.4s ease-out;
-}
+/* ═══ Animations ═══ */
+.page-enter { animation: fadeSlideIn 0.4s ease-out; }
 
 @keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes slideRight {
   from { opacity: 0; transform: translateX(-12px); }
   to { opacity: 1; transform: translateX(0); }
 }
-
-/* Staggered children animation */
-.stagger-children > * {
-  animation: slideUp 0.5s ease-out both;
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.stagger-children > * { animation: slideUp 0.5s ease-out both; }
 .stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
 .stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
 .stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
 .stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
 .stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
 
-/* ===== Icon Styles ===== */
+/* ═══ Icons ═══ */
 .material-symbols-outlined {
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   vertical-align: middle;
 }
 
-.material-symbols-filled {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  vertical-align: middle;
-}
-
-/* ===== Subtle Background Pattern ===== */
+/* ═══ Subtle Grid Background ═══ */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(90, 169, 230, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(90, 169, 230, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(0, 229, 204, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 204, 0.02) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
-/* ===== Scrollbar ===== */
-::-webkit-scrollbar {
-  width: 6px;
-}
+/* ═══ Scrollbar ═══ */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 229, 204, 0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 229, 204, 0.3); }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(90, 169, 230, 0.2);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(90, 169, 230, 0.35);
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* ===== Leaflet Overrides ===== */
+/* ═══ Leaflet Overrides ═══ */
 .leaflet-container {
-  background: #e8f4f8 !important;
+  background: var(--map-bg) !important;
   font-family: var(--font-body) !important;
+  transition: background-color 0.3s ease;
+}
+.leaflet-control-zoom a {
+  background: rgba(18, 24, 37, 0.9) !important;
+  color: #E8EDF5 !important;
+  border: 1px solid rgba(0, 229, 204, 0.15) !important;
+}
+.light .leaflet-control-zoom a {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #1A202C !important;
+  border: 1px solid rgba(0, 150, 136, 0.15) !important;
 }
 
-.leaflet-control-zoom a {
-  background: rgba(250, 248, 243, 0.95) !important;
-  color: #2c3e50 !important;
-  border: 1px solid rgba(90, 169, 230, 0.2) !important;
+/* ═══ Gradient Text Utilities ═══ */
+.text-gradient-cyan {
+  background: linear-gradient(135deg, #00E5CC, #00FFF5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+/* Legacy aliases */
+.text-gradient-blue {
+  background: linear-gradient(135deg, #00E5CC, #00FFF5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.text-gradient-multi {
+  background: linear-gradient(135deg, #00E5CC, #00E676, #00E5CC);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ═══ Tailwind v4 backward compat ═══ */
+/* neon-blue alias → neon-cyan for existing class usage */
+@theme {
+  --color-neon-blue: var(--neon-cyan);
 }

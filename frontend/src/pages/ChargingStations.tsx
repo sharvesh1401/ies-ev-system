@@ -2,233 +2,282 @@ import { useState, useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
-interface Station {
-  id: number
-  name: string
-  lat: number
-  lng: number
-  town: string
-  operator: string
-  maxKW: number | null
-  connectors: number
-  isOperational: boolean
-}
-
-/* Netherlands center: Amsterdam */
-const NL_CENTER: [number, number] = [52.3676, 4.9041]
-
-/* Amsterdam area charging stations */
-const STATIONS: Station[] = [
-  { id: 1, name: 'FastNed Amstel', lat: 52.3469, lng: 4.9179, town: 'Amsterdam', operator: 'FastNed', maxKW: 300, connectors: 4, isOperational: true },
-  { id: 2, name: 'Shell Recharge Jan van Galenstraat', lat: 52.3714, lng: 4.8584, town: 'Amsterdam', operator: 'Shell Recharge', maxKW: 50, connectors: 2, isOperational: true },
-  { id: 3, name: 'IONITY A2 Breukelen', lat: 52.1650, lng: 4.9850, town: 'Breukelen', operator: 'IONITY', maxKW: 350, connectors: 6, isOperational: true },
-  { id: 4, name: 'Allego P+R Sloterdijk', lat: 52.3890, lng: 4.8375, town: 'Amsterdam', operator: 'Allego', maxKW: 150, connectors: 4, isOperational: true },
-  { id: 5, name: 'EVBox Amstelveenseweg', lat: 52.3530, lng: 4.8630, town: 'Amsterdam', operator: 'EVBox', maxKW: 22, connectors: 2, isOperational: true },
-  { id: 6, name: 'Tesla Supercharger Schiphol', lat: 52.3056, lng: 4.7581, town: 'Schiphol', operator: 'Tesla', maxKW: 250, connectors: 12, isOperational: true },
-  { id: 7, name: 'GreenFlux Zuidas', lat: 52.3364, lng: 4.8738, town: 'Amsterdam', operator: 'GreenFlux', maxKW: 50, connectors: 3, isOperational: true },
-  { id: 8, name: 'NewMotion Leidseplein', lat: 52.3640, lng: 4.8812, town: 'Amsterdam', operator: 'NewMotion', maxKW: 22, connectors: 2, isOperational: false },
-  { id: 9, name: 'FastNed A10 West', lat: 52.3760, lng: 4.8100, town: 'Amsterdam', operator: 'FastNed', maxKW: 300, connectors: 4, isOperational: true },
-  { id: 10, name: 'Allego Centraal Station', lat: 52.3791, lng: 4.9003, town: 'Amsterdam', operator: 'Allego', maxKW: 50, connectors: 4, isOperational: true },
-  { id: 11, name: 'Shell Recharge Bijlmer', lat: 52.3120, lng: 4.9480, town: 'Amsterdam', operator: 'Shell Recharge', maxKW: 150, connectors: 4, isOperational: true },
-  { id: 12, name: 'EVBox Haarlem Centrum', lat: 52.3810, lng: 4.6360, town: 'Haarlem', operator: 'EVBox', maxKW: 22, connectors: 2, isOperational: true },
-  { id: 13, name: 'IONITY A4 Hoofddorp', lat: 52.3060, lng: 4.6870, town: 'Hoofddorp', operator: 'IONITY', maxKW: 350, connectors: 8, isOperational: true },
-  { id: 14, name: 'FastNed Zaandam', lat: 52.4418, lng: 4.8263, town: 'Zaandam', operator: 'FastNed', maxKW: 300, connectors: 4, isOperational: true },
-  { id: 15, name: 'Allego Diemen', lat: 52.3410, lng: 4.9620, town: 'Diemen', operator: 'Allego', maxKW: 50, connectors: 3, isOperational: true },
-  { id: 16, name: 'GreenFlux Amstelveen', lat: 52.3000, lng: 4.8600, town: 'Amstelveen', operator: 'GreenFlux', maxKW: 50, connectors: 2, isOperational: true },
-  { id: 17, name: 'Tesla Supercharger Weesp', lat: 52.3080, lng: 5.0420, town: 'Weesp', operator: 'Tesla', maxKW: 250, connectors: 8, isOperational: true },
-  { id: 18, name: 'Shell Recharge Muiden', lat: 52.3340, lng: 5.0710, town: 'Muiden', operator: 'Shell Recharge', maxKW: 50, connectors: 2, isOperational: true },
-  { id: 19, name: 'FastNed Almere Poort', lat: 52.3510, lng: 5.1280, town: 'Almere', operator: 'FastNed', maxKW: 300, connectors: 4, isOperational: true },
-  { id: 20, name: 'EVBox Hilversum', lat: 52.2230, lng: 5.1720, town: 'Hilversum', operator: 'EVBox', maxKW: 22, connectors: 2, isOperational: true },
+/* Amsterdam-area demonstration fallback data */
+const DEMO_STATIONS = [
+  { ID: 1, AddressInfo: { Title: 'FastNed Amstel', AddressLine1: 'Julianaplein 1', Town: 'Amsterdam', Latitude: 52.3469, Longitude: 4.9179 }, Connections: [{ PowerKW: 300, LevelID: 3, ConnectionTypeID: 33 }] },
+  { ID: 2, AddressInfo: { Title: 'Shell Recharge Centrum', AddressLine1: 'Waterlooplein 2', Town: 'Amsterdam', Latitude: 52.3714, Longitude: 4.8584 }, Connections: [{ PowerKW: 50, LevelID: 3, ConnectionTypeID: 33 }] },
+  { ID: 3, AddressInfo: { Title: 'Allego P+R Sloterdijk', AddressLine1: 'Piarcoplein 1', Town: 'Amsterdam', Latitude: 52.3890, Longitude: 4.8375 }, Connections: [{ PowerKW: 150, LevelID: 3, ConnectionTypeID: 33 }] },
+  { ID: 4, AddressInfo: { Title: 'Tesla Supercharger Schiphol', AddressLine1: 'Schiphol Boulevard 1', Town: 'Schiphol', Latitude: 52.3056, Longitude: 4.7581 }, Connections: [{ PowerKW: 250, LevelID: 3, ConnectionTypeID: 27 }] },
+  { ID: 5, AddressInfo: { Title: 'IONITY A4 Hoofddorp', AddressLine1: 'Rijksweg A4', Town: 'Hoofddorp', Latitude: 52.3060, Longitude: 4.6870 }, Connections: [{ PowerKW: 350, LevelID: 3, ConnectionTypeID: 33 }] },
+  { ID: 6, AddressInfo: { Title: 'FastNed A10 West', AddressLine1: 'Rijksweg A10', Town: 'Amsterdam', Latitude: 52.3760, Longitude: 4.8100 }, Connections: [{ PowerKW: 300, LevelID: 3, ConnectionTypeID: 33 }] },
+  { ID: 7, AddressInfo: { Title: 'GreenFlux Zuidas', AddressLine1: 'Gustav Mahlerlaan', Town: 'Amsterdam', Latitude: 52.3364, Longitude: 4.8738 }, Connections: [{ PowerKW: 50, LevelID: 2, ConnectionTypeID: 25 }] },
+  { ID: 8, AddressInfo: { Title: 'Allego Centraal Station', AddressLine1: 'Stationsplein 1', Town: 'Amsterdam', Latitude: 52.3791, Longitude: 4.9003 }, Connections: [{ PowerKW: 50, LevelID: 3, ConnectionTypeID: 33 }] },
+  { ID: 9, AddressInfo: { Title: 'FastNed Zaandam', AddressLine1: 'Rijksweg A8', Town: 'Zaandam', Latitude: 52.4418, Longitude: 4.8263 }, Connections: [{ PowerKW: 300, LevelID: 3, ConnectionTypeID: 33 }] },
+  { ID: 10, AddressInfo: { Title: 'Shell Recharge Bijlmer', AddressLine1: 'Arena Boulevard', Town: 'Amsterdam', Latitude: 52.3120, Longitude: 4.9480 }, Connections: [{ PowerKW: 150, LevelID: 3, ConnectionTypeID: 33 }] },
 ]
 
-function createStationIcon() {
-  return L.divIcon({
-    className: '',
-    html: `<div style="
-      width:30px;height:30px;background:#5aa9e6;border-radius:50%;border:3px solid #fff;
-      display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);
-      font-size:13px;color:#fff;
-    ">⚡</div>`,
-    iconSize: [30, 30],
-    iconAnchor: [15, 30],
-    popupAnchor: [0, -30],
-  })
-}
-
-function createActiveIcon() {
-  return L.divIcon({
-    className: '',
-    html: `<div style="
-      width:36px;height:36px;background:#3d7bc9;border-radius:50%;border:4px solid #fff;
-      display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(90,169,230,0.5);
-      font-size:15px;color:#fff;
-    ">⚡</div>`,
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -36],
-  })
-}
-
 export default function ChargingStations() {
-  const [selected, setSelected] = useState<Station>(STATIONS[0])
-  const mapContainerRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<L.Map | null>(null)
-  const markersRef = useRef<Map<number, L.Marker>>(new Map())
+  const [stations, setStations] = useState<any[]>(DEMO_STATIONS)
+  const [loading, setLoading] = useState(false)
+  const [selectedStation, setSelectedStation] = useState<any | null>(null)
+  const [usingDemoData, setUsingDemoData] = useState(true)
 
-  // Initialize map
+  const mapRef = useRef<HTMLDivElement>(null)
+  const leafletMap = useRef<L.Map | null>(null)
+  const markersRef = useRef<{ [id: string]: L.Marker }>({})
+
+  // Initialize Map & Fetch Data
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return
+    if (!mapRef.current || leafletMap.current) return
 
-    const map = L.map(mapContainerRef.current, {
-      center: NL_CENTER,
+    const map = L.map(mapRef.current, {
+      center: [52.3676, 4.9041], // Default Amsterdam center
       zoom: 12,
-      zoomControl: true,
+      zoomControl: false,
     })
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a>',
+    // Blade Runner Dark CARTO tiles
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
     }).addTo(map)
 
-    // Add markers
-    STATIONS.forEach((s) => {
-      const marker = L.marker([s.lat, s.lng], { icon: createStationIcon() })
-        .addTo(map)
-        .bindPopup(`<b>${s.name}</b><br/>${s.maxKW ? s.maxKW + ' kW • ' : ''}${s.operator}`)
+    L.control.zoom({ position: 'bottomright' }).addTo(map)
+    leafletMap.current = map
 
-      marker.on('click', () => setSelected(s))
-      markersRef.current.set(s.id, marker)
+    const fetchStations = async (lat: number, lng: number) => {
+      setLoading(true)
+      try {
+        const apiKey = import.meta.env.VITE_OPENCHARGE_API_KEY;
+        const response = await fetch(`/ocm/poi/?output=json&maxresults=50&compact=true&verbose=false&latitude=${lat}&longitude=${lng}&distance=30`, {
+          headers: {
+            'X-API-Key': apiKey || ''
+          }
+        })
+        if (!response.ok) {
+          if (response.status === 403) throw new Error('API Key Required')
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        const data = await response.json()
+        if (data && data.length > 0) {
+          setStations(data)
+          setUsingDemoData(false)
+        }
+      } catch (err: any) {
+        if (err.message.includes('API Key Required')) {
+          setUsingDemoData(true)
+          setStations(DEMO_STATIONS)
+        } else {
+          console.error(err.message)
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    // Initial fetch
+    fetchStations(52.3676, 4.9041)
+
+    // Listen for map panning to refetch
+    let timeout: ReturnType<typeof setTimeout>
+    map.on('moveend', () => {
+      clearTimeout(timeout)
+      // Debounce fetch to stop API spam while user scrolls quickly
+      timeout = setTimeout(() => {
+        const center = map.getCenter()
+        fetchStations(center.lat, center.lng)
+      }, 750)
     })
-
-    mapRef.current = map
 
     return () => {
       map.remove()
-      mapRef.current = null
+      leafletMap.current = null
+      markersRef.current = {}
+      clearTimeout(timeout)
     }
   }, [])
 
-  // Update marker styles when selection changes
+  // Update Markers
   useEffect(() => {
-    markersRef.current.forEach((marker, id) => {
-      marker.setIcon(id === selected.id ? createActiveIcon() : createStationIcon())
+    const map = leafletMap.current
+    if (!map) return
+
+    // Clear old markers
+    Object.values(markersRef.current).forEach((marker) => marker.remove())
+    markersRef.current = {}
+
+    stations.forEach((station) => {
+      const lat = station.AddressInfo.Latitude
+      const lng = station.AddressInfo.Longitude
+      if (!lat || !lng) return
+
+      const maxPower = Math.max(...(station.Connections?.map((c: any) => c.PowerKW || 0) || [0]))
+      const isFast = maxPower >= 50
+
+      const pinColor = isFast ? '#00E5CC' : '#00E676'
+      const customIcon = L.divIcon({
+        className: '',
+        html: `<div style="width:28px;height:28px;background:rgba(10,14,23,0.8);backdrop-filter:blur(4px);border-radius:50%;border:2px solid ${pinColor};display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px ${pinColor}80, inset 0 0 10px ${pinColor}40;font-size:14px;color:${pinColor}; transition: transform 0.3s; cursor: pointer;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">⚡</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 28],
+      })
+
+      const marker = L.marker([lat, lng], { icon: customIcon })
+        .addTo(map)
+        .on('click', () => {
+          setSelectedStation(station)
+          map.flyTo([lat, lng], 14, { animate: true, duration: 1 })
+        })
+
+      markersRef.current[station.ID] = marker
     })
-    if (mapRef.current) {
-      mapRef.current.flyTo([selected.lat, selected.lng], 13, { duration: 0.8 })
-    }
-  }, [selected])
-
-  const getStatusColor = (s: Station) =>
-    s.isOperational ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
-
-  const getStatusLabel = (s: Station) =>
-    s.isOperational ? 'AVAILABLE' : 'OFFLINE'
+  }, [stations])
 
   return (
-    <div className="flex-1 relative flex h-full overflow-hidden">
+    <div className="flex-1 flex h-full overflow-hidden p-6 gap-6 relative">
 
-      {/* ───── Map Area ───── */}
-      <div className="flex-1 relative overflow-hidden">
-        <div ref={mapContainerRef} className="h-full w-full" />
-
-        {/* Selected Station Card */}
-        <div className="absolute bottom-6 left-6 right-6 lg:right-auto lg:w-[420px] z-[1000]" style={{ animation: 'slideUp 0.4s ease-out' }}>
-          <div className="glass-ivory rounded-2xl shadow-2xl p-5">
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <span className="inline-block px-2 py-0.5 bg-brand-primary/10 text-brand-primary text-[10px] font-bold tracking-wider uppercase rounded-md mb-2">
-                  {selected.operator}
-                </span>
-                <h3 className="text-lg font-bold text-surface-900 leading-tight">{selected.name}</h3>
-                <p className="text-sm text-surface-800/50 flex items-center gap-1 mt-1">
-                  <span className="material-symbols-outlined text-sm">location_on</span>
-                  {selected.town}, Netherlands
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              <div className="bg-ice/50 p-3 rounded-xl border border-brand-primary/10">
-                <p className="text-[10px] font-bold text-surface-800/40 uppercase tracking-widest mb-1">Max Power</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-surface-900">{selected.maxKW || '—'}</span>
-                  <span className="text-sm font-medium text-surface-800/50">kW</span>
-                </div>
-              </div>
-              <div className="bg-ice/50 p-3 rounded-xl border border-brand-primary/10">
-                <p className="text-[10px] font-bold text-surface-800/40 uppercase tracking-widest mb-1">Connectors</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold text-surface-900">{selected.connectors}</span>
-                  <span className="text-sm font-medium text-surface-800/50">ports</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => window.open(`https://www.google.com/maps/dir/?api=1&destination=${selected.lat},${selected.lng}`, '_blank')}
-                className="flex-1 bg-brand-primary text-white font-bold py-3 rounded-xl hover:bg-brand-secondary transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-brand-primary/20"
-              >
-                <span className="material-symbols-outlined">navigation</span>
-                Directions
-              </button>
-              <button className="w-12 bg-surface-100 text-surface-800/60 rounded-xl flex items-center justify-center hover:bg-surface-200 transition-colors">
-                <span className="material-symbols-outlined">share</span>
-              </button>
-            </div>
+      {/* ═══ Main Map Container ═══ */}
+      <div className="flex-1 glass-dark  overflow-hidden relative shadow-[0_0_30px_rgba(0,180,216,0.1)] border border-neon-blue/20">
+        <div ref={mapRef} className="h-full w-full z-0 opacity-90" />
+        <div className="absolute inset-0 z-10 pointer-events-none shadow-[inset_0_0_100px_rgba(10,14,23,0.8)]" />
+        
+        {/* Loading Overlay */}
+        {loading && (
+          <div className="absolute inset-0 bg-brand-bg/60 backdrop-blur-sm flex items-center justify-center z-[1000]">
+            <div className="w-12 h-12 rounded-full border-2 border-neon-blue/30 border-t-neon-blue animate-spin shadow-[0_0_15px_#00b4d8]" />
           </div>
-        </div>
+        )}
       </div>
 
-      {/* ───── Station List ───── */}
-      <div className="w-[380px] bg-ivory border-l border-surface-200 flex flex-col shadow-xl z-20 shrink-0">
-        <div className="p-6 border-b border-surface-200">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-surface-900">Nearby Chargers</h3>
-            <span className="text-xs font-bold text-brand-primary">{STATIONS.length} found</span>
-          </div>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-surface-800/30 text-xl">search</span>
+      {/* ═══ Left Panel (Floating) ═══ */}
+      <div className="w-full md:w-[380px] flex flex-col gap-6 shrink-0 relative z-[1000] pointer-events-none h-full" style={{ animation: 'slideRight 0.4s ease-out' }}>
+        
+        {/* Header Search & API Status */}
+        <div className="glass-dark  p-5 md:p-6 pointer-events-auto border border-neon-blue/20 shadow-[0_4px_30px_rgba(0,180,216,0.15)] shrink-0">
+          <h2 className="text-2xl font-headline font-bold text-surface-900 tracking-tight glow-neon mb-1">Charging Network</h2>
+          <p className="text-[10px] font-mono text-neon-blue/60 uppercase tracking-widest mb-5">Global Grid Access</p>
+
+          <div className="relative mb-5">
+            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-neon-blue text-[20px]">search</span>
             <input
-              className="w-full bg-surface-50 border border-surface-200 rounded-xl pl-11 pr-4 py-2.5 text-sm focus:ring-brand-primary focus:border-brand-primary outline-none text-surface-900"
-              placeholder="Search station name…"
               type="text"
+              placeholder="Search area (e.g. Amsterdam)..."
+              className="w-full bg-surface-100/50 border border-white/10 text-surface-900 text-sm pl-12 pr-4 py-3.5 outline-none focus:border-neon-blue/50 focus:bg-surface-200/50 transition-all shadow-inner"
             />
           </div>
+
+          <div className={`p-4 border flex gap-3.5 items-start ${
+            usingDemoData 
+              ? 'bg-accent-warning/5 border-accent-warning/20' 
+              : 'bg-accent-success/5 border-accent-success/20'
+          }`}>
+            <span className={`material-symbols-outlined text-[22px] shrink-0 ${usingDemoData ? 'text-accent-warning' : 'text-accent-success'}`}>
+              {usingDemoData ? 'api' : 'verified_user'}
+            </span>
+            <div className="flex-1 min-w-0">
+              <p className={`text-[10px] font-mono font-bold uppercase tracking-widest mb-1 ${
+                usingDemoData ? 'text-accent-warning' : 'text-accent-success'
+              }`}>{usingDemoData ? 'Demo Mode Active' : 'Live Data Active'}</p>
+              <p className="text-xs text-surface-800/60 leading-relaxed">
+                {usingDemoData 
+                  ? 'Showing fallback data. To use live data, set your OpenChargeMap API key in the backend configuration.'
+                  : 'Successfully connected to OpenChargeMap live API.'}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {STATIONS.map((s) => (
-            <div
-              key={s.id}
-              onClick={() => setSelected(s)}
-              className={`p-4 rounded-2xl cursor-pointer transition-all duration-300 ${
-                selected.id === s.id
-                  ? 'border-2 border-brand-primary bg-brand-primary/5 ring-4 ring-brand-primary/5 shadow-md'
-                  : 'border border-surface-200 bg-white hover:border-brand-primary/20 hover:shadow-sm'
-              }`}
+        {/* Selected Station Details Panel */}
+        {selectedStation ? (
+          <div className="glass-dark  p-5 md:p-6 border border-neon-blue/20 shadow-[0_4px_30px_rgba(0,180,216,0.15)] flex-1 overflow-y-auto custom-scrollbar pointer-events-auto relative min-h-0">
+            <button 
+              onClick={() => setSelectedStation(null)}
+              className="absolute top-6 right-6 w-8 h-8 rounded-full bg-surface-100 border border-white/5 flex items-center justify-center text-surface-800/50 hover:text-neon-red hover:border-neon-red/30 transition-all"
             >
-              <div className="flex justify-between items-start mb-2">
-                <h4 className="font-bold text-surface-900 leading-tight text-sm">{s.name}</h4>
-                <span className={`text-[10px] px-2 py-0.5 rounded-md font-bold shrink-0 ml-2 ${getStatusColor(s)}`}>
-                  {getStatusLabel(s)}
-                </span>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-surface-800/50">
-                {s.maxKW && (
-                  <div className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-sm">bolt</span>
-                    {s.maxKW} kW
-                  </div>
-                )}
-                <div className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm">location_on</span>
-                  {s.town}
-                </div>
-              </div>
-              <p className="text-[10px] text-surface-800/30 mt-2 font-medium">{s.operator}</p>
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+
+            <div className="mb-6">
+              <span className="inline-block px-2 py-0.5 border border-neon-green/30 text-[9px] font-mono font-bold text-neon-green  shadow-[0_0_10px_rgba(0,245,160,0.2)] mb-3 uppercase tracking-widest">
+                Station Active
+              </span>
+              <h3 className="text-xl font-headline font-bold text-surface-900 leading-tight mb-2 pr-10">
+                {selectedStation.AddressInfo.Title}
+              </h3>
+              <p className="text-xs text-surface-800/50 font-mono">
+                {selectedStation.AddressInfo.AddressLine1}, {selectedStation.AddressInfo.Town}
+              </p>
             </div>
-          ))}
-        </div>
+
+            <h4 className="text-[10px] font-mono text-neon-blue/60 uppercase tracking-widest mb-3 border-b border-neon-blue/10 pb-2">Available Connectors</h4>
+            <div className="space-y-3 mb-6">
+              {selectedStation.Connections?.map((conn: any, i: number) => (
+                <div key={i} className="flex items-center justify-between p-3.5 bg-surface-100/50 border border-white/5  group hover:border-neon-blue/20 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10  bg-surface-200/50 border border-white/5 flex items-center justify-center text-neon-blue shrink-0 shadow-[inset_0_0_10px_rgba(0,180,216,0.1)]">
+                      <span className="material-symbols-outlined">electrical_services</span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-surface-900 group-hover:text-neon-blue transition-colors">Type {conn.ConnectionTypeID || 'Unknown'}</p>
+                      <p className="text-[10px] text-surface-800/40 font-mono mt-0.5">DC Fast Charging</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-headline font-bold text-neon-green glow-neon">{conn.PowerKW || '?'} <span className="text-[10px] font-sans">kW</span></p>
+                  </div>
+                </div>
+              )) || <p className="text-xs text-surface-800/40 italic">No connection details available.</p>}
+            </div>
+
+            <div className="flex gap-3">
+              <button className="flex-1 bg-gradient-to-r from-neon-blue to-neon-green text-brand-bg font-extrabold text-[11px] font-mono uppercase tracking-widest py-3.5  transition-all shadow-[0_4px_20px_rgba(0,180,216,0.25)] hover:scale-[1.02] flex items-center justify-center gap-2">
+                <span className="material-symbols-outlined text-lg">navigation</span>
+                Navigate
+              </button>
+              <button className="w-12 h-12  bg-surface-100 border border-white/5 flex items-center justify-center text-surface-800/50 hover:text-neon-blue hover:border-neon-blue/30 transition-all">
+                <span className="material-symbols-outlined">bookmark</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="glass-dark  border border-neon-blue/20 flex-1 overflow-hidden flex flex-col pointer-events-auto min-h-0">
+            <div className="p-4 border-b border-white/5 bg-surface-50/50 backdrop-blur shrink-0">
+              <p className="text-[10px] font-mono font-bold text-surface-800/50 uppercase tracking-widest text-center mt-1">Nearby Grid Nodes ({stations.length})</p>
+            </div>
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
+              {stations.map((s) => {
+                const maxPower = Math.max(...(s.Connections?.map((c: any) => c.PowerKW || 0) || [0]))
+                const isFast = maxPower >= 50
+                return (
+                  <div
+                    key={s.ID}
+                    onClick={() => {
+                      setSelectedStation(s)
+                      const map = leafletMap.current
+                      if (map) map.flyTo([s.AddressInfo.Latitude, s.AddressInfo.Longitude], 14, { animate: true, duration: 1 })
+                    }}
+                    className="p-4 border-b border-white/5 last:border-0 hover:bg-surface-100/30 cursor-pointer group transition-colors flex items-center gap-4"
+                  >
+                    <div className={`w-10 h-10 rounded-full border border-white/10 flex items-center justify-center shrink-0 shadow-[inset_0_0_10px_rgba(255,255,255,0.05)] transition-colors ${
+                      isFast ? 'bg-neon-blue/10 text-neon-blue group-hover:border-neon-blue/50' : 'bg-neon-green/10 text-neon-green group-hover:border-neon-green/50'
+                    }`}>
+                      <span className="material-symbols-outlined text-sm">ev_station</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-surface-900 group-hover:text-neon-blue transition-colors truncate">{s.AddressInfo.Title}</p>
+                      <p className="text-[10px] font-mono text-surface-800/40 truncate">{s.AddressInfo.AddressLine1}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className={`text-sm font-bold font-headline ${isFast ? 'text-neon-blue' : 'text-neon-green'}`}>{maxPower > 0 ? `${maxPower} kW` : '--'}</p>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
+
     </div>
   )
 }
+
