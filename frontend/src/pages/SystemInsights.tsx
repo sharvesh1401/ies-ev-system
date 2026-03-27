@@ -124,10 +124,10 @@ export default function SystemInsights() {
   }
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 space-y-4 md:space-y-5 max-w-7xl mx-auto w-full h-full overflow-y-auto no-scrollbar flex flex-col pt-4">
+    <div className="p-4 md:p-5 lg:p-6 space-y-3 md:space-y-4 max-w-7xl mx-auto w-full h-full overflow-y-auto no-scrollbar flex flex-col pt-4">
 
       {/* ═══ Top Section: Profile & Metrics ═══ */}
-      <div className="grid grid-cols-12 gap-4 md:gap-5 shrink-0">
+      <div className="grid grid-cols-12 gap-3 md:gap-4 shrink-0">
         
         {/* Profile Card (Ported from Profile.tsx) */}
         <div className="col-span-12 lg:col-span-3 glass-dark p-4 border border-neon-blue/20 relative overflow-hidden flex flex-col justify-between">
@@ -209,7 +209,7 @@ export default function SystemInsights() {
         </div>
 
         {/* Right: Live metrics cards */}
-        <div className="col-span-12 lg:col-span-4 grid grid-rows-2 gap-4 md:gap-5">
+        <div className="col-span-12 lg:col-span-4 grid grid-rows-2 gap-3 md:gap-4">
           <div className="glass-dark  p-5 border border-neon-blue/10 relative overflow-hidden flex flex-col justify-between group hover:border-neon-blue/30 transition-colors">
             <div className="absolute -top-10 -right-10 w-24 h-24 bg-neon-blue/10 rounded-full blur-[30px] group-hover:bg-neon-blue/20 transition-all" />
             <div className="flex items-center justify-between mb-4 relative z-10">
@@ -248,11 +248,11 @@ export default function SystemInsights() {
       </div>
 
       {/* ═══ Terminal + Diagnostics ═══ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 shrink-0">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 shrink-0">
         {/* Terminal */}
-        <div className="lg:col-span-2 glass-dark overflow-hidden flex flex-col h-full lg:h-[220px] border border-neon-green/10 relative">
+        <div className="lg:col-span-2 bg-[#0D1117] rounded-xl overflow-hidden flex flex-col h-full lg:h-[220px] border border-neon-green/10 relative shadow-md">
           <div className="absolute inset-0 bg-[linear-gradient(rgba(0,245,160,0.03)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none z-0" />
-          <div className="px-6 py-4 bg-surface-100/50 border-b border-neon-green/20 flex items-center justify-between shrink-0 relative z-10">
+          <div className="px-6 py-4 bg-[#161B22] border-b border-[#21262D] flex items-center justify-between shrink-0 relative z-10">
             <div className="flex items-center gap-4">
               <div className="flex gap-1.5">
                 <div className="w-3 h-3 rounded-full bg-neon-red shadow-[0_0_8px_#ff3e6c]" />
@@ -263,7 +263,7 @@ export default function SystemInsights() {
             </div>
             <span className="text-[9px] px-2 py-0.5 border border-neon-green/30 bg-neon-green/10 font-mono text-neon-green  shadow-[0_0_10px_rgba(0,245,160,0.2)]">● LIVE</span>
           </div>
-          <div ref={terminalRef} className="p-6 font-mono text-xs text-white/70 overflow-y-auto space-y-2 flex-1 no-scrollbar relative z-10 custom-scrollbar">
+          <div ref={terminalRef} className="p-6 font-mono text-xs text-white/70 overflow-y-auto space-y-2 flex-1 no-scrollbar relative z-10 custom-scrollbar bg-[#0D1117]">
             {logs.map((log, i) => (
               <div key={i} className={`flex gap-4 ${i === logs.length - 1 ? 'opacity-50' : ''} ${i === logs.length - 2 ? 'opacity-70' : ''}`}>
                 <span className="text-neon-green/40 shrink-0 w-[70px]">[{log.time}]</span>

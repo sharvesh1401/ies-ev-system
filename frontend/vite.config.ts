@@ -10,7 +10,9 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://backend:8000',
+        // When running Vite on the host (not inside docker-compose),
+        // the backend is exposed on localhost via port mapping.
+        target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
       },

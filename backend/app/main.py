@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 from app.config import settings
-from app.routes import health_router, ai_router
-from app.routes.simulation import router as simulation_router
+from app.routes import health_router, ai_router, simulation_router
 from app.routes.prediction_v2 import router as prediction_v2_router
 
 app = FastAPI(

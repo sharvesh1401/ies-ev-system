@@ -1,0 +1,134 @@
+C:\Users\5h4rv\Downloads\ies-ev-system
+├── backend
+|  ├── app
+|  |  ├── config
+|  |  |  ├── metric_thresholds.py
+|  |  |  └── __init__.py
+|  |  ├── config.py
+|  |  ├── database.py
+|  |  ├── main.py
+|  |  ├── ml
+|  |  |  ├── confidence_scorer.py
+|  |  |  ├── data_generator.py
+|  |  |  ├── hybrid_predictor.py
+|  |  |  ├── models
+|  |  |  ├── model_loader.py
+|  |  |  ├── validation.py
+|  |  |  └── __init__.py
+|  |  ├── routes
+|  |  |  ├── ai.py
+|  |  |  ├── health.py
+|  |  |  ├── prediction_v2.py
+|  |  |  ├── simulation.py
+|  |  |  └── __init__.py
+|  |  ├── services
+|  |  |  ├── ai_service.py
+|  |  |  └── __init__.py
+|  |  ├── simulation
+|  |  |  ├── battery_model.py
+|  |  |  ├── confidence_scorer.py
+|  |  |  ├── converters.py
+|  |  |  ├── driving_profiles.py
+|  |  |  ├── efficiency.py
+|  |  |  ├── energy_calculator.py
+|  |  |  ├── environment.py
+|  |  |  ├── integrated_engine.py
+|  |  |  ├── schemas.py
+|  |  |  ├── telemetry.py
+|  |  |  ├── tests
+|  |  |  ├── validation.py
+|  |  |  ├── variable_speed_engine.py
+|  |  |  ├── vehicle_dynamics.py
+|  |  |  └── __init__.py
+|  |  └── __init__.py
+|  ├── coverage.txt
+|  ├── debug_imports.py
+|  ├── debug_imports_full.py
+|  ├── Dockerfile
+|  ├── models
+|  |  └── README.md
+|  ├── pyproject.toml
+|  ├── reports
+|  |  ├── gate_decision.json
+|  |  ├── validation_metrics.json
+|  |  └── validation_report.md
+|  ├── requirements.txt
+|  ├── scripts
+|  |  ├── benchmark_hybrid.py
+|  |  ├── check_phase_gate.py
+|  |  ├── generate_report.py
+|  |  ├── test_simulation_visual.py
+|  |  ├── train_ml_model.py
+|  |  ├── validate_metrics.py
+|  |  ├── validate_ml_models.py
+|  |  └── verify_models.py
+|  ├── tests
+|  |  ├── ml
+|  |  |  ├── test_confidence_scorer.py
+|  |  |  ├── test_driving_profiles.py
+|  |  |  ├── test_hybrid_predictor.py
+|  |  |  ├── test_prediction_v2_api.py
+|  |  |  └── __init__.py
+|  |  ├── unit
+|  |  |  ├── test_main.py
+|  |  |  └── __init__.py
+|  |  └── __init__.py
+|  ├── test_output.txt
+|  ├── test_results.txt
+|  └── validation_output.txt
+├── CONTRIBUTING.md
+├── docker-compose.yml
+├── docs
+|  ├── API.md
+|  ├── API_V2.md
+|  ├── PHASE_2_ML_GUIDE.md
+|  └── SETUP.md
+├── frontend
+|  ├── Dockerfile
+|  ├── index.html
+|  ├── package-lock.json
+|  ├── package.json
+|  ├── public
+|  |  └── models
+|  |     └── car.glb
+|  ├── src
+|  |  ├── App.css
+|  |  ├── App.tsx
+|  |  ├── components
+|  |  |  ├── AnimatedBackground.tsx
+|  |  |  ├── AnimatedNumber.tsx
+|  |  |  ├── CarModel.tsx
+|  |  |  ├── Layout.tsx
+|  |  |  ├── Sidebar.tsx
+|  |  |  └── TopBar.tsx
+|  |  ├── hooks
+|  |  |  └── useRealtimeTelemetry.ts
+|  |  ├── index.css
+|  |  ├── lib
+|  |  |  └── api.ts
+|  |  ├── main.tsx
+|  |  ├── pages
+|  |  |  ├── BatteryAnalytics.tsx
+|  |  |  ├── ChargingStations.tsx
+|  |  |  ├── Home.tsx
+|  |  |  ├── Profile.tsx
+|  |  |  ├── RoutePlanner.tsx
+|  |  |  └── SystemInsights.tsx
+|  |  ├── services
+|  |  |  └── api.ts
+|  |  └── vite-env.d.ts
+|  ├── tsconfig.json
+|  ├── tsconfig.node.json
+|  └── vite.config.ts
+├── LICENSE
+├── Makefile
+├── monitoring
+|  └── prometheus.yml
+├── README.md
+├── scripts
+|  └── verify.sh
+└── simulation_results.png
+
+directory: 558 file: 1265
+
+ignored: directory (57)

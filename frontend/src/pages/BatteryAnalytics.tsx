@@ -59,12 +59,12 @@ export default function BatteryAnalytics() {
   const sohArea = `${sohPath} L ${chartW} ${chartH} L 0 ${chartH} Z`
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 flex flex-col gap-5 max-w-7xl mx-auto w-full h-full overflow-y-auto no-scrollbar">
+    <div className="p-4 md:p-5 lg:p-6 flex flex-col gap-4 max-w-7xl mx-auto w-full h-full overflow-y-auto no-scrollbar">
 
       {/* ═══ Summary Stats ═══ */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-children">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 stagger-children">
         {/* Battery Health */}
-        <div className="glass-dark p-6  card-hover relative overflow-hidden border border-accent-success/20">
+        <div className="glass-dark p-5  card-hover relative overflow-hidden border border-accent-success/20">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent-success/15 rounded-full blur-[40px]" />
           <p className="text-[10px] text-accent-success font-mono uppercase tracking-widest font-bold mb-3">Battery Health (SoH)</p>
           <div className="flex items-baseline gap-3 relative z-10">
@@ -81,7 +81,7 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Charge Cycles */}
-        <div className="glass-dark p-6  card-hover relative overflow-hidden border border-neon-blue/20">
+        <div className="glass-dark p-5  card-hover relative overflow-hidden border border-neon-blue/20">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-blue/15 rounded-full blur-[40px]" />
           <p className="text-[10px] text-neon-blue font-mono uppercase tracking-widest font-bold mb-3">Charge Cycles</p>
           <div className="flex items-baseline gap-2 relative z-10">
@@ -95,7 +95,7 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Lifetime Remaining */}
-        <div className="glass-dark p-6  card-hover relative overflow-hidden border border-neon-purple/20">
+        <div className="glass-dark p-5  card-hover relative overflow-hidden border border-neon-purple/20">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-purple/15 rounded-full blur-[40px]" />
           <p className="text-[10px] text-neon-purple font-mono uppercase tracking-widest font-bold mb-3">Lifetime Remaining</p>
           <div className="flex items-baseline gap-2 relative z-10">
@@ -114,7 +114,7 @@ export default function BatteryAnalytics() {
       </div>
 
       {/* ═══ Degradation Chart (SVG) ═══ */}
-      <div className="glass-dark p-6 card-hover border border-neon-blue/10 flex-1 flex flex-col min-h-[300px]">
+      <div className="glass-dark p-5 card-hover border border-neon-blue/10 flex-1 flex flex-col min-h-[260px]">
         <div className="flex items-center justify-between mb-2">
           <div>
             <h3 className="text-xl font-headline font-bold text-surface-900 tracking-tight">State of Health Trend</h3>
@@ -190,7 +190,7 @@ export default function BatteryAnalytics() {
       </div>
 
       {/* ═══ Bento Grid ═══ */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 
         {/* Cell Voltage Heatmap */}
         <div className="lg:col-span-2 glass-dark p-6  card-hover border border-neon-blue/10">

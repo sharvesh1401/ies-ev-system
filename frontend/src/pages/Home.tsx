@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import CarModel from '../components/CarModel'
+import AnimatedNumber from '../components/AnimatedNumber'
 
 function createMiniPinIcon() {
   return L.divIcon({
@@ -67,33 +68,33 @@ export default function Home() {
         <div className="flex-[2] flex flex-col gap-4 md:gap-6 shrink-0 md:min-w-[260px]">
           
           {/* SoC Card */}
-          <div className="glass-dark  p-7 card-hover relative overflow-hidden flex-1 flex flex-col">
+          <div className="glass-dark  p-5 card-hover relative overflow-hidden flex-1 flex flex-col">
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-blue/20 rounded-full blur-[40px]" />
             <div className="flex justify-between items-start mb-auto relative z-10">
               <span className="text-[10px] font-mono font-bold text-surface-800/60 uppercase tracking-widest">State of Charge</span>
             </div>
-            <div className="relative z-10 mt-6">
+            <div className="relative z-10 mt-3">
               <div className="flex items-baseline gap-1">
-                <span className="text-7xl font-headline font-bold text-white tabular-nums tracking-tighter">76</span>
+                <AnimatedNumber value={76} duration={2000} className="text-7xl font-headline font-bold text-white tabular-nums tracking-tighter" />
                 <span className="text-3xl font-bold text-neon-blue">%</span>
                 <span className="material-symbols-outlined text-neon-blue/80 text-3xl ml-2 drop-shadow-[0_0_8px_rgba(0,180,216,0.6)] animate-pulse-slow">bolt</span>
               </div>
             </div>
-            <div className="mt-8 space-y-4 relative z-10">
+            <div className="mt-5 space-y-3 relative z-10">
               <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
-                <span className="text-xs text-surface-800/60 font-mono hidden xl:inline">Health (SoH)</span>
-                <span className="text-sm font-bold text-accent-success">94%</span>
+                <span className="text-xs text-surface-800/60 font-mono">Health (SoH)</span>
+                <span className="text-sm font-bold text-accent-success"><AnimatedNumber value={94} duration={1500} suffix="%" /></span>
               </div>
               <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
-                <span className="text-xs text-surface-800/60 font-mono hidden xl:inline">Est. Range</span>
-                <span className="text-sm font-bold text-white tabular-nums">312 <span className="text-[10px] text-surface-800/40 ml-1">km</span></span>
+                <span className="text-xs text-surface-800/60 font-mono">Est. Range</span>
+                <span className="text-sm font-bold text-white tabular-nums"><AnimatedNumber value={312} duration={2000} /> <span className="text-[10px] text-surface-800/40 ml-1">km</span></span>
               </div>
               <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
-                <span className="text-xs text-surface-800/60 font-mono hidden xl:inline">Battery Core</span>
+                <span className="text-xs text-surface-800/60 font-mono">Battery Core</span>
                 <span className="text-sm font-bold text-white tabular-nums">29°C</span>
               </div>
               <div className="flex justify-between items-baseline">
-                <span className="text-xs text-surface-800/60 font-mono hidden xl:inline">Power Draw</span>
+                <span className="text-xs text-surface-800/60 font-mono">Power Draw</span>
                 <span className="text-sm font-bold text-neon-blue tabular-nums">4.3 <span className="text-[10px] text-surface-800/40 ml-1">kW</span></span>
               </div>
             </div>
@@ -166,7 +167,7 @@ export default function Home() {
               {['1H', '6H', '24H'].map((t) => (
                 <button
                   key={t}
-                  className={`text-[9px] font-bold px-3 py-1.5  transition-colors ${
+                  className={`text-[9px] font-bold px-3 py-1.5 rounded-lg transition-colors ${
                     t === '6H' ? 'bg-neon-blue/20 text-neon-blue border border-neon-blue/30' : 'text-surface-800/40 hover:text-surface-900 bg-surface-100'
                   }`}
                 >
@@ -184,7 +185,7 @@ export default function Home() {
                   className="w-full max-w-[40px]  bg-gradient-to-t from-neon-blue/20 to-neon-blue/60 transition-all duration-500 group-hover:from-neon-blue/40 group-hover:to-neon-blue/90 relative"
                   style={{ height: `${val + 10}%` }}
                 >
-                  <div className="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-mono text-neon-blue font-bold transition-opacity bg-surface-200/80 px-1.5 py-0.5 ">
+                  <div className="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-mono text-neon-blue font-bold transition-opacity bg-surface-200/80 px-1.5 py-0.5 rounded-md">
                     {val * 3}
                   </div>
                 </div>

@@ -25,14 +25,14 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="group/sidebar w-[86px] hover:w-[260px] flex flex-col h-full z-50 overflow-hidden shrink-0 bg-surface-100 border-r border-neon-cyan/8 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] absolute md:relative">
+    <aside className="group/sidebar w-[260px] hidden md:flex flex-col h-full z-50 overflow-hidden shrink-0 bg-surface-100 border-r border-neon-cyan/8 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] absolute md:relative">
       {/* Logo */}
       <div className="p-6 pb-4">
         <div className="flex items-center gap-3 w-max">
           <div className="w-10 h-10  bg-gradient-to-br from-neon-cyan to-neon-green flex items-center justify-center glow-cyan shrink-0">
             <span className="material-symbols-outlined text-white text-lg">bolt</span>
           </div>
-          <div className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/sidebar:pointer-events-auto">
+          <div className="opacity-100 transition-opacity duration-200 pointer-events-auto">
             <h1 className="font-headline font-bold text-base tracking-tight leading-none text-surface-900">
               IES_EV
             </h1>
@@ -53,7 +53,7 @@ export default function Sidebar() {
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-2.5 mx-1  font-medium text-[13px] transition-all duration-300 overflow-hidden whitespace-nowrap ${
+              `flex items-center gap-4 px-4 py-3 mx-1 rounded-lg font-medium text-[15px] transition-all duration-300 overflow-hidden whitespace-nowrap ${
                 isActive
                   ? 'bg-gradient-to-r from-neon-cyan/15 to-neon-green/5 text-neon-cyan border border-neon-cyan/15 shadow-[inset_0_0_10px_rgba(0,229,204,0.05)]'
                   : 'text-surface-800/50 hover:bg-surface-200/80 hover:text-surface-900'
@@ -63,14 +63,14 @@ export default function Sidebar() {
             {({ isActive }) => (
               <>
                 <span
-                  className={`material-symbols-outlined text-[18px] transition-all duration-300 ${isActive ? 'scale-110' : ''}`}
+                  className={`material-symbols-outlined text-[22px] transition-all duration-300 ${isActive ? 'scale-110' : ''}`}
                   style={isActive ? { fontVariationSettings: "'FILL' 1, 'wght' 500" } : {}}
                 >
                   {item.icon}
                 </span>
-                <span className="opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200 delay-75">{item.label}</span>
+                <span className="opacity-100 transition-opacity duration-200 delay-75">{item.label}</span>
                 {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse opacity-0 group-hover/sidebar:opacity-100 transition-opacity" />
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse opacity-100 transition-opacity" />
                 )}
               </>
             )}
@@ -82,16 +82,16 @@ export default function Sidebar() {
       <div className="p-4 mt-auto relative">
         <div
           onClick={() => setProfileOpen(!profileOpen)}
-          className=" p-2.5 md:p-3.5 flex items-center gap-3 bg-surface-200/50 border border-neon-cyan/8 cursor-pointer hover:border-neon-cyan/20 transition-all duration-300 group w-max group-hover/sidebar:w-full min-w-[54px] md:min-w-0 mx-auto group-hover/sidebar:mx-0 overflow-hidden"
+          className=" p-2.5 md:p-3.5 flex items-center gap-3 bg-surface-200/50 border border-neon-cyan/8 cursor-pointer hover:border-neon-cyan/20 transition-all duration-300 group w-full min-w-[54px] md:min-w-0 mx-0 overflow-hidden"
         >
           <div className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-xs font-bold bg-gradient-to-br from-neon-cyan/30 to-neon-green/20 text-neon-cyan border border-neon-cyan/20">
             SH
           </div>
-          <div className="overflow-hidden flex-1 opacity-0 group-hover/sidebar:opacity-100 transition-opacity duration-200">
+          <div className="overflow-hidden flex-1 opacity-100 transition-opacity duration-200">
             <p className="text-sm font-semibold truncate text-surface-900">Sharvesh</p>
             <p className="text-[10px] text-surface-800/30 whitespace-nowrap">System Developer</p>
           </div>
-          <span className={`material-symbols-outlined text-surface-800/30 text-sm opacity-0 group-hover/sidebar:opacity-100 transition-all duration-300 shrink-0 ${profileOpen ? 'rotate-180' : ''}`}>
+          <span className={`material-symbols-outlined text-surface-800/30 text-sm opacity-100 transition-all duration-300 shrink-0 ${profileOpen ? 'rotate-180' : ''}`}>
             expand_more
           </span>
         </div>
@@ -119,7 +119,7 @@ export default function Sidebar() {
                 <button
                   key={item.label}
                   onClick={item.onClick}
-                  className="w-full flex items-center gap-3 px-3 py-2.5  text-left hover:bg-surface-200/30 transition-colors group"
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-surface-200/30 transition-colors group"
                 >
                   <span className="material-symbols-outlined text-surface-800/40 text-lg group-hover:text-neon-cyan transition-colors">{item.icon}</span>
                   <div>
@@ -130,7 +130,7 @@ export default function Sidebar() {
               ))}
             </div>
             <div className="p-2 border-t border-neon-cyan/8">
-              <button className="w-full flex items-center gap-3 px-3 py-2.5  text-left hover:bg-neon-red/10 transition-colors group">
+              <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-neon-red/10 transition-colors group">
                 <span className="material-symbols-outlined text-neon-red/50 text-lg">logout</span>
                 <span className="text-sm text-neon-red/70 group-hover:text-neon-red">Sign Out</span>
               </button>

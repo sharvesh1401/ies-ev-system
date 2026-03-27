@@ -73,11 +73,13 @@ function LocationAutocomplete({ placeholder, defaultValue, color, onSelect }: an
   return (
     <div className="relative w-full">
       <input
-        className={`w-full bg-surface-100/50 border border-white/10 text-surface-900 text-sm px-4 py-3.5  outline-none focus:bg-surface-200/50 transition-all shadow-inner ${
+        className={`w-full bg-surface-100/50 border border-white/10 text-surface-900 text-sm px-4 py-3.5 rounded-lg outline-none focus:bg-surface-200/50 transition-all shadow-inner ${
           color === 'blue' ? 'focus:border-neon-blue/50' : 'focus:border-neon-green/50'
         }`}
         value={query}
         placeholder={placeholder}
+        aria-label={placeholder}
+        aria-expanded={isOpen}
         onChange={(e) => {
           setQuery(e.target.value)
           setIsOpen(true)
@@ -180,11 +182,11 @@ export default function RoutePlanner() {
         {/* ── Top search bar overlay ── */}
         <div className="absolute top-5 left-5 right-5 lg:left-[420px] lg:right-auto lg:w-[400px] z-[1000]">
           <div className="glass-dark  p-1 flex items-center gap-2 border border-neon-blue/20">
-            <div className="w-10 h-10  bg-neon-blue/10 flex items-center justify-center shrink-0 ml-1">
+            <div className="w-10 h-10 rounded-lg bg-neon-blue/10 flex items-center justify-center shrink-0 ml-1">
               <span className="material-symbols-outlined text-neon-blue">search</span>
             </div>
             <input
-              className="flex-1 bg-transparent text-surface-900 text-sm py-3 pr-4 outline-none placeholder:text-surface-800/40"
+              className="flex-1 bg-transparent text-surface-900 text-sm py-3 pr-4 outline-none placeholder:text-surface-800/40 rounded-lg"
               placeholder="Search places, addresses…"
               type="text"
             />
@@ -194,14 +196,16 @@ export default function RoutePlanner() {
         {/* ── Map layer toggle ── */}
         <div className="absolute top-5 right-5 z-[1000] flex flex-col gap-2">
           <button
+            aria-label="Toggle Charging Stations Layer"
+            aria-pressed={showStations}
             onClick={() => setShowStations(!showStations)}
-            className={`px-3 py-2  text-xs font-bold font-mono tracking-widest uppercase flex items-center gap-2 transition-all duration-300 ${
+            className={`px-3 py-2 rounded-lg text-xs font-bold font-mono tracking-widest uppercase flex items-center gap-2 transition-all duration-300 ${
               showStations
                 ? 'glass-dark text-neon-blue border border-neon-blue/40 shadow-[0_0_15px_rgba(0,180,216,0.2)]'
                 : 'bg-surface-200/50 backdrop-blur text-surface-800/40 border border-white/5'
             }`}
           >
-            <span className="material-symbols-outlined text-sm">ev_station</span>
+            <span className="material-symbols-outlined text-sm" aria-hidden="true">ev_station</span>
             Chargers
           </button>
         </div>
@@ -213,7 +217,7 @@ export default function RoutePlanner() {
             
             <div className="flex items-center justify-between mb-4 relative z-10">
               <h4 className="text-[10px] font-mono font-bold text-surface-800/60 uppercase tracking-widest">Energy Prediction</h4>
-              <span className="px-2 py-0.5 bg-accent-success/10 border border-accent-success/20 text-accent-success text-[9px]  font-mono font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(0,245,160,0.2)]">Optimized</span>
+              <span className="px-2 py-0.5 bg-accent-success/10 border border-accent-success/20 text-accent-success text-[9px] rounded-full font-mono font-bold uppercase tracking-widest shadow-[0_0_10px_rgba(0,245,160,0.2)]">Optimized</span>
             </div>
 
             <div className="mb-5 relative z-10">
@@ -241,10 +245,10 @@ export default function RoutePlanner() {
             </div>
 
             <div className="flex gap-2 relative z-10">
-              <button className="flex-1 text-xs font-bold text-surface-900 py-3  bg-surface-100/80 hover:bg-surface-200 transition-colors border border-white/5">
+              <button className="flex-1 text-xs font-bold text-surface-900 py-3 rounded-lg bg-surface-100/80 hover:bg-surface-200 transition-colors border border-white/5" aria-label="View Route Details">
                 Details
               </button>
-              <button className="flex-1 text-xs font-bold text-brand-bg py-3  bg-neon-green border border-neon-green hover:bg-[#00d68b] transition-colors shadow-[0_0_15px_rgba(0,245,160,0.3)] tracking-wide">
+              <button className="flex-1 text-xs font-bold text-brand-bg py-3 rounded-lg bg-neon-green border border-neon-green hover:bg-[#00d68b] transition-colors shadow-[0_0_15px_rgba(0,245,160,0.3)] tracking-wide" aria-label="Start Navigation">
                 Start Nav
               </button>
             </div>
@@ -327,9 +331,9 @@ export default function RoutePlanner() {
           </div>
 
           <div className="p-6 bg-surface-50/50 border-t border-white/5 shrink-0 backdrop-blur-md">
-            <button className="w-full bg-gradient-to-r from-neon-blue to-neon-green hover:from-[#00c5eb] hover:to-[#17ffae] text-brand-bg font-extrabold tracking-widest uppercase py-4  transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,180,216,0.25)] relative overflow-hidden group">
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-              <span className="material-symbols-outlined text-xl drop-shadow-md relative z-10">navigation</span>
+            <button className="w-full bg-gradient-to-r from-neon-blue to-neon-green hover:from-[#00c5eb] hover:to-[#17ffae] text-brand-bg font-extrabold tracking-widest uppercase py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(0,180,216,0.25)] relative overflow-hidden group" aria-label="Start Sequence Vector Calculation">
+              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" aria-hidden="true" />
+              <span className="material-symbols-outlined text-xl drop-shadow-md relative z-10" aria-hidden="true">navigation</span>
               <span className="relative z-10">Start Sequence</span>
             </button>
           </div>

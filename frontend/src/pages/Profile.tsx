@@ -12,10 +12,10 @@ export default function Profile() {
           <div>
             <h1 className="text-2xl font-headline font-bold text-surface-900 tracking-tight">Sharvesh Selvakumar</h1>
             <div className="flex flex-wrap gap-2 mt-2">
-              <span className="px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-widest bg-gradient-to-r from-neon-cyan/20 to-neon-green/10 text-neon-cyan border border-neon-cyan/30 shadow-[0_0_10px_rgba(0,229,204,0.2)]">
+              <span className="px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-widest bg-gradient-to-r from-neon-cyan/20 to-neon-green/10 text-neon-cyan border border-neon-cyan/30 shadow-[0_0_10px_rgba(0,229,204,0.2)] rounded-full">
                 System Developer
               </span>
-              <span className="px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-widest border border-neon-purple/30 text-neon-purple bg-neon-purple/10">
+              <span className="px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-widest border border-neon-purple/30 text-neon-purple bg-neon-purple/10 rounded-full">
                 ML Engineer
               </span>
             </div>
@@ -90,7 +90,7 @@ export default function Profile() {
           ].map((skill) => (
             <span
               key={skill.name}
-              className={`px-4 py-2 text-sm font-medium border transition-all hover:scale-105 cursor-default ${
+              className={`px-4 py-2 text-sm font-medium border transition-all hover:scale-105 cursor-default rounded-full ${
                 skill.level === 'expert'
                   ? 'bg-accent-success/10 border-accent-success/30 text-accent-success shadow-[0_0_8px_rgba(0,230,118,0.15)]'
                   : skill.level === 'advanced'
@@ -110,7 +110,7 @@ export default function Profile() {
           <span className="material-symbols-outlined text-neon-cyan text-lg">science</span>
           Research & Publications
         </h3>
-        <div className="bg-surface-200/30 border border-neon-cyan/10 p-5 group hover:border-neon-cyan/20 transition-colors">
+        <div className="bg-surface-200/30 border border-neon-cyan/10 p-5 group hover:border-neon-cyan/20 transition-colors rounded-xl">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h4 className="text-sm font-bold text-surface-900 group-hover:text-neon-cyan transition-colors leading-snug">
@@ -118,7 +118,7 @@ export default function Profile() {
               </h4>
               <p className="text-[11px] text-surface-800/50 mt-2 font-mono">IEEE Conference • 2026</p>
             </div>
-            <span className="px-3 py-1 text-[9px] font-mono font-bold uppercase tracking-widest bg-neon-yellow/10 border border-neon-yellow/30 text-neon-yellow shrink-0 shadow-[0_0_10px_rgba(255,214,0,0.15)]">
+            <span className="px-3 py-1 text-[9px] font-mono font-bold uppercase tracking-widest bg-neon-yellow/10 border border-neon-yellow/30 text-neon-yellow shrink-0 shadow-[0_0_10px_rgba(255,214,0,0.15)] rounded-full">
               Submitted
             </span>
           </div>
