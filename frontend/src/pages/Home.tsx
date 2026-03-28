@@ -75,7 +75,7 @@ export default function Home() {
             </div>
             <div className="relative z-10 mt-3">
               <div className="flex items-baseline gap-1">
-                <AnimatedNumber value={76} duration={2000} className="text-7xl font-headline font-bold text-white tabular-nums tracking-tighter" />
+                <AnimatedNumber value={76} duration={2000} className="text-7xl font-headline font-bold text-surface-900 tabular-nums tracking-tighter" />
                 <span className="text-3xl font-bold text-neon-blue">%</span>
                 <span className="material-symbols-outlined text-neon-blue/80 text-3xl ml-2 drop-shadow-[0_0_8px_rgba(0,180,216,0.6)] animate-pulse-slow">bolt</span>
               </div>
@@ -87,11 +87,11 @@ export default function Home() {
               </div>
               <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
                 <span className="text-xs text-surface-800/60 font-mono">Est. Range</span>
-                <span className="text-sm font-bold text-white tabular-nums"><AnimatedNumber value={312} duration={2000} /> <span className="text-[10px] text-surface-800/40 ml-1">km</span></span>
+                <span className="text-sm font-bold text-surface-900 tabular-nums"><AnimatedNumber value={312} duration={2000} /> <span className="text-[10px] text-surface-800/60 ml-1">km</span></span>
               </div>
-              <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
+              <div className="flex justify-between items-baseline border-b border-surface-200/50 pb-3">
                 <span className="text-xs text-surface-800/60 font-mono">Battery Core</span>
-                <span className="text-sm font-bold text-white tabular-nums">29°C</span>
+                <span className="text-sm font-bold text-surface-900 tabular-nums">29°C</span>
               </div>
               <div className="flex justify-between items-baseline">
                 <span className="text-xs text-surface-800/60 font-mono">Power Draw</span>
@@ -122,9 +122,9 @@ export default function Home() {
 
           <div className="relative z-10 h-full p-6 flex flex-col justify-between">
             <div className="mt-2 ml-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 backdrop-blur-md border border-white/10 rounded-full mb-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-200/50 backdrop-blur-md border border-surface-200 rounded-full mb-3">
                 <span className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
-                <span className="text-[9px] font-mono font-bold text-white uppercase tracking-widest">Nearby Charger</span>
+                <span className="text-[9px] font-mono font-bold text-surface-900 uppercase tracking-widest">Nearby Charger</span>
               </div>
               <h3 className="text-xl font-bold text-surface-900 flex items-center gap-2 drop-shadow-md">
                 Tesla M2
@@ -135,11 +135,11 @@ export default function Home() {
               <div className="flex justify-between items-end">
                 <div>
                   <p className="text-[10px] font-mono text-neon-blue/90 uppercase tracking-widest mb-1 font-bold shadow-sm">Recommended</p>
-                  <p className="text-base font-bold text-white">Tesla Supercharger M2</p>
-                  <p className="text-xs text-surface-800/80 mt-0.5 font-medium">250 kW • CCS2</p>
+                  <p className="text-base font-bold text-surface-900">Tesla Supercharger M2</p>
+                  <p className="text-xs text-surface-800 mt-0.5 font-medium">250 kW • CCS2</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-white/80 mb-2 font-mono font-bold">1.2 km away</p>
+                  <p className="text-xs text-surface-800 mb-2 font-mono font-bold">1.2 km away</p>
                   <button onClick={() => navigate('/route-planner', { state: { destination: 'Tesla Supercharger M2' } })} className="w-11 h-11 rounded-full bg-neon-blue hover:bg-[#00c5eb] text-brand-bg border border-neon-blue flex items-center justify-center transition-colors shadow-[0_0_15px_rgba(0,180,216,0.4)] cursor-pointer">
                     <span className="material-symbols-outlined text-[20px]">directions</span>
                   </button>

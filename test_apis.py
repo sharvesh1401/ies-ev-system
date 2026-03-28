@@ -2,9 +2,9 @@ import urllib.request
 import urllib.parse
 import json
 
-ORS_API_KEY = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjgzYTA3OTkwYWI3MjRmMjRhOGM4OTBlNDNiZDg5ZDIyIiwiaCI6Im11cm11cjY0In0="
-OPENWEATHER_API_KEY = "cd71c2529b62ae38493a7c94832231a2"
-OPENCHARGE_API_KEY = "14402eda-48ca-4832-b2e4-fce9aa6e40b8"
+ORS_API_KEY = "your api key"
+OPENWEATHER_API_KEY = "your api key"
+OPENCHARGE_API_KEY = "your api key"
 
 def test_ors():
     print("Testing OpenRouteService...")

@@ -28,7 +28,11 @@ def main():
 
     # Check expected files
     expected_files = [
-        ("energy_predictor.pth", "PyTorch DNN", "~8 MB"),
+        ("student.pth", "Student PyTorch (Energy)", "~1.7 MB"),
+        ("teacher.pth", "Teacher PyTorch (Energy)", "~13 MB"),
+        ("student.onnx", "ONNX Optimized Student", "~0.2 MB"),
+        ("scaler.pkl", "Feature Normalization Scaler", "~1 KB"),
+        ("energy_predictor.pth", "Legacy Energy Predictor", "~8 MB"),
         ("driver_classifier.pth", "PyTorch LSTM", "~3 MB"),
         ("traffic_estimator.pkl", "Scikit-learn RF", "~1 MB"),
         ("metrics.json", "Training metrics", "<1 KB"),
@@ -62,9 +66,15 @@ def main():
             print(f"  {model_name:25s} {status}")
 
         if load_result["errors"]:
-            print("\nErrors:")
+            print("\nPotential Issues Detected:")
             for name, err in load_result["errors"].items():
-                print(f"  {name}: {err}")
+                print(f"  ⚠ {name}: {err}")
+            
+            if "energy_predictor_student" in load_result["errors"] and "tcn" in load_result["errors"]["energy_predictor_student"].lower():
+                print("\n  [!] HINT: This model appears to be a TCN-Transformer but the class definition is missing.")
+            
+            if "energy_predictor_onnx" in load_result["errors"] and "missing external data" in load_result["errors"]["energy_predictor_onnx"].lower():
+                print("\n  [!] HINT: The ONNX model is missing its external '.onnx.data' file.")
 
         # Verify loaded models
         if any(load_result["loaded"].values()):

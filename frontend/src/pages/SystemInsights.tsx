@@ -216,7 +216,7 @@ export default function SystemInsights() {
               <span className="text-[12px] font-mono text-neon-blue uppercase tracking-widest font-bold drop-shadow-[0_0_5px_#00b4d8]">Inference Latency</span>
               <span className="material-symbols-outlined text-neon-blue/50 text-xl">speed</span>
             </div>
-            <div className="text-4xl font-headline font-bold text-white tabular-nums tracking-tighter relative z-10">
+            <div className="text-4xl font-headline font-bold text-surface-900 tabular-nums tracking-tighter relative z-10">
               {currentLatency.toFixed(1)}<span className="text-sm font-mono text-neon-blue/60 ml-1.5 tracking-normal">ms</span>
             </div>
             <div className="mt-4 relative z-10 opacity-80 group-hover:opacity-100 transition-opacity">
@@ -234,7 +234,7 @@ export default function SystemInsights() {
               <span className="text-[12px] font-mono text-neon-purple uppercase tracking-widest font-bold drop-shadow-[0_0_5px_#7b2ff7]">Throughput</span>
               <span className="material-symbols-outlined text-neon-purple/50 text-xl">dns</span>
             </div>
-            <div className="text-4xl font-headline font-bold text-white tabular-nums tracking-tighter relative z-10">
+            <div className="text-4xl font-headline font-bold text-surface-900 tabular-nums tracking-tighter relative z-10">
               {currentThroughput}<span className="text-sm font-mono text-neon-purple/60 ml-1.5 tracking-normal">req/s</span>
             </div>
             <div className="mt-4 relative z-10 opacity-80 group-hover:opacity-100 transition-opacity">
@@ -263,7 +263,7 @@ export default function SystemInsights() {
             </div>
             <span className="text-[9px] px-2 py-0.5 border border-neon-green/30 bg-neon-green/10 font-mono text-neon-green  shadow-[0_0_10px_rgba(0,245,160,0.2)]">● LIVE</span>
           </div>
-          <div ref={terminalRef} className="p-6 font-mono text-xs text-white/70 overflow-y-auto space-y-2 flex-1 no-scrollbar relative z-10 custom-scrollbar bg-[#0D1117]">
+          <div ref={terminalRef} className="p-6 font-mono text-xs text-[#E8EDF5]/70 overflow-y-auto space-y-2 flex-1 no-scrollbar relative z-10 custom-scrollbar bg-[#0D1117]">
             {logs.map((log, i) => (
               <div key={i} className={`flex gap-4 ${i === logs.length - 1 ? 'opacity-50' : ''} ${i === logs.length - 2 ? 'opacity-70' : ''}`}>
                 <span className="text-neon-green/40 shrink-0 w-[70px]">[{log.time}]</span>

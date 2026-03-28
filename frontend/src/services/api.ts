@@ -1,36 +1,15 @@
 import axios from 'axios';
 
-// Create axios instance with base URL
-// Vite proxy will handle request to /api -> backend:8000/api
+// Backend API URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// Create axios instance
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   },
-  timeout: 10000,
+  timeout: 10000 // 10 second timeout
 });
 
-// Response Types
-export interface HealthStatus {
-  status: string;
-  database: string;
-  redis: string;
-}
-
-export interface ChatResponse {
-  response: string;
-  raw?: any;
-}
-
-// API Service
-export const apiService = {
-  checkHealth: async (): Promise<HealthStatus> => {
-    const response = await api.get<HealthStatus>('/health');
-    return response.data;
-  },
-
-  chatWithAI: async (message: string): Promise<ChatResponse> => {
-    const response = await api.post<ChatResponse>('/ai/chat', { message });
-    return response.data;
-  }
-};
+export default api;

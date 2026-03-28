@@ -68,7 +68,7 @@ export default function BatteryAnalytics() {
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent-success/15 rounded-full blur-[40px]" />
           <p className="text-[10px] text-accent-success font-mono uppercase tracking-widest font-bold mb-3">Battery Health (SoH)</p>
           <div className="flex items-baseline gap-3 relative z-10">
-            <span className="text-5xl font-headline font-bold text-white tabular-nums tracking-tight">{sohAnim.toFixed(1)}%</span>
+            <span className="text-5xl font-headline font-bold text-surface-900 tabular-nums tracking-tight">{sohAnim.toFixed(1)}%</span>
             <span className="flex items-center gap-1 text-accent-success text-xs font-mono tracking-widest uppercase border border-accent-success/30 px-2 py-0.5  shadow-[0_0_10px_rgba(0,245,160,0.2)]">
               <span className="w-1.5 h-1.5 rounded-full bg-accent-success animate-pulse" />
               Nominal
@@ -85,7 +85,7 @@ export default function BatteryAnalytics() {
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-blue/15 rounded-full blur-[40px]" />
           <p className="text-[10px] text-neon-blue font-mono uppercase tracking-widest font-bold mb-3">Charge Cycles</p>
           <div className="flex items-baseline gap-2 relative z-10">
-            <span className="text-5xl font-headline font-bold text-white tabular-nums tracking-tight glow-neon">{Math.round(cyclesAnim)}</span>
+            <span className="text-5xl font-headline font-bold text-surface-900 tabular-nums tracking-tight glow-neon">{Math.round(cyclesAnim)}</span>
             <span className="text-sm font-mono text-surface-800/40 font-medium">/ 2000 max</span>
           </div>
           <div className="mt-5 w-full bg-surface-200/50 h-2 rounded-full overflow-hidden relative z-10 shadow-inner">
@@ -99,7 +99,7 @@ export default function BatteryAnalytics() {
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-purple/15 rounded-full blur-[40px]" />
           <p className="text-[10px] text-neon-purple font-mono uppercase tracking-widest font-bold mb-3">Lifetime Remaining</p>
           <div className="flex items-baseline gap-2 relative z-10">
-            <span className="text-5xl font-headline font-bold text-white tracking-tight drop-shadow-[0_0_15px_rgba(123,47,247,0.4)]">{6.1}</span>
+            <span className="text-5xl font-headline font-bold text-surface-900 tracking-tight drop-shadow-[0_0_15px_rgba(123,47,247,0.4)]">{6.1}</span>
             <span className="text-sm font-mono text-surface-800/40 font-medium">years</span>
           </div>
           <div className="mt-5 flex gap-1.5 relative z-10">
@@ -256,7 +256,7 @@ export default function BatteryAnalytics() {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-                  <span className="text-3xl font-headline font-bold text-white tabular-nums tracking-tighter glow-neon">{liveTemp.toFixed(1)}°</span>
+                  <span className="text-3xl font-headline font-bold text-surface-900 tabular-nums tracking-tighter glow-neon">{liveTemp.toFixed(1)}°</span>
                   <span className={`text-[9px] font-mono tracking-widest mt-1 border px-2 py-0.5  shadow-[0_0_10px_currentColor] ${liveTemp > 40 ? 'text-neon-red border-neon-red/50' : 'text-neon-blue border-neon-blue/50'}`}>
                     {liveTemp > 40 ? 'CRITICAL' : 'STABLE'}
                   </span>

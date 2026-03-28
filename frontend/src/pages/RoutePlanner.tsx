@@ -612,6 +612,7 @@ export default function RoutePlanner() {
   const [destData, setDestData] = useState<LatLng | null>(null)
   const [originName, setOriginName] = useState('Amsterdam Centraal')
   const [destName, setDestName] = useState(defaultDest || 'Rotterdam Centraal')
+  const [modelType, setModelType] = useState<'onnx'|'student'|'teacher'>('onnx')
 
   // ── Initialize Map
   useEffect(() => {
@@ -667,7 +668,7 @@ export default function RoutePlanner() {
 
         // Popup with comparison info
         line.bindPopup(
-          `<div class="text-white text-xs" style="min-width:140px">
+          `<div class="text-[#FFFFFF] text-xs" style="min-width:140px">
             <div style="font-weight:bold;margin-bottom:4px;color:#FFB300">Alternative Route ${i + 1}</div>
             <div>${(route.distance_m / 1000).toFixed(1)} km · ${Math.round(route.duration_s / 60)} min</div>
             ${altPred ? `<div>Energy: ${altPred.energy_kwh.toFixed(1)} kWh</div>
@@ -677,9 +678,9 @@ export default function RoutePlanner() {
         )
 
         // Click to switch
-        line.on('click', () => {
+        line.on('click', async () => {
           const newCtx = { ...ctx, selectedRouteIndex: i }
-          const newPred = runHybridPrediction(newCtx, DEFAULT_VEHICLE)
+          const newPred = await runHybridPrediction(newCtx, DEFAULT_VEHICLE, 85, undefined, modelType)
           setRouteCtx(newCtx)
           setPrediction(newPred)
           drawRoute(newCtx, newPred, preds)
@@ -722,7 +723,7 @@ export default function RoutePlanner() {
             }).addTo(map)
 
             line.bindPopup(
-              `<div class="text-white text-xs" style="min-width:120px">
+              `<div class="text-[#FFFFFF] text-xs" style="min-width:120px">
                 <div style="font-weight:bold;margin-bottom:3px">Segment ${i + 1}</div>
                 <div>Energy: ${cost.toFixed(2)} kWh</div>
                 <div>Gradient: ${seg.gradient.toFixed(1)}%</div>
@@ -750,7 +751,7 @@ export default function RoutePlanner() {
       })
         .addTo(map)
         .bindPopup(
-          `<div class="text-white"><b>Start:</b> ${ctx.originName}</div>`
+          `<div class="text-[#FFFFFF]"><b>Start:</b> ${ctx.originName}</div>`
         )
       layersRef.current.push(startMarker)
 
@@ -759,7 +760,7 @@ export default function RoutePlanner() {
       })
         .addTo(map)
         .bindPopup(
-          `<div class="text-white"><b>Destination:</b> ${ctx.destinationName}</div>`
+          `<div class="text-[#FFFFFF]"><b>Destination:</b> ${ctx.destinationName}</div>`
         )
       layersRef.current.push(endMarker)
 
@@ -770,7 +771,7 @@ export default function RoutePlanner() {
         })
           .addTo(map)
           .bindPopup(
-            `<div class="text-white text-xs">
+            `<div class="text-[#FFFFFF] text-xs">
               <b>${ch.name}</b><br/>
               ${ch.powerKw} kW · ${ch.operator}<br/>
               <span style="color:${ch.status === 'available' ? '#00E5CC' : ch.status === 'busy' ? '#FFB300' : '#FF3D00'}">${ch.status.toUpperCase()}</span>
@@ -850,7 +851,7 @@ export default function RoutePlanner() {
       setPipelineStage('physics_validation')
       await new Promise((r) => setTimeout(r, 400)) // visual pause for UI
 
-      const { bestIndex, predictions } = selectBestRoute(ctx)
+      const { bestIndex, predictions } = await selectBestRoute(ctx, DEFAULT_VEHICLE, modelType)
 
       // Update context with best route
       ctx.selectedRouteIndex = bestIndex
@@ -1040,6 +1041,23 @@ export default function RoutePlanner() {
                   }}
                 />
               </div>
+            </div>
+
+            {/* Model Selection Tuple */}
+            <div className="mt-4 flex rounded-xl overflow-hidden border border-neon-blue/20">
+              {(['onnx', 'student', 'teacher'] as const).map(type => (
+                <button
+                  key={type}
+                  className={`flex-1 py-1.5 text-[9px] font-mono font-bold tracking-widest uppercase transition-all ${
+                    modelType === type
+                      ? 'bg-neon-blue/20 text-neon-blue shadow-[0_0_10px_rgba(0,180,216,0.2)]'
+                      : 'bg-surface-100/50 text-surface-800/40 hover:text-surface-900/80 hover:bg-surface-200/50'
+                  }`}
+                  onClick={() => setModelType(type)}
+                >
+                  {type}
+                </button>
+              ))}
             </div>
           </div>
 

@@ -11,6 +11,7 @@
   --color-neon-green: var(--neon-green);
   --color-neon-purple: var(--neon-purple);
   --color-neon-yellow: var(--neon-yellow);
+  --color-neon-blue: var(--neon-blue);
   --color-surface-50: var(--surface-50);
   --color-surface-100: var(--surface-100);
   --color-surface-200: var(--surface-200);
@@ -38,6 +39,7 @@
   --neon-green: #00E676;
   --neon-purple: #7B2FF7;
   --neon-yellow: #FFD600;
+  --neon-blue: #00b4d8;
   --surface-50: #0D1220;
   --surface-100: #121825;
   --surface-200: #1A2332;
@@ -57,32 +59,67 @@
 }
 
 :root.light {
-  /* Light Mode - Meridian Brand Palette */
-  --brand-primary: #1ACBF8; /* Energy Cyan */
-  --brand-secondary: #2ECC71; /* Route Green */
-  --brand-accent: #FF6F61; /* Progress Coral */
-  --brand-bg: #F8F9FA; /* BG: Off-White */
-  --neon-cyan: #1ACBF8; /* Energy Cyan */
-  --neon-red: #FF6F61; /* Progress Coral */
-  --neon-green: #2ECC71; /* Route Green */
-  --neon-purple: #7B2FF7; /* Keeping purple to avoid breaking existing things not in palette */
-  --neon-yellow: #FFB300; /* Yellow */
+  /* Premium, Vibrant Light Mode Aesthetic */
+  --brand-primary: #0284C7; /* Sky 600 - welcoming blue */
+  --brand-secondary: #059669; /* Emerald 600 */
+  --brand-accent: #E11D48; /* Rose 600 */
+  --brand-bg: #F0F4F8; /* Soft blue-tinted paper background */
+  --neon-cyan: #0284C7; 
+  --neon-red: #E11D48; 
+  --neon-green: #059669; 
+  --neon-purple: #7C3AED; /* Violet 600 */
+  --neon-yellow: #D97706; /* Amber 600 */
+  --neon-blue: #2563EB; /* Royal blue */
   --surface-50: #FFFFFF;
-  --surface-100: #FFFFFF;
-  --surface-200: #ECEFF1; /* Card Accent - Muted Card Accents */
-  --surface-300: #E0E4E8;
-  --surface-800: #555A61; /* Muted Charcoal - Secondary Text */
-  --surface-900: #2A2E35; /* Charcoal Text - Primary Text */
-  --accent-success: #009688; /* Status Teal - Supportive Status Teal */
-  --accent-warning: #FFB300;
-  --accent-danger: #FF6F61;
-  --text-primary: #2A2E35;
-  --glass-dark-bg: rgba(255, 255, 255, 0.85);
-  --glass-dark-border: rgba(26, 203, 248, 0.15);
-  --glass-panel-bg: rgba(248, 249, 250, 0.75);
-  --glass-ivory-bg: rgba(255, 255, 255, 0.95);
-  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  --map-bg: #F8F9FA;
+  --surface-100: #F8FAFC;
+  --surface-200: #E2E8F0;
+  --surface-300: #CBD5E1;
+  --surface-800: #475569;
+  --surface-900: #0F172A; /* Crisp, dark slate for high legibility */
+  --accent-success: #10B981; 
+  --accent-warning: #F59E0B;
+  --accent-danger: #EF4444;
+  --text-primary: #0F172A;
+  --glass-dark-bg: rgba(255, 255, 255, 0.75);
+  --glass-dark-border: rgba(37, 99, 235, 0.15); /* Delicate blue tint to borders */
+  --glass-panel-bg: rgba(255, 255, 255, 0.85);
+  --glass-ivory-bg: #FFFFFF;
+  --glass-shadow: 0 10px 40px -10px rgba(37, 99, 235, 0.08); /* Emotional depth */
+  --map-bg: #EAEFF4;
+}
+
+/* ── Light Mode Specific Overrides to Disable Neons ── */
+.light .glow-cyan,
+.light .glow-red,
+.light .glow-green {
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.05) !important;
+}
+
+.light .glass-dark {
+  background: var(--glass-dark-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-dark-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.light .mix-blend-screen {
+  mix-blend-mode: normal !important;
+}
+
+.light [class*="blur-"] {
+  opacity: 0.1 !important; /* Neutralizes decorative light flares */
+}
+
+/* ── Light Mode Map Inversion ── */
+.light .leaflet-tile-pane {
+  filter: invert(100%) hue-rotate(180deg) brightness(105%) contrast(90%);
+}
+
+/* ── Universal Text Contrast Fix ── */
+.light [class*="text-white"],
+.light [class*="text-surface-50"] {
+  color: var(--color-surface-900) !important;
 }
 
 /* ═══ Base ═══ */

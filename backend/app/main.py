@@ -4,6 +4,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app.config import settings
 from app.routes import health_router, ai_router, simulation_router
 from app.routes.prediction_v2 import router as prediction_v2_router
+from app.api.routes import predict
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -35,6 +36,7 @@ app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
 app.include_router(simulation_router, prefix="/api/simulation", tags=["Simulation"])
 app.include_router(prediction_v2_router, prefix="/api/v2", tags=["Prediction v2"])
 app.include_router(external_api_router, prefix="/api/external", tags=["External Proxies"])
+app.include_router(predict.router)
 
 # Monitoring
 Instrumentator().instrument(app).expose(app)

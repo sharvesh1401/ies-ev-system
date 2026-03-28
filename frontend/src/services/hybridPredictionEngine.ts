@@ -2,7 +2,7 @@
  * Hybrid ML/Physics Prediction Engine (Client-Side)
  *
  * Mirrors the backend HybridPredictor logic:
- * - ML fast path: simplified physics-based energy model
+ * - FastAPI ML path (ONNX/Teacher/Student)
  * - Physics validation: per-segment detailed computation
  * - Decision: ML confidence ≥ 0.75 → accept; else physics fallback
  * - If ML/physics diverge > 10% → choose physics for safety
@@ -10,6 +10,7 @@
  */
 
 import type { RouteContext } from './routeService'
+import { predictEnergy } from './predictions'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -234,12 +235,13 @@ function estimateDegradation(
 
 // ─── Main Prediction Function ────────────────────────────────────────────────
 
-export function runHybridPrediction(
+export async function runHybridPrediction(
   ctx: RouteContext,
   vehicle: VehicleProfile = DEFAULT_VEHICLE,
   initialSoc: number = 85,
-  onStageChange?: (stage: string) => void
-): PredictionResult {
+  onStageChange?: (stage: string) => void,
+  modelType: 'onnx' | 'student' | 'teacher' = 'onnx'
+): Promise<PredictionResult> {
   const route = ctx.routes[ctx.selectedRouteIndex]
   const dist_km = route.distance_m / 1000
   const duration_min = route.duration_s / 60
@@ -247,7 +249,34 @@ export function runHybridPrediction(
 
   // ── Step 1: ML Fast Path
   onStageChange?.('ml_prediction')
-  const ml = mlFastPath(ctx, vehicle, initialSoc)
+  
+  let mlEnergy = 0;
+  let mlConfidence = 0;
+  let usedBackend = false;
+  
+  try {
+    const apiResult = await predictEnergy({
+      distance_km: dist_km,
+      speed_kmh: avg_speed_kmh,
+      temperature_c: ctx.weather.temperature,
+      initial_soc: initialSoc,
+      initial_soh: 100, // Assuming 100 SoH for planning default
+      mass_kg: vehicle.mass_kg,
+      drag_coeff: vehicle.drag_coefficient,
+      model_type: modelType
+    });
+    mlEnergy = apiResult.energy_kwh;
+    mlConfidence = apiResult.confidence;
+    usedBackend = true;
+  } catch(e) {
+    console.warn("Backend ML failed, using local fallback math", e);
+    const localMl = mlFastPath(ctx, vehicle, initialSoc);
+    mlEnergy = localMl.energy;
+    mlConfidence = localMl.confidence;
+  }
+
+  // Get breakdown for UI UI
+  const localBreakdown = mlFastPath(ctx, vehicle, initialSoc).breakdown;
 
   let energy: number
   let confidence: number
@@ -255,26 +284,28 @@ export function runHybridPrediction(
   let segmentCosts: number[] = []
   let explanation: string
 
-  if (ml.confidence >= CONFIDENCE_THRESHOLD) {
+  if (mlConfidence >= CONFIDENCE_THRESHOLD) {
     // ML is confident — accept (but still run physics for validation)
     onStageChange?.('physics_validation')
     const physics = physicsValidation(ctx, vehicle)
     segmentCosts = physics.segmentCosts
 
-    const relError = Math.abs(ml.energy - physics.energy) / Math.max(physics.energy, 0.01)
+    const relError = Math.abs(mlEnergy - physics.energy) / Math.max(physics.energy, 0.01)
 
     if (relError <= DIVERGENCE_THRESHOLD) {
       // ML and physics agree
-      energy = ml.energy
-      confidence = ml.confidence
+      energy = mlEnergy
+      confidence = mlConfidence
       method = 'ml_validated'
-      explanation = `ML prediction (${ml.energy.toFixed(1)} kWh) validated by physics engine (${physics.energy.toFixed(1)} kWh). ${(relError * 100).toFixed(1)}% divergence — within tolerance.`
+      const prefix = usedBackend ? 'ONNX Backend ML' : 'Local ML'
+      explanation = `${prefix} prediction (${mlEnergy.toFixed(1)} kWh) validated by physics engine (${physics.energy.toFixed(1)} kWh). ${(relError * 100).toFixed(1)}% divergence — within tolerance.`
     } else {
       // Divergence > 10% — use physics for safety
       energy = physics.energy
-      confidence = Math.max(0.6, ml.confidence - 0.15)
+      confidence = Math.max(0.6, mlConfidence - 0.15)
       method = 'physics_fallback'
-      explanation = `ML predicted ${ml.energy.toFixed(1)} kWh but physics computed ${physics.energy.toFixed(1)} kWh (${(relError * 100).toFixed(1)}% divergence). Using physics result for safety.`
+      const prefix = usedBackend ? 'ONNX Backend ML' : 'Local ML'
+      explanation = `${prefix} predicted ${mlEnergy.toFixed(1)} kWh but physics computed ${physics.energy.toFixed(1)} kWh (${(relError * 100).toFixed(1)}% divergence). Using physics result for safety.`
     }
   } else {
     // Low confidence — skip ML, use physics directly
@@ -284,7 +315,7 @@ export function runHybridPrediction(
     segmentCosts = physics.segmentCosts
     confidence = 0.70 // physics-only confidence
     method = 'physics_fallback'
-    explanation = `ML confidence too low (${(ml.confidence * 100).toFixed(0)}% < 75% threshold). Route evaluated with physics engine for accuracy.`
+    explanation = `ML confidence too low (${(mlConfidence * 100).toFixed(0)}% < 75% threshold). Route evaluated with physics engine for accuracy.`
   }
 
   // ── SoC and Degradation
@@ -338,7 +369,7 @@ export function runHybridPrediction(
     avg_speed_kmh: Math.round(avg_speed_kmh),
     route_explanation: explanation,
     charger_stop,
-    energy_breakdown: ml.breakdown,
+    energy_breakdown: localBreakdown,
     segment_costs: segmentCosts,
     route_cost: Math.round(routeCost * 1000) / 1000,
     weather_impact: weatherImpact,
@@ -348,15 +379,19 @@ export function runHybridPrediction(
 
 // ─── Select Best Route ───────────────────────────────────────────────────────
 
-export function selectBestRoute(ctx: RouteContext, vehicle: VehicleProfile = DEFAULT_VEHICLE): {
+export async function selectBestRoute(
+  ctx: RouteContext, 
+  vehicle: VehicleProfile = DEFAULT_VEHICLE,
+  modelType: 'onnx' | 'student' | 'teacher' = 'onnx'
+): Promise<{
   bestIndex: number
   predictions: PredictionResult[]
-} {
+}> {
   const predictions: PredictionResult[] = []
 
   for (let i = 0; i < ctx.routes.length; i++) {
     const ctxCopy = { ...ctx, selectedRouteIndex: i }
-    predictions.push(runHybridPrediction(ctxCopy, vehicle))
+    predictions.push(await runHybridPrediction(ctxCopy, vehicle, 85, undefined, modelType))
   }
 
   // Select lowest cost route

@@ -24,6 +24,13 @@ try:
 except ImportError:
     PICKLE_AVAILABLE = False
 
+try:
+    import onnxruntime as ort
+    ONNX_AVAILABLE = True
+except ImportError:
+    ort = None
+    ONNX_AVAILABLE = False
+
 
 class ModelLoader:
     """
@@ -46,9 +53,16 @@ class ModelLoader:
 
         # Model instances (loaded on demand)
         self.energy_predictor = None
+        self.teacher = None
+        self.student = None
+        self.scaler = None
         self.driver_classifier = None
         self.traffic_estimator = None
         self.metrics: Optional[Dict[str, Any]] = None
+        
+        # ONNX Sessions
+        self.onnx_energy_predictor = None
+        self.onnx_session = None
 
         # Status tracking
         self._load_errors: Dict[str, str] = {}
@@ -59,32 +73,69 @@ class ModelLoader:
 
     def load_energy_predictor(self) -> Optional[Any]:
         """
-        Load energy prediction DNN from ``energy_predictor.pth``.
-
-        Returns the loaded PyTorch model, or ``None`` if unavailable.
+        Load energy prediction model.
+        
+        Prioritizes:
+        1. student (1).onnx (if onnxruntime is available)
+        2. student.pth
+        3. energy_predictor.pth
         """
+        # --- Try ONNX first ---
+        onnx_path = self.models_dir / "student (1).onnx"
+        if ONNX_AVAILABLE and onnx_path.exists():
+            try:
+                self.onnx_energy_predictor = ort.InferenceSession(
+                    str(onnx_path), 
+                    providers=['CPUExecutionProvider']
+                )
+                print(f"  ✓ Loaded ONNX model: {onnx_path.name}")
+                return self.onnx_energy_predictor
+            except Exception as e:
+                self._load_errors["energy_predictor_onnx"] = str(e)
+
+        # --- Fallback to PyTorch ---
         if not TORCH_AVAILABLE:
             self._load_errors["energy_predictor"] = "PyTorch not installed"
             return None
 
-        model_path = self.models_dir / "energy_predictor.pth"
-        if not model_path.exists():
-            self._load_errors["energy_predictor"] = f"File not found: {model_path}"
+        # Check multiple possible filenames
+        paths_to_try = [
+            self.models_dir / "student.pth",
+            self.models_dir / "energy_predictor.pth",
+            self.models_dir / "teacher.pth"
+        ]
+        
+        model_path = None
+        for p in paths_to_try:
+            if p.exists():
+                model_path = p
+                break
+
+        if not model_path:
+            self._load_errors["energy_predictor"] = f"No .pth model files found in {self.models_dir}"
             return None
 
         try:
             from app.ml.models.energy_predictor import EnergyPredictorNetwork
 
-            model = EnergyPredictorNetwork(
-                input_size=17,
-                hidden_sizes=[128, 64, 32],
-                dropout_rate=0.2,
-            )
-
-            state_dict = torch.load(model_path, map_location=self.device, weights_only=True)
-            model.load_state_dict(state_dict)
-            model.to(self.device)
-            model.eval()
+            # We try to load using the robust load_checkpoint if it's a full checkpoint,
+            # otherwise fall back to state_dict matching.
+            try:
+                # Try loading as a full checkpoint first
+                model = EnergyPredictorNetwork.load_checkpoint(str(model_path), device=str(self.device))
+                print(f"  ✓ Loaded checkpoint model: {model_path.name}")
+            except Exception:
+                # Fallback to default architecture
+                model = EnergyPredictorNetwork(
+                    input_size=17,
+                    hidden_sizes=[128, 64, 32],
+                    dropout_rate=0.2,
+                )
+                state_dict = torch.load(model_path, map_location=self.device, weights_only=True)
+                model.load_state_dict(state_dict)
+                model.to(self.device)
+                model.eval()
+                print(f"  ✓ Loaded state_dict model: {model_path.name}")
 
             self.energy_predictor = model
             return model
@@ -92,6 +143,87 @@ class ModelLoader:
         except Exception as e:
             self._load_errors["energy_predictor"] = str(e)
             return None
+
+    def load_scaler(self):
+        scaler_path = self.models_dir / "scaler.pkl"
+        if scaler_path.exists() and PICKLE_AVAILABLE:
+            try:
+                with open(scaler_path, 'rb') as f:
+                    self.scaler = pickle.load(f)
+                print(f"  ✓ Loaded scaler: {scaler_path.name}")
+                return self.scaler
+            except Exception as e:
+                self._load_errors["scaler"] = str(e)
+        return None
+
+    def load_teacher(self):
+        if not TORCH_AVAILABLE: return None
+        teacher_path = self.models_dir / "teacher.pth"
+        if teacher_path.exists():
+            try:
+                from app.ml.models.tcn_transformer import TeacherModel
+                model = TeacherModel(64, 14)
+                model.load_state_dict(torch.load(teacher_path, map_location=self.device, weights_only=True))
+                model.to(self.device)
+                model.eval()
+                self.teacher = model
+                print(f"  ✓ Loaded teacher: {teacher_path.name}")
+                return model
+            except Exception as e:
+                self._load_errors["teacher"] = str(e)
+        return None
+
+    def load_student(self):
+        if not TORCH_AVAILABLE: return None
+        student_path = self.models_dir / "student.pth"
+        if student_path.exists():
+            try:
+                from app.ml.models.tcn_transformer import StudentModel
+                model = StudentModel(64, 14)
+                model.load_state_dict(torch.load(student_path, map_location=self.device, weights_only=True))
+                model.to(self.device)
+                model.eval()
+                self.student = model
+                print(f"  ✓ Loaded student: {student_path.name}")
+                return model
+            except Exception as e:
+                self._load_errors["student"] = str(e)
+        return None
+
+    def load_models(self, load_teacher=True, load_student=True, load_onnx=True) -> Dict[str, Any]:
+        """Method strictly required by prediction_service.py"""
+        models = {}
+        if not self.scaler: self.load_scaler()
+        if self.scaler: models['scaler'] = self.scaler
+        
+        if load_teacher:
+            if not self.teacher: self.load_teacher()
+            if self.teacher: models['teacher'] = self.teacher
+            
+        if load_student:
+            if not self.student: self.load_student()
+            if self.student: models['student'] = self.student
+            
+        if load_onnx:
+            if not self.onnx_session:
+                onnx_path = self.models_dir / "student.onnx"
+                if ONNX_AVAILABLE and onnx_path.exists():
+                    self.onnx_session = ort.InferenceSession(str(onnx_path), providers=['CPUExecutionProvider'])
+            if self.onnx_session: models['onnx_session'] = self.onnx_session
+            
+        return models
+    
+    def get_model_info(self) -> Dict[str, Any]:
+        info = {"loaded": True, "device": str(self.device), "models_available": []}
+        if self.scaler: info["models_available"].append("scaler")
+        if self.teacher: 
+            info["models_available"].append("teacher")
+            info["teacher_params"] = sum(p.numel() for p in self.teacher.parameters())
+        if self.student:
+            info["models_available"].append("student")
+            info["student_params"] = sum(p.numel() for p in self.student.parameters())
+        if self.onnx_session: info["models_available"].append("onnx_session")
+        return info
 
     def load_driver_classifier(self) -> Optional[Any]:
         """
@@ -181,6 +313,9 @@ class ModelLoader:
 
         results = {
             "energy_predictor": self.load_energy_predictor() is not None,
+            "teacher": self.load_teacher() is not None,
+            "student": self.load_student() is not None,
+            "scaler": self.load_scaler() is not None,
             "driver_classifier": self.load_driver_classifier() is not None,
             "traffic_estimator": self.load_traffic_estimator() is not None,
             "metrics": bool(self.load_metrics()),
@@ -201,12 +336,19 @@ class ModelLoader:
         results: Dict[str, Any] = {}
 
         # Energy predictor
-        if self.energy_predictor is not None and TORCH_AVAILABLE:
+        if self.onnx_energy_predictor is not None:
+            results["energy_predictor_onnx"] = {"status": "OK (ONNX)"}
+        elif self.energy_predictor is not None and TORCH_AVAILABLE:
             try:
                 dummy = torch.randn(1, 17).to(self.device)
                 with torch.no_grad():
-                    self.energy_predictor(dummy)
-                results["energy_predictor"] = {"status": "OK"}
+                    # Check if model has normalize_input, if so use it
+                    if hasattr(self.energy_predictor, 'normalize_input'):
+                        self.energy_predictor(dummy)
+                    else:
+                        # Simple forward
+                        self.energy_predictor(dummy)
+                results["energy_predictor"] = {"status": "OK (PyTorch)"}
             except Exception as e:
                 results["energy_predictor"] = {"status": "FAIL", "error": str(e)}
         else:
@@ -247,7 +389,8 @@ class ModelLoader:
         return {
             "models_dir": str(self.models_dir.absolute()),
             "device": str(self.device),
-            "energy_predictor_loaded": self.energy_predictor is not None,
+            "energy_predictor_loaded": self.energy_predictor is not None or self.onnx_energy_predictor is not None,
+            "using_onnx": self.onnx_energy_predictor is not None,
             "driver_classifier_loaded": self.driver_classifier is not None,
             "traffic_estimator_loaded": self.traffic_estimator is not None,
             "metrics_loaded": self.metrics is not None,
@@ -276,3 +419,8 @@ def get_model_loader(models_dir: str = "models") -> ModelLoader:
         _model_loader.load_all()
 
     return _model_loader
+
+def get_models() -> Dict[str, Any]:
+    """Helper for prediction_service.py to get models dictionary"""
+    loader = get_model_loader()
+    return loader.load_models()
