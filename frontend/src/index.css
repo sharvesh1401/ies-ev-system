@@ -57,32 +57,32 @@
 }
 
 :root.light {
-  /* Light Mode */
-  --brand-primary: #009688;
-  --brand-secondary: #00796B;
-  --brand-accent: #00BFA5;
-  --brand-bg: #F0F4F8;
-  --neon-cyan: #009688;
-  --neon-red: #D32F2F;
-  --neon-green: #2E7D32;
-  --neon-purple: #6A1B9A;
-  --neon-yellow: #F57F17;
+  /* Light Mode - Meridian Brand Palette */
+  --brand-primary: #1ACBF8; /* Energy Cyan */
+  --brand-secondary: #2ECC71; /* Route Green */
+  --brand-accent: #FF6F61; /* Progress Coral */
+  --brand-bg: #F8F9FA; /* BG: Off-White */
+  --neon-cyan: #1ACBF8; /* Energy Cyan */
+  --neon-red: #FF6F61; /* Progress Coral */
+  --neon-green: #2ECC71; /* Route Green */
+  --neon-purple: #7B2FF7; /* Keeping purple to avoid breaking existing things not in palette */
+  --neon-yellow: #FFB300; /* Yellow */
   --surface-50: #FFFFFF;
-  --surface-100: #F5F7FA;
-  --surface-200: #E8ECF0;
-  --surface-300: #D0D7E0;
-  --surface-800: #4A5568;
-  --surface-900: #1A202C;
-  --accent-success: #2E7D32;
-  --accent-warning: #F57F17;
-  --accent-danger: #D32F2F;
-  --text-primary: #1A202C;
-  --glass-dark-bg: rgba(255, 255, 255, 0.8);
-  --glass-dark-border: rgba(0, 150, 136, 0.15);
-  --glass-panel-bg: rgba(245, 247, 250, 0.7);
-  --glass-ivory-bg: rgba(255, 255, 255, 0.92);
-  --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.06);
-  --map-bg: #F0F4F8;
+  --surface-100: #FFFFFF;
+  --surface-200: #ECEFF1; /* Card Accent - Muted Card Accents */
+  --surface-300: #E0E4E8;
+  --surface-800: #555A61; /* Muted Charcoal - Secondary Text */
+  --surface-900: #2A2E35; /* Charcoal Text - Primary Text */
+  --accent-success: #009688; /* Status Teal - Supportive Status Teal */
+  --accent-warning: #FFB300;
+  --accent-danger: #FF6F61;
+  --text-primary: #2A2E35;
+  --glass-dark-bg: rgba(255, 255, 255, 0.85);
+  --glass-dark-border: rgba(26, 203, 248, 0.15);
+  --glass-panel-bg: rgba(248, 249, 250, 0.75);
+  --glass-ivory-bg: rgba(255, 255, 255, 0.95);
+  --glass-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  --map-bg: #F8F9FA;
 }
 
 /* ═══ Base ═══ */

@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import useWindowSize from '../hooks/useWindowSize'
+import GeoSearch, { GeoSearchResult } from '../components/GeoSearch'
 import {
   orchestrateRoute,
   type LatLng,
@@ -596,6 +597,7 @@ export default function RoutePlanner() {
   const leafletMap = useRef<L.Map | null>(null)
   const layersRef = useRef<L.Layer[]>([])
   const location = useLocation()
+  const navigate = useNavigate()
   const defaultDest = location.state?.destination || ''
   const { isMobile } = useWindowSize()
 
@@ -899,23 +901,25 @@ export default function RoutePlanner() {
 
         {/* ── Top search bar overlay ── */}
         <div className="absolute top-5 left-5 right-5 lg:left-[440px] lg:right-auto lg:w-[400px] z-[1000]">
-          <div className="glass-dark p-1 flex items-center gap-2 border border-neon-blue/20">
-            <div className="w-10 h-10 rounded-lg bg-neon-blue/10 flex items-center justify-center shrink-0 ml-1">
-              <span className="material-symbols-outlined text-neon-blue">search</span>
-            </div>
-            <input
-              className="flex-1 bg-transparent text-surface-900 text-sm py-3 pr-4 outline-none placeholder:text-surface-800/40 rounded-lg"
-              placeholder="Search places, addresses…"
-              type="text"
-            />
-          </div>
+          <GeoSearch
+            variant="glass"
+            color="blue"
+            placeholder="Search places, addresses…"
+            onSelect={(result: GeoSearchResult) => {
+              setDestData({ lat: parseFloat(result.lat), lng: parseFloat(result.lon) })
+              setDestName(result.display_name.split(',')[0])
+              const map = leafletMap.current
+              if (map) map.flyTo([parseFloat(result.lat), parseFloat(result.lon)], 14, { animate: true, duration: 1 })
+            }}
+          />
         </div>
 
         {/* ── Map layer toggle ── */}
         <div className="absolute top-5 right-5 z-[1000] flex flex-col gap-2">
           <button
-            aria-label="Toggle Charging Stations Layer"
-            className="px-3 py-2 rounded-lg text-xs font-bold font-mono tracking-widest uppercase flex items-center gap-2 transition-all duration-300 glass-dark text-neon-blue border border-neon-blue/40 shadow-[0_0_15px_rgba(0,180,216,0.2)]"
+            onClick={() => navigate('/charging-stations')}
+            aria-label="Navigate to Charging Stations"
+            className="px-3 py-2 rounded-lg text-xs font-bold font-mono tracking-widest uppercase flex items-center gap-2 transition-all duration-300 glass-dark text-neon-blue border border-neon-blue/40 shadow-[0_0_15px_rgba(0,180,216,0.2)] hover:bg-neon-blue/10 cursor-pointer"
           >
             <span className="material-symbols-outlined text-sm" aria-hidden="true">
               ev_station

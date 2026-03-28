@@ -18,9 +18,9 @@ export default function MobileTopBar() {
       {/* Left: Logo + Title */}
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-[10px] overflow-hidden shrink-0 glow-cyan">
-          <img src="/logo.png" alt="IES_EV Logo" className="w-full h-full object-cover" />
+          <img src="/logo.png" alt="Meridian Logo" className="w-full h-full object-cover" />
         </div>
-        <span className="text-lg font-headline font-bold text-surface-900 tracking-tight">IES_EV</span>
+        <span className="text-lg font-headline font-bold text-surface-900 tracking-tight">Meridian</span>
       </div>
 
       {/* Right: Status Icons */}

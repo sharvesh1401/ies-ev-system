@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import useWindowSize from '../hooks/useWindowSize'
+import GeoSearch, { GeoSearchResult } from '../components/GeoSearch'
 
 /* Amsterdam-area demonstration fallback data */
 const DEMO_STATIONS = [
@@ -30,7 +31,6 @@ export default function ChargingStations() {
   const [selectedStation, setSelectedStation] = useState<any | null>(null)
   const [usingDemoData, setUsingDemoData] = useState(true)
   const [activeFilter, setActiveFilter] = useState<'all' | 'fast' | 'available'>('all')
-  const [searchQuery, setSearchQuery] = useState('')
 
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<L.Map | null>(null)
@@ -58,14 +58,11 @@ export default function ChargingStations() {
     const fetchStations = async (lat: number, lng: number) => {
       setLoading(true)
       try {
-        const apiKey = import.meta.env.VITE_OPENCHARGE_API_KEY;
-        if (!apiKey) throw new Error('API Key Required')
-        const response = await fetch(`/ocm/poi/?output=json&maxresults=50&compact=true&verbose=false&latitude=${lat}&longitude=${lng}&distance=30`, {
-          headers: { 'X-API-Key': apiKey }
-        })
+        const baseUrl = import.meta.env.VITE_API_URL || '';
+        const response = await fetch(`${baseUrl}/api/external/ocm/poi?output=json&maxresults=50&compact=true&verbose=false&latitude=${lat}&longitude=${lng}&distance=30`);
+        
         if (!response.ok) {
-          if (response.status === 403) throw new Error('API Key Required')
-          throw new Error(`HTTP error! status: ${response.status}`)
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json()
         if (data && data.length > 0) {
@@ -141,10 +138,6 @@ export default function ChargingStations() {
     const status = getStationStatus(s)
     if (activeFilter === 'fast' && maxPower < 50) return false
     if (activeFilter === 'available' && status.label !== 'AVAILABLE') return false
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase()
-      return s.AddressInfo?.Title?.toLowerCase().includes(q) || s.AddressInfo?.Town?.toLowerCase().includes(q)
-    }
     return true
   })
 
@@ -234,14 +227,16 @@ export default function ChargingStations() {
           </div>
 
           <div className="relative mb-3">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-surface-800/40 text-[18px]" aria-hidden="true">search</span>
-            <input
-              type="text"
-              placeholder="Search address or station"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-surface-200/50 border border-white/10 text-surface-900 text-sm pl-10 pr-4 py-2.5 outline-none focus:border-neon-blue/50 transition-all"
-              aria-label="Search charging stations"
+            <GeoSearch
+              variant="solid"
+              color="blue"
+              placeholder="Search globally for any location..."
+              onSelect={(result: GeoSearchResult) => {
+                const map = leafletMap.current
+                if (map) {
+                  map.flyTo([parseFloat(result.lat), parseFloat(result.lon)], 14, { animate: true, duration: 1 })
+                }
+              }}
             />
           </div>
 

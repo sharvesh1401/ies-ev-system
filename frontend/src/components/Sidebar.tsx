@@ -30,14 +30,14 @@ export default function Sidebar() {
       <div className="p-6 pb-4">
         <div className="flex items-center gap-3 w-max">
           <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 glow-cyan">
-            <img src="/logo.png" alt="IES_EV Logo" className="w-full h-full object-cover" />
+            <img src="/logo.png" alt="Meridian Logo" className="w-full h-full object-cover" />
           </div>
           <div className="opacity-100 transition-opacity duration-200 pointer-events-auto">
             <h1 className="font-headline font-bold text-base tracking-tight leading-none text-surface-900">
-              IES_EV
+              Meridian
             </h1>
             <p className="text-[10px] mt-0.5 text-surface-800/40 font-medium">
-              Intelligent Management
+              Intelligent EV Routing & Navigation
             </p>
           </div>
         </div>
