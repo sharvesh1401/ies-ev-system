@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import useWindowSize from '../hooks/useWindowSize'
 
 /* Amsterdam-area demonstration fallback data */
 const DEMO_STATIONS = [
@@ -34,6 +35,8 @@ export default function ChargingStations() {
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<L.Map | null>(null)
   const markersRef = useRef<{ [id: string]: L.Marker }>({})
+  const { isMobile } = useWindowSize()
+  const [showList, setShowList] = useState(!isMobile)
 
   // Initialize Map & Fetch Data
   useEffect(() => {
@@ -146,7 +149,7 @@ export default function ChargingStations() {
   })
 
   return (
-    <div className="flex-1 flex h-full overflow-hidden relative">
+    <div className={`flex-1 flex h-full overflow-hidden relative ${isMobile ? 'flex-col' : ''}`}>
 
       {/* ═══ Map (Left — takes most width) ═══ */}
       <div className="flex-1 relative bg-brand-bg">
@@ -162,7 +165,7 @@ export default function ChargingStations() {
 
         {/* Selected Station Popup (Bottom Left) */}
         {selectedStation && (
-          <div className="absolute bottom-5 left-5 w-[360px] z-[1000]" style={{ animation: 'slideUp 0.3s ease-out' }}>
+          <div className={`absolute z-[1000] ${isMobile ? 'bottom-2 left-2 right-2 w-auto' : 'bottom-5 left-5 w-[360px]'}`} style={{ animation: 'slideUp 0.3s ease-out' }}>
             <div className="glass-dark p-5 border border-neon-blue/20 relative overflow-hidden">
               <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-blue/10 rounded-full blur-[30px]" />
               <button 
@@ -207,7 +210,21 @@ export default function ChargingStations() {
       </div>
 
       {/* ═══ Right Panel ═══ */}
-      <div className="w-[340px] xl:w-[380px] flex flex-col shrink-0 bg-surface-100/50 backdrop-blur-xl border-l border-neon-blue/10 h-full overflow-hidden">
+      {/* Mobile toggle button */}
+      {isMobile && (
+        <button
+          onClick={() => setShowList(!showList)}
+          className="absolute top-3 right-3 z-[1100] w-11 h-11 rounded-full glass-dark border border-neon-blue/30 flex items-center justify-center text-neon-blue shadow-[0_0_15px_rgba(0,180,216,0.3)] active:scale-95 transition-transform"
+          aria-label="Toggle station list"
+        >
+          <span className="material-symbols-outlined text-xl">{showList ? 'close' : 'list'}</span>
+        </button>
+      )}
+      <div className={`flex flex-col shrink-0 bg-surface-100/50 backdrop-blur-xl border-l border-neon-blue/10 overflow-hidden transition-all duration-300 ${
+        isMobile
+          ? `absolute bottom-0 left-0 right-0 z-[1000] border-l-0 border-t border-neon-blue/10 ${showList ? 'h-[50vh]' : 'h-0'}`
+          : 'w-[340px] xl:w-[380px] h-full relative'
+      }`}>
 
         {/* Header + Search */}
         <div className="p-5 pb-4 shrink-0 border-b border-white/5">

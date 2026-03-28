@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     DEEPSEEK_API_KEY: Optional[str] = None
     DEEPSEEK_MODEL: str = "deepseek-coder"
     
+    # External APIs
+    ORS_API_KEY: Optional[str] = None
+    OPENWEATHER_API_KEY: Optional[str] = None
+    OPENCHARGE_API_KEY: Optional[str] = None
+    
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
 
 settings = Settings()

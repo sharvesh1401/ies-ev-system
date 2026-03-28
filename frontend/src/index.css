@@ -254,3 +254,47 @@ button, .btn, input, .input, select, .select {
 @theme {
   --color-neon-blue: var(--neon-cyan);
 }
+
+/* ═══ Mobile Touch Interactions ═══ */
+@media (max-width: 767px) {
+  /* Prevent double-tap zoom on interactive elements */
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  /* Smooth scrolling on iOS */
+  .overflow-auto, .overflow-y-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent pull-to-refresh on map containers */
+  .leaflet-container {
+    overscroll-behavior-y: contain;
+  }
+
+  /* Prevent iOS zoom on input focus (must be 16px+) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ═══ Touch device hover overrides ═══ */
+@media (hover: none) and (pointer: coarse) {
+  .card-hover:hover {
+    transform: none;
+    box-shadow: var(--glass-shadow);
+  }
+  .card-hover:active {
+    transform: scale(0.98);
+  }
+}
+
+/* ═══ Safe Area Handling ═══ */
+@supports (padding: env(safe-area-inset-top)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+}

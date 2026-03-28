@@ -27,11 +27,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.routes.external_apis import router as external_api_router
+
 # Include Routers
 app.include_router(health_router, prefix="/api", tags=["Health"])
 app.include_router(ai_router, prefix="/api/ai", tags=["AI"])
 app.include_router(simulation_router, prefix="/api/simulation", tags=["Simulation"])
 app.include_router(prediction_v2_router, prefix="/api/v2", tags=["Prediction v2"])
+app.include_router(external_api_router, prefix="/api/external", tags=["External Proxies"])
 
 # Monitoring
 Instrumentator().instrument(app).expose(app)

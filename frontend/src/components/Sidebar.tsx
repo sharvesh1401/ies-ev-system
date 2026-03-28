@@ -29,8 +29,8 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-6 pb-4">
         <div className="flex items-center gap-3 w-max">
-          <div className="w-10 h-10  bg-gradient-to-br from-neon-cyan to-neon-green flex items-center justify-center glow-cyan shrink-0">
-            <span className="material-symbols-outlined text-white text-lg">bolt</span>
+          <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 glow-cyan">
+            <img src="/logo.png" alt="IES_EV Logo" className="w-full h-full object-cover" />
           </div>
           <div className="opacity-100 transition-opacity duration-200 pointer-events-auto">
             <h1 className="font-headline font-bold text-base tracking-tight leading-none text-surface-900">

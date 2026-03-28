@@ -15,12 +15,6 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
         secure: false,
-      },
-      '/ocm': {
-        target: 'https://api.openchargemap.io',
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path: string) => path.replace(/^\/ocm/, '/v3'),
       }
     }
   }
