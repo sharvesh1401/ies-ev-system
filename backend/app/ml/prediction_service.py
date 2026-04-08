@@ -11,7 +11,12 @@ import logging
 from typing import Dict, Any, Literal
 import time
 import numpy as np
-import torch
+try:
+    import torch
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None
+    TORCH_AVAILABLE = False
 
 from .model_loader import get_models
 
@@ -144,6 +149,9 @@ class PredictionService:
     
     def _predict_student(self, features: np.ndarray) -> Dict[str, Any]:
         """Predict using Student PyTorch (fast)"""
+        if not TORCH_AVAILABLE or self.models.get('student') is None:
+            raise RuntimeError("Student model/PyTorch not available")
+            
         student = self.models['student']
         device = next(student.parameters()).device
         
@@ -172,6 +180,9 @@ class PredictionService:
     
     def _predict_teacher(self, features: np.ndarray) -> Dict[str, Any]:
         """Predict using Teacher PyTorch (most accurate)"""
+        if not TORCH_AVAILABLE or self.models.get('teacher') is None:
+            raise RuntimeError("Teacher model/PyTorch not available")
+            
         teacher = self.models['teacher']
         device = next(teacher.parameters()).device
         

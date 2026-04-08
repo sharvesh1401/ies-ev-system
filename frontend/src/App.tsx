@@ -1,6 +1,7 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
+import { VehicleProvider } from './contexts/VehicleContext'
 
 // Lazy loading pages for performance optimization
 const Home = lazy(() => import('./pages/Home'))
@@ -11,18 +12,20 @@ const SystemInsights = lazy(() => import('./pages/SystemInsights'))
 
 function App() {
   return (
-    <Suspense fallback={<div className="h-screen w-screen bg-brand-bg flex items-center justify-center"><div className="w-8 h-8 rounded-full border-t-2 border-r-2 border-neon-cyan animate-spin" /></div>}>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/route-planner" element={<RoutePlanner />} />
-          <Route path="/battery-analytics" element={<BatteryAnalytics />} />
-          <Route path="/charging-stations" element={<ChargingStations />} />
-          <Route path="/system-insights" element={<SystemInsights />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-    </Suspense>
+    <VehicleProvider>
+      <Suspense fallback={<div className="h-screen w-screen bg-brand-bg flex items-center justify-center"><div className="w-8 h-8 rounded-full border-t-2 border-r-2 border-neon-cyan animate-spin" /></div>}>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/route-planner" element={<RoutePlanner />} />
+            <Route path="/battery-analytics" element={<BatteryAnalytics />} />
+            <Route path="/charging-stations" element={<ChargingStations />} />
+            <Route path="/system-insights" element={<SystemInsights />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </Suspense>
+    </VehicleProvider>
   )
 }
 

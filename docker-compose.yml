@@ -19,6 +19,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+      - ./backend:/app
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/api/health || exit 1"]
       interval: 30s

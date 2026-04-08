@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import { useVehicle } from '../contexts/VehicleContext'
+import VehicleSelector from '../components/VehicleSelector'
 
 /* ── Live log generator ── */
 const LOG_POOL = [
@@ -49,6 +51,7 @@ function useSparkline(count: number, baseVal: number, variance: number, interval
 }
 
 export default function SystemInsights() {
+  const { vehicle } = useVehicle()
   const terminalRef = useRef<HTMLDivElement>(null)
   const [logs, setLogs] = useState(() => Array.from({ length: 12 }, () => generateLog()))
 
@@ -80,18 +83,25 @@ export default function SystemInsights() {
     if (terminalRef.current) terminalRef.current.scrollTop = terminalRef.current.scrollHeight
   }, [logs])
 
-  // Fluctuate ML distribution
+  // Fluctuate ML distribution — adapted per vehicle
   useEffect(() => {
     const id = setInterval(() => {
-      const ml = 70 + Math.random() * 12
-      const phys = 3 + Math.random() * 8
+      // Different vehicles use different model ratios
+      let mlBase = 75, physBase = 5
+      if (vehicle.id === 'model-t-cargo') {
+        mlBase = 55; physBase = 18 // cargo relies more on physics
+      } else if (vehicle.id === 'model-s-commuter') {
+        mlBase = 62; physBase = 12 // degraded uses more physics fallback
+      }
+      const ml = mlBase + (Math.random() - 0.5) * 10
+      const phys = physBase + Math.random() * 6
       const hyb = 100 - ml - phys
       setMlPct(ml)
       setHybridPct(hyb)
       setPhysicsPct(phys)
     }, 4000)
     return () => clearInterval(id)
-  }, [])
+  }, [vehicle.id])
 
   // Sparkline SVG renderer - styled for Blade Runner theme
   function renderSparkline(data: number[], color: string, height = 40, width = 300) {
@@ -131,23 +141,29 @@ export default function SystemInsights() {
         
         {/* Profile Card (Ported from Profile.tsx) */}
         <div className="col-span-12 lg:col-span-3 glass-dark p-4 border border-neon-blue/20 relative overflow-hidden flex flex-col justify-between">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-neon-blue/10 border border-neon-blue/30 flex items-center justify-center text-neon-blue shadow-[0_0_10px_rgba(0,180,216,0.2)]">
-              <span className="material-symbols-outlined text-xl">bolt</span>
-            </div>
-            <div>
-              <h2 className="text-sm font-headline font-bold text-white tracking-tight">Sharvesh</h2>
-              <p className="text-[9px] font-mono text-neon-blue uppercase tracking-widest">System Developer</p>
-            </div>
+          <div className="mb-3">
+            <VehicleSelector />
           </div>
           <div className="space-y-2 mt-auto text-[9px] font-mono text-surface-800/60 uppercase tracking-widest">
-             <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[12px] text-neon-blue">mail</span>
-                s_sharvesh@outlook.com
+             <div className="flex justify-between items-center bg-surface-100/50 p-2 rounded">
+                <span>Motor Efficiency</span>
+                <span className="text-neon-blue font-bold">{(vehicle.specs.motor_efficiency * 100).toFixed(0)}%</span>
              </div>
-             <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[12px] text-neon-purple">code</span>
-                @sharvesh1401
+             <div className="flex justify-between items-center bg-surface-100/50 p-2 rounded">
+                <span>Drag Coefficient</span>
+                <span className="text-neon-purple font-bold">{vehicle.specs.drag_coefficient} Cd</span>
+             </div>
+             <div className="flex justify-between items-center bg-surface-100/50 p-2 rounded">
+                <span>Base Weight</span>
+                <span className="text-neon-green font-bold">{vehicle.specs.mass_kg} kg</span>
+             </div>
+             <div className="flex justify-between items-center bg-surface-100/50 p-2 rounded">
+                <span>Max Power</span>
+                <span className="text-accent-warning font-bold">{vehicle.specs.max_power_kw} kW</span>
+             </div>
+             <div className="flex justify-between items-center bg-surface-100/50 p-2 rounded">
+                <span>Battery Health</span>
+                <span className={`font-bold ${vehicle.health.soh_percent >= 90 ? 'text-accent-success' : vehicle.health.soh_percent >= 80 ? 'text-accent-warning' : 'text-neon-red'}`}>{vehicle.health.soh_percent}% SoH</span>
              </div>
           </div>
         </div>

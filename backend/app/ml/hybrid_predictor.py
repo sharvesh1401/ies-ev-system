@@ -14,12 +14,12 @@ import math
 
 try:
     import torch
-    import numpy as np
     TORCH_AVAILABLE = True
 except ImportError:
     torch = None
-    np = None
     TORCH_AVAILABLE = False
+
+import numpy as np
 
 from app.simulation.schemas import (
     VehicleParameters,

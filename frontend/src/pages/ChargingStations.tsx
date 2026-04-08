@@ -3,6 +3,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import useWindowSize from '../hooks/useWindowSize'
 import GeoSearch, { GeoSearchResult } from '../components/GeoSearch'
+import { useVehicle } from '../contexts/VehicleContext'
 
 /* Amsterdam-area demonstration fallback data */
 const DEMO_STATIONS = [
@@ -26,6 +27,7 @@ function getStationStatus(station: any) {
 }
 
 export default function ChargingStations() {
+  const { vehicle } = useVehicle()
   const [stations, setStations] = useState<any[]>(DEMO_STATIONS)
   const [loading, setLoading] = useState(false)
   const [selectedStation, setSelectedStation] = useState<any | null>(null)
@@ -181,9 +183,16 @@ export default function ChargingStations() {
 
               <div className="grid grid-cols-2 gap-3 mb-4 relative z-10">
                 {selectedStation.Connections?.slice(0, 2).map((conn: any, i: number) => (
-                  <div key={i} className="bg-surface-100/50 border border-white/5 p-3">
-                    <p className="text-[9px] font-mono text-surface-800/40 uppercase tracking-widest mb-1">Connector</p>
-                    <p className="text-lg font-headline font-bold text-neon-green">{conn.PowerKW || '?'} <span className="text-[10px] font-sans text-surface-800/40">kW</span></p>
+                  <div key={i} className="bg-surface-100/50 border border-white/5 p-3 flex flex-col justify-between">
+                    <div>
+                      <p className="text-[9px] font-mono text-surface-800/40 uppercase tracking-widest mb-1">Connector</p>
+                      <p className="text-lg font-headline font-bold text-neon-green">{conn.PowerKW || '?'} <span className="text-[10px] font-sans text-surface-800/40">kW</span></p>
+                    </div>
+                    {conn.PowerKW && (
+                      <p className="text-[9px] font-mono text-surface-800/60 uppercase tracking-wide mt-1">
+                        ~{Math.round(((vehicle.battery.capacity_kwh * 0.8) / conn.PowerKW) * 60)}m to 80% (for {vehicle.name.split(' - ')[0]})
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>

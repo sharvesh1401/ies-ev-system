@@ -13,9 +13,9 @@ import {
 import {
   runHybridPrediction,
   selectBestRoute,
-  DEFAULT_VEHICLE,
   type PredictionResult,
 } from '../services/hybridPredictionEngine'
+import { useVehicle } from '../contexts/VehicleContext'
 
 // ─── Marker Icons ────────────────────────────────────────────────────────────
 
@@ -281,6 +281,7 @@ function DecisionCard({
 }) {
   const [expanded, setExpanded] = useState(false)
   const route = routeCtx.routes[routeCtx.selectedRouteIndex]
+  const { vehicle } = useVehicle()
 
   // Build plain-language method description
   const methodText =
@@ -368,7 +369,7 @@ function DecisionCard({
             style={{
               width: `${Math.min(
                 100,
-                (prediction.energy_kwh / DEFAULT_VEHICLE.battery_capacity_kwh) * 100
+                (prediction.energy_kwh / vehicle.battery.capacity_kwh) * 100
               )}%`,
             }}
           />
@@ -600,6 +601,7 @@ export default function RoutePlanner() {
   const navigate = useNavigate()
   const defaultDest = location.state?.destination || ''
   const { isMobile } = useWindowSize()
+  const { vehicle } = useVehicle()
 
   // ── State
   const [showPanel, setShowPanel] = useState(false)
@@ -680,7 +682,12 @@ export default function RoutePlanner() {
         // Click to switch
         line.on('click', async () => {
           const newCtx = { ...ctx, selectedRouteIndex: i }
-          const newPred = await runHybridPrediction(newCtx, DEFAULT_VEHICLE, 85, undefined, modelType)
+          const localEngineVehicle = {
+            ...vehicle.specs,
+            battery_capacity_kwh: vehicle.battery.capacity_kwh,
+            auxiliary_power_kw: 0.5,
+          }
+          const newPred = await runHybridPrediction(newCtx, localEngineVehicle, 85, undefined, modelType)
           setRouteCtx(newCtx)
           setPrediction(newPred)
           drawRoute(newCtx, newPred, preds)
@@ -787,7 +794,7 @@ export default function RoutePlanner() {
         map.fitBounds(L.latLngBounds(allPoints), { padding: [60, 60] })
       }
     },
-    [clearLayers]
+    [clearLayers, vehicle]
   )
 
   // ── Execute Route Planning
@@ -851,7 +858,12 @@ export default function RoutePlanner() {
       setPipelineStage('physics_validation')
       await new Promise((r) => setTimeout(r, 400)) // visual pause for UI
 
-      const { bestIndex, predictions } = await selectBestRoute(ctx, DEFAULT_VEHICLE, modelType)
+      const engineVehicle = {
+        ...vehicle.specs,
+        battery_capacity_kwh: vehicle.battery.capacity_kwh,
+        auxiliary_power_kw: 0.5,
+      }
+      const { bestIndex, predictions } = await selectBestRoute(ctx, engineVehicle, modelType)
 
       // Update context with best route
       ctx.selectedRouteIndex = bestIndex
@@ -874,7 +886,7 @@ export default function RoutePlanner() {
       setError(err.message || 'Route planning failed')
       setPipelineStage('error')
     }
-  }, [originData, destData, originName, destName, drawRoute])
+  }, [originData, destData, originName, destName, drawRoute, vehicle])
 
   // ── Build route step list from ORS instructions
   const routeSteps = routeCtx

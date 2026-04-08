@@ -16,12 +16,13 @@ import math
 
 try:
     import torch
-    import numpy as np
-    DEPS_AVAILABLE = True
+    TORCH_AVAILABLE = True
 except ImportError:
     torch = None
-    np = None
-    DEPS_AVAILABLE = False
+    TORCH_AVAILABLE = False
+
+import numpy as np
+DEPS_AVAILABLE = True 
 
 
 class TestStatus(Enum):

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useVehicle } from '../contexts/VehicleContext'
 
 export default function TopBar() {
   const [time, setTime] = useState(new Date())
-  const soc = 76 // simulated
+  const { vehicle } = useVehicle()
+  const soc = vehicle.battery.soc_percent
 
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000)

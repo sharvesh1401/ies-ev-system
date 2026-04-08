@@ -2,10 +2,16 @@
 TCN-Transformer Architecture for Teacher and Student Energy Predictors.
 """
 
-import torch
-import torch.nn as nn
+try:
+    import torch
+    import torch.nn as nn
+    TORCH_AVAILABLE = True
+except ImportError:
+    torch = None
+    nn = None
+    TORCH_AVAILABLE = False
 
-class TCNBlock(nn.Module):
+class TCNBlock(nn.Module if TORCH_AVAILABLE else object):
     def __init__(self, in_channels, out_channels, kernel_size=3, dilation=1, dropout=0.1):
         super().__init__()
         padding = (kernel_size - 1) * dilation // 2
@@ -27,7 +33,7 @@ class TCNBlock(nn.Module):
         return torch.relu(out + res)
 
 
-class TeacherModel(nn.Module):
+class TeacherModel(nn.Module if TORCH_AVAILABLE else object):
     def __init__(self, seq_len=64, n_features=14):
         super().__init__()
         self.seq_len = seq_len
@@ -74,7 +80,7 @@ class TeacherModel(nn.Module):
                 energy_out[:, 0], energy_out[:, 1])
 
 
-class StudentModel(nn.Module):
+class StudentModel(nn.Module if TORCH_AVAILABLE else object):
     def __init__(self, seq_len=64, n_features=14):
         super().__init__()
         self.seq_len = seq_len

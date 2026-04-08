@@ -4,6 +4,8 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import CarModel from '../components/CarModel'
 import AnimatedNumber from '../components/AnimatedNumber'
+import VehicleSelector from '../components/VehicleSelector'
+import { useVehicle } from '../contexts/VehicleContext'
 
 function createMiniPinIcon() {
   return L.divIcon({
@@ -17,6 +19,7 @@ function createMiniPinIcon() {
 export default function Home() {
   const mapRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
+  const { vehicle } = useVehicle()
 
   useEffect(() => {
     if (!mapRef.current) return
@@ -53,15 +56,43 @@ export default function Home() {
             background: 'radial-gradient(circle at center, transparent 40%, rgba(10, 14, 23, 0.4) 100%)'
           }} />
           <div className="absolute top-8 left-8 z-20 max-w-[80%]">
-            <h2 className="text-2xl font-headline font-bold text-surface-900 tracking-tight glow-neon inline-block">
-              Model V - Performance
-            </h2>
+            <VehicleSelector />
             <div className="flex items-center gap-2 mt-2">
-              <span className="w-2 h-2 rounded-full bg-accent-success animate-pulse glow-neon" />
-              <span className="text-[10px] font-mono text-accent-success uppercase tracking-widest">Aero Mode Active</span>
+              <div
+                className="vehicle-badge drop-shadow-[0_0_10px_currentColor] text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono tracking-widest border"
+                style={{
+                  background: `linear-gradient(135deg, ${vehicle.badgeColor}22, ${vehicle.badgeColor}44)`,
+                  borderColor: `${vehicle.badgeColor}55`,
+                  color: vehicle.badgeColor
+                }}
+              >
+                {vehicle.badge}
+              </div>
+              <span className="text-[10px] font-mono text-surface-800/60 uppercase tracking-widest ml-2">Aero Mode Active</span>
             </div>
+
+            {/* ── Conditional warning banners ── */}
+            {vehicle.battery.soh_percent < 85 && (
+              <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent-warning/10 border border-accent-warning/25 text-accent-warning text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
+                ⚠ Battery degradation detected ({vehicle.battery.soh_percent}% SoH)
+              </div>
+            )}
+            {vehicle.specs.mass_kg > 2000 && (
+              <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neon-blue/10 border border-neon-blue/25 text-neon-blue text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
+                ℹ Heavy vehicle — higher energy consumption
+              </div>
+            )}
           </div>
-          <CarModel />
+          <div className="transition-all duration-500 w-full h-full" data-vehicle={vehicle.id}>
+            <CarModel
+              batteryKwh={vehicle.battery.capacity_kwh}
+              tempC={vehicle.battery.temperature_c}
+              glowColor={vehicle.color}
+              modelPath={vehicle.modelPath}
+              regenActive={vehicle.realtime.regen_active}
+              maxPowerKw={vehicle.specs.max_power_kw}
+            />
+          </div>
         </div>
 
         {/* Column 2: Right Info Column (SoC + Sentry) */}
@@ -75,7 +106,7 @@ export default function Home() {
             </div>
             <div className="relative z-10 mt-3">
               <div className="flex items-baseline gap-1">
-                <AnimatedNumber value={76} duration={2000} className="text-7xl font-headline font-bold text-surface-900 tabular-nums tracking-tighter" />
+                <AnimatedNumber value={vehicle.battery.soc_percent} duration={2000} className="text-7xl font-headline font-bold text-surface-900 tabular-nums tracking-tighter" />
                 <span className="text-3xl font-bold text-neon-blue">%</span>
                 <span className="material-symbols-outlined text-neon-blue/80 text-3xl ml-2 drop-shadow-[0_0_8px_rgba(0,180,216,0.6)] animate-pulse-slow">bolt</span>
               </div>
@@ -83,19 +114,19 @@ export default function Home() {
             <div className="mt-5 space-y-3 relative z-10">
               <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
                 <span className="text-xs text-surface-800/60 font-mono">Health (SoH)</span>
-                <span className="text-sm font-bold text-accent-success"><AnimatedNumber value={94} duration={1500} suffix="%" /></span>
+                <span className={`text-sm font-bold ${vehicle.battery.soh_percent < 85 ? 'text-accent-warning' : 'text-accent-success'}`}><AnimatedNumber value={vehicle.battery.soh_percent} duration={1500} suffix="%" /></span>
               </div>
               <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
                 <span className="text-xs text-surface-800/60 font-mono">Est. Range</span>
-                <span className="text-sm font-bold text-surface-900 tabular-nums"><AnimatedNumber value={312} duration={2000} /> <span className="text-[10px] text-surface-800/60 ml-1">km</span></span>
+                <span className="text-sm font-bold text-surface-900 tabular-nums"><AnimatedNumber value={vehicle.range_km} duration={2000} /> <span className="text-[10px] text-surface-800/60 ml-1">km</span></span>
               </div>
               <div className="flex justify-between items-baseline border-b border-surface-200/50 pb-3">
                 <span className="text-xs text-surface-800/60 font-mono">Battery Core</span>
-                <span className="text-sm font-bold text-surface-900 tabular-nums">29°C</span>
+                <span className="text-sm font-bold text-surface-900 tabular-nums">{vehicle.battery.temperature_c}°C</span>
               </div>
               <div className="flex justify-between items-baseline">
                 <span className="text-xs text-surface-800/60 font-mono">Power Draw</span>
-                <span className="text-sm font-bold text-neon-blue tabular-nums">4.3 <span className="text-[10px] text-surface-800/40 ml-1">kW</span></span>
+                <span className="text-sm font-bold text-neon-blue tabular-nums">{vehicle.realtime.power_draw_kw} <span className="text-[10px] text-surface-800/40 ml-1">kW</span></span>
               </div>
             </div>
           </div>
@@ -196,11 +227,11 @@ export default function Home() {
           <div className="flex gap-8 mt-4 pt-4 border-t border-white/5 relative z-10 w-full">
             <div>
               <p className="text-[10px] font-mono text-surface-800/50 uppercase">Average</p>
-              <p className="text-xl font-headline font-bold text-surface-900 mt-1">142 <span className="text-[10px] text-surface-800/50 font-sans tracking-wide">Wh/km</span></p>
+              <p className="text-xl font-headline font-bold text-surface-900 mt-1">{vehicle.realtime.efficiency_wh_per_km} <span className="text-[10px] text-surface-800/50 font-sans tracking-wide">Wh/km</span></p>
             </div>
             <div>
               <p className="text-[10px] font-mono text-neon-purple/70 uppercase">Optimal</p>
-              <p className="text-xl font-headline font-bold text-neon-purple mt-1 drop-shadow-[0_0_8px_rgba(123,47,247,0.5)]">118 <span className="text-[10px] text-neon-purple/50 font-sans tracking-wide">Wh/km</span></p>
+              <p className="text-xl font-headline font-bold text-neon-purple mt-1 drop-shadow-[0_0_8px_rgba(123,47,247,0.5)]">{vehicle.realtime.optimal_wh_per_km} <span className="text-[10px] text-neon-purple/50 font-sans tracking-wide">Wh/km</span></p>
             </div>
             <div className="ml-auto self-end">
               <p className="text-[9px] font-mono text-surface-800/30 uppercase tracking-widest">Updated: 2 Sec Ago</p>

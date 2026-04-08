@@ -1,0 +1,185 @@
+.vehicle-selector {
+  position: relative;
+  z-index: 100;
+
+  .vehicle-selector-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: var(--glass-dark-bg, rgba(18, 24, 37, 0.92));
+    border: 1px solid var(--glass-dark-border, rgba(0, 229, 204, 0.15));
+    border-radius: 12px;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 280px;
+    backdrop-filter: blur(16px);
+
+    &:hover {
+      background: var(--glass-panel-bg, rgba(26, 35, 50, 0.9));
+      border-color: rgba(0, 229, 204, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .vehicle-info {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      flex: 1;
+
+      .vehicle-icon {
+        font-size: 1.75rem;
+        line-height: 1;
+      }
+
+      .vehicle-details {
+        text-align: left;
+
+        .vehicle-name {
+          font-size: 1rem;
+          font-weight: 600;
+          color: var(--text-primary, #E8EDF5);
+          margin-bottom: 0.125rem;
+        }
+
+        .vehicle-subtitle {
+          font-size: 0.6875rem;
+          color: var(--surface-800, #8A95A8);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+    }
+
+    .dropdown-arrow {
+      color: var(--surface-800, #8A95A8);
+
+      svg {
+        transition: transform 0.2s ease;
+
+        &.rotated {
+          transform: rotate(180deg);
+        }
+      }
+    }
+  }
+
+  .saved-indicator {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-success, #00E676);
+    color: #0A0E1A;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    box-shadow: 0 4px 20px rgba(0, 230, 118, 0.3);
+    animation: vsFadeInOut 2s ease;
+    pointer-events: none;
+    white-space: nowrap;
+
+    @keyframes vsFadeInOut {
+      0%, 100% { opacity: 0; transform: translateX(-50%) translateY(4px); }
+      10%, 90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+  }
+}
+
+/* ─── Portal dropdown — rendered at document.body level ─── */
+.vehicle-dropdown {
+  background: rgba(10, 14, 26, 0.97);
+  border: 1px solid rgba(0, 229, 204, 0.2);
+  border-radius: 12px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 229, 204, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  backdrop-filter: blur(24px);
+  animation: vsSlideDown 0.2s ease;
+
+  @keyframes vsSlideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .vehicle-option {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1.25rem;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: var(--text-primary, #E8EDF5);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: rgba(26, 35, 50, 0.8);
+    }
+
+    &.selected {
+      background: rgba(36, 48, 68, 0.9);
+      border-left: 3px solid var(--vehicle-color, #00E5CC);
+      padding-left: calc(1.25rem - 3px);
+    }
+
+    .option-icon {
+      font-size: 1.75rem;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .option-details {
+      flex: 1;
+      min-width: 0;
+
+      .option-name {
+        font-size: 0.9375rem;
+        font-weight: 600;
+        color: var(--text-primary, #E8EDF5);
+        margin-bottom: 0.2rem;
+      }
+
+      .option-subtitle {
+        font-size: 0.6875rem;
+        color: var(--surface-800, #8A95A8);
+        margin-bottom: 0.375rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      .option-stats {
+        display: flex;
+        gap: 0.4rem;
+        font-size: 0.625rem;
+        font-family: var(--font-mono, monospace);
+        color: rgba(138, 149, 168, 0.6);
+      }
+    }
+
+    .selected-check {
+      color: var(--vehicle-color, #00E5CC);
+      font-size: 1.125rem;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+  }
+}
