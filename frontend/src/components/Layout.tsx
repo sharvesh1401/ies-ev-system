@@ -12,8 +12,8 @@ export default function Layout() {
   const { isMobile } = useWindowSize()
 
   return (
-    <div className="flex h-[100dvh] w-full overflow-hidden bg-brand-bg relative">
-      <a href="#main-content" className="absolute -top-12 left-0 bg-neon-cyan text-brand-bg px-4 py-2 rounded-br-lg z-[2000] focus:top-0 transition-all font-bold">
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-background relative">
+      <a href="#main-content" className="absolute -top-12 left-0 bg-primary text-on-primary px-4 py-2 rounded-br-lg z-[2000] focus:top-0 transition-all font-bold">
         Skip to main content
       </a>
       <AnimatedBackground />

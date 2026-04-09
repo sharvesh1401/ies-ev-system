@@ -25,6 +25,33 @@
   --font-headline: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-label: "Space Grotesk", "Inter", sans-serif;
+
+  /* ── Stitch / Material Design 3 surface tokens ── */
+  --color-primary: var(--stitch-primary);
+  --color-primary-fixed-dim: var(--stitch-primary-fixed-dim);
+  --color-primary-container: var(--stitch-primary-container);
+  --color-on-primary: var(--stitch-on-primary);
+  --color-surface: var(--stitch-surface);
+  --color-surface-dim: var(--stitch-surface-dim);
+  --color-surface-bright: var(--stitch-surface-bright);
+  --color-surface-variant: var(--stitch-surface-variant);
+  --color-surface-container-lowest: var(--stitch-surface-container-lowest);
+  --color-surface-container-low: var(--stitch-surface-container-low);
+  --color-surface-container: var(--stitch-surface-container);
+  --color-surface-container-high: var(--stitch-surface-container-high);
+  --color-surface-container-highest: var(--stitch-surface-container-highest);
+  --color-on-surface: var(--stitch-on-surface);
+  --color-on-surface-variant: var(--stitch-on-surface-variant);
+  --color-secondary-container: var(--stitch-secondary-container);
+  --color-on-secondary-container: var(--stitch-on-secondary-container);
+  --color-tertiary-container: var(--stitch-tertiary-container);
+  --color-outline-variant: var(--stitch-outline-variant);
+  --color-outline: var(--stitch-outline);
+  --color-background: var(--stitch-background);
+  --color-on-background: var(--stitch-on-background);
+  --color-error: var(--stitch-error);
+  --color-error-container: var(--stitch-error-container);
 }
 
 /* ═══ Theme Variables ═══ */
@@ -56,6 +83,32 @@
   --glass-ivory-bg: rgba(18, 24, 37, 0.85);
   --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.35);
   --map-bg: #0A0E1A;
+
+  /* ── Stitch / Material Design 3 tokens ── */
+  --stitch-primary: #afecff;
+  --stitch-primary-fixed-dim: #00d9ff;
+  --stitch-primary-container: #00d9ff;
+  --stitch-on-primary: #003641;
+  --stitch-surface: #0f131c;
+  --stitch-surface-dim: #0f131c;
+  --stitch-surface-bright: #353942;
+  --stitch-surface-variant: #31353e;
+  --stitch-surface-container-lowest: #0a0e16;
+  --stitch-surface-container-low: #181c24;
+  --stitch-surface-container: #1c2028;
+  --stitch-surface-container-high: #262a33;
+  --stitch-surface-container-highest: #31353e;
+  --stitch-on-surface: #dfe2ee;
+  --stitch-on-surface-variant: #bbc9ce;
+  --stitch-secondary-container: #34ff8d;
+  --stitch-on-secondary-container: #007239;
+  --stitch-tertiary-container: #ffbb24;
+  --stitch-outline-variant: #3c494d;
+  --stitch-outline: #859398;
+  --stitch-background: #0f131c;
+  --stitch-on-background: #dfe2ee;
+  --stitch-error: #ffb4ab;
+  --stitch-error-container: #93000a;
 }
 
 :root.light {
@@ -290,6 +343,11 @@ button, .btn, input, .input, select, .select {
 /* neon-blue alias → neon-cyan for existing class usage */
 @theme {
   --color-neon-blue: var(--neon-cyan);
+}
+
+/* font-label utility */
+.font-label {
+  font-family: var(--font-label);
 }
 
 /* ═══ Mobile Touch Interactions ═══ */

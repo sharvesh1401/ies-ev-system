@@ -15,45 +15,25 @@ export default function TopBar() {
   const minutes = time.getMinutes().toString().padStart(2, '0')
   const seconds = time.getSeconds().toString().padStart(2, '0')
 
-  // SoC color coding per spec
-  const socColor = soc > 60 ? 'text-accent-success' : soc > 30 ? 'text-neon-yellow' : 'text-accent-danger'
-  const batteryIcon = soc > 60 ? 'battery_charging_full' : soc > 30 ? 'battery_4_bar' : 'battery_1_bar'
+  const batteryIcon = soc > 60 ? 'battery_full' : soc > 30 ? 'battery_4_bar' : 'battery_1_bar'
 
   return (
-    <header className="h-14 flex items-center justify-between px-8 z-10 shrink-0 border-b border-neon-cyan/8 bg-surface-100/50 backdrop-blur-md">
-      <div className="flex items-center gap-4">
-        <h2 className="text-sm font-headline font-semibold text-surface-900">
-          System Status
-        </h2>
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-accent-success/10 border border-accent-success/15">
-          <div className="w-1.5 h-1.5 rounded-full bg-accent-success animate-pulse" />
-          <span className="text-[9px] font-bold text-accent-success uppercase tracking-widest">Connected</span>
-        </div>
+    <header className="h-14 flex items-center justify-between px-8 z-40 shrink-0 border-b border-white/5 bg-surface-container-highest/60 backdrop-blur-xl shadow-2xl shadow-black/40">
+      {/* Left: System status */}
+      <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-green-400">
+        <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+        System Status: CONNECTED
       </div>
 
+      {/* Right: icons + clock */}
       <div className="flex items-center gap-6">
-        {/* Live Clock */}
-        <div className="flex items-center gap-2 font-mono text-sm">
-          <span className="text-neon-cyan font-bold tabular-nums">{hours}</span>
-          <span className="text-neon-cyan/40 animate-pulse">:</span>
-          <span className="text-neon-cyan font-bold tabular-nums">{minutes}</span>
-          <span className="text-neon-cyan/40 animate-pulse">:</span>
-          <span className="text-neon-cyan/50 font-bold tabular-nums text-xs">{seconds}</span>
+        <div className="flex items-center gap-4 text-on-surface-variant">
+          <span className="material-symbols-outlined text-sm hover:text-primary transition-colors cursor-pointer">wifi</span>
+          <span className="material-symbols-outlined text-sm hover:text-primary transition-colors cursor-pointer">{batteryIcon}</span>
         </div>
-
-        <div className="w-px h-5 bg-surface-200/30" />
-
-        <div className="flex items-center gap-3 text-surface-800/50">
-          <span className="material-symbols-outlined text-base">wifi</span>
-          <div className="flex items-center gap-1.5">
-            <span
-              className={`material-symbols-outlined ${socColor} text-base`}
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              {batteryIcon}
-            </span>
-            <span className={`text-xs font-bold tabular-nums ${socColor}`}>{soc}%</span>
-          </div>
+        <div className="h-4 w-px bg-white/10" />
+        <div className="font-mono text-xs font-bold tracking-widest text-primary">
+          {hours}:{minutes}:{seconds}
         </div>
       </div>
     </header>

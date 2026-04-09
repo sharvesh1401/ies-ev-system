@@ -93,8 +93,8 @@ function LocationAutocomplete({
   return (
     <div className="relative w-full">
       <input
-        className={`w-full bg-surface-100/50 border border-white/10 text-surface-900 text-sm px-4 py-3.5 rounded-lg outline-none focus:bg-surface-200/50 transition-all shadow-inner ${
-          color === 'blue' ? 'focus:border-neon-blue/50' : 'focus:border-neon-green/50'
+        className={`w-full bg-surface-container-lowest border border-outline-variant/20 text-on-surface text-sm px-4 py-3.5 rounded-lg outline-none focus:bg-surface-container transition-all ${
+          color === 'blue' ? 'focus:border-primary/50' : 'focus:border-secondary-container/50'
         }`}
         value={query}
         placeholder={placeholder}
@@ -111,11 +111,11 @@ function LocationAutocomplete({
         type="text"
       />
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-surface-100/90 backdrop-blur-md border border-white/10 shadow-2xl z-[2000] overflow-hidden">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-surface-container-high backdrop-blur-md border border-outline-variant/20 rounded-xl shadow-2xl z-[2000] overflow-hidden">
           {results.map((r: any) => (
             <div
               key={r.place_id}
-              className="px-4 py-3 hover:bg-surface-200/50 cursor-pointer border-b border-white/5 last:border-0"
+              className="px-4 py-3 hover:bg-surface-container-highest cursor-pointer border-b border-white/5 last:border-0"
               onClick={() => {
                 const title = r.display_name.split(',')[0]
                 setQuery(title)
@@ -123,10 +123,10 @@ function LocationAutocomplete({
                 if (onSelect) onSelect(r)
               }}
             >
-              <p className="text-sm font-semibold text-surface-900 truncate">
+              <p className="text-sm font-semibold text-on-surface truncate">
                 {r.display_name.split(',')[0]}
               </p>
-              <p className="text-[10px] text-surface-800/50 truncate mt-0.5">
+              <p className="text-[10px] text-on-surface-variant truncate mt-0.5">
                 {r.display_name}
               </p>
             </div>
@@ -175,24 +175,24 @@ function PipelineStepper({
 
   return (
     <div
-      className={`glass-dark p-5 border ${
-        isComplete ? 'border-neon-green/30' : stage === 'error' ? 'border-neon-red/30' : 'border-neon-blue/20'
+      className={`bg-surface-container p-5 rounded-2xl border ${
+        isComplete ? 'border-secondary-container/30' : stage === 'error' ? 'border-error/30' : 'border-primary/20'
       }`}
       style={{ animation: 'slideUp 0.4s ease-out' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-neon-blue/60">
+        <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-primary/60">
           {isComplete ? 'Pipeline Complete' : stage === 'error' ? 'Pipeline Error' : 'Computing Route'}
         </p>
         {isRunning && (
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full border-2 border-neon-blue/30 border-t-neon-blue animate-spin" />
-            <span className="text-[9px] font-mono text-neon-blue/50">Processing</span>
+            <div className="w-3 h-3 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
+            <span className="text-[9px] font-mono text-primary/50">Processing</span>
           </div>
         )}
         {isComplete && (
-          <span className="text-[9px] font-mono text-neon-green/70 flex items-center gap-1">
+          <span className="text-[9px] font-mono text-secondary-container/70 flex items-center gap-1">
             <span className="material-symbols-outlined text-[12px]">check_circle</span>
             Done
           </span>
@@ -210,10 +210,10 @@ function PipelineStepper({
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 ${
                     isDone
-                      ? 'bg-neon-green/15 text-neon-green border border-neon-green/30'
+                      ? 'bg-secondary-container/15 text-secondary-container border border-secondary-container/30'
                       : isActive
-                      ? 'bg-neon-blue/20 text-neon-blue border border-neon-blue/40 shadow-[0_0_14px_rgba(0,180,216,0.5)] animate-pulse'
-                      : 'bg-surface-200/20 text-surface-800/25 border border-white/5'
+                      ? 'bg-primary/20 text-primary border border-primary/40 animate-pulse'
+                      : 'bg-surface-container-highest/20 text-on-surface-variant/25 border border-white/5'
                   }`}
                 >
                   {isDone ? (
@@ -225,10 +225,10 @@ function PipelineStepper({
                 <span
                   className={`text-[8px] font-mono text-center leading-tight transition-colors ${
                     isDone
-                      ? 'text-neon-green/60'
+                      ? 'text-secondary-container/60'
                       : isActive
-                      ? 'text-neon-blue'
-                      : 'text-surface-800/20'
+                      ? 'text-primary'
+                      : 'text-on-surface-variant/20'
                   }`}
                 >
                   {step.label.split(' ')[0]}
@@ -237,7 +237,7 @@ function PipelineStepper({
               {i < PIPELINE_STEPS.length - 1 && (
                 <div
                   className={`flex-1 h-[2px] rounded-full transition-all duration-500 mt-[-12px] ${
-                    isDone ? 'bg-neon-green/40' : 'bg-surface-200/15'
+                    isDone ? 'bg-secondary-container/40' : 'bg-surface-container-highest/15'
                   }`}
                 />
               )}
@@ -249,10 +249,10 @@ function PipelineStepper({
       {/* Active step description */}
       {isRunning && (
         <div className="mt-3 flex items-center justify-center gap-2">
-          <span className="text-[10px] font-mono text-surface-900/70">
+          <span className="text-[10px] font-mono text-on-surface/70">
             {PIPELINE_STEPS[activeIdx]?.label}
           </span>
-          <span className="text-[9px] font-mono text-surface-800/40">
+          <span className="text-[9px] font-mono text-on-surface-variant/40">
             ({PIPELINE_STEPS[activeIdx]?.sublabel})
           </span>
         </div>
@@ -261,7 +261,7 @@ function PipelineStepper({
       {/* Completion badge */}
       {isComplete && finalLabel && (
         <div className="mt-3 text-center">
-          <span className="text-[11px] font-mono font-bold text-neon-green/80">
+          <span className="text-[11px] font-mono font-bold text-secondary-container/80">
             {finalLabel}
           </span>
         </div>
@@ -295,23 +295,21 @@ function DecisionCard({
 
   const methodBadge =
     prediction.method === 'ml_validated'
-      ? { text: 'ML VALIDATED', color: 'accent-success' }
+      ? { text: 'ML VALIDATED', color: 'secondary-container' }
       : prediction.method === 'physics_fallback'
-      ? { text: 'PHYSICS FALLBACK', color: 'accent-warning' }
+      ? { text: 'PHYSICS FALLBACK', color: 'tertiary-container' }
       : prediction.method === 'ml'
-      ? { text: 'ML ONLY', color: 'neon-blue' }
-      : { text: 'HYBRID', color: 'neon-purple' }
+      ? { text: 'ML ONLY', color: 'primary' }
+      : { text: 'HYBRID', color: 'on-surface-variant' }
 
   return (
     <div
-      className="glass-dark p-5 border border-neon-blue/15 relative overflow-hidden"
+      className="bg-surface-container p-5 rounded-2xl border border-outline-variant/15 relative overflow-hidden"
       style={{ animation: 'slideUp 0.5s ease-out' }}
     >
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent-success/10 rounded-full blur-[30px]" />
-
       {/* ── Header with method badge ── */}
       <div className="flex items-center justify-between mb-4 relative z-10">
-        <h4 className="text-[10px] font-mono font-bold text-surface-800/60 uppercase tracking-widest">
+        <h4 className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest">
           Route Decision
         </h4>
         <span
@@ -342,14 +340,14 @@ function DecisionCard({
       </div>
 
       {/* ── Why this route — always visible ── */}
-      <div className="mb-4 p-3 bg-surface-100/30 border border-white/5 relative z-10">
-        <p className="text-[9px] font-mono text-neon-blue/50 uppercase tracking-widest mb-1.5">
+      <div className="mb-4 p-3 bg-surface-container-low rounded-xl border border-outline-variant/10 relative z-10">
+        <p className="text-[9px] font-mono text-primary/50 uppercase tracking-widest mb-1.5">
           Why This Route
         </p>
-        <p className="text-[11px] text-surface-900/80 leading-relaxed">
+        <p className="text-[11px] text-on-surface/80 leading-relaxed">
           {prediction.route_explanation}
         </p>
-        <p className="text-[10px] text-surface-800/50 mt-1.5 font-mono">
+        <p className="text-[10px] text-on-surface-variant mt-1.5 font-mono">
           Method: {methodText}
         </p>
       </div>
@@ -357,15 +355,15 @@ function DecisionCard({
       {/* ── Energy headline ── */}
       <div className="mb-4 relative z-10">
         <div className="flex justify-between items-end mb-1.5">
-          <span className="text-xs font-mono text-surface-800/50">Energy Needed</span>
-          <span className="text-2xl font-headline font-bold text-neon-blue glow-neon">
+          <span className="text-xs font-mono text-on-surface-variant">Energy Needed</span>
+          <span className="text-2xl font-bold text-primary">
             {prediction.energy_kwh.toFixed(1)}{' '}
-            <span className="text-[10px] font-sans text-neon-blue/50">kWh</span>
+            <span className="text-[10px] font-sans text-primary/50">kWh</span>
           </span>
         </div>
-        <div className="w-full bg-surface-200/50 h-1.5 rounded-full overflow-hidden">
+        <div className="w-full bg-surface-container-highest h-1.5 rounded-full overflow-hidden">
           <div
-            className="bg-gradient-to-r from-neon-blue to-neon-green h-full rounded-full shadow-[0_0_10px_#00f5a0]"
+            className="bg-gradient-to-r from-primary to-secondary-container h-full rounded-full"
             style={{
               width: `${Math.min(
                 100,
@@ -378,63 +376,63 @@ function DecisionCard({
 
       {/* ── Stats grid ── */}
       <div className="grid grid-cols-2 gap-2.5 mb-4 relative z-10">
-        <div className="bg-surface-100/50 backdrop-blur p-3 border border-white/5">
-          <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-1">
+        <div className="bg-surface-container-low rounded-xl p-3">
+          <p className="text-[9px] font-mono text-on-surface-variant uppercase tracking-widest mb-1">
             Arrival SoC
           </p>
           <p
-            className={`text-xl font-headline font-bold ${
+            className={`text-xl font-bold ${
               prediction.arrival_soc > 30
-                ? 'text-accent-success'
+                ? 'text-secondary-container'
                 : prediction.arrival_soc > 15
-                ? 'text-accent-warning'
-                : 'text-neon-red'
+                ? 'text-tertiary-container'
+                : 'text-error'
             }`}
           >
             {prediction.arrival_soc.toFixed(0)}%
           </p>
         </div>
-        <div className="bg-surface-100/50 backdrop-blur p-3 border border-white/5">
-          <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-1">
+        <div className="bg-surface-container-low rounded-xl p-3">
+          <p className="text-[9px] font-mono text-on-surface-variant uppercase tracking-widest mb-1">
             Confidence
           </p>
           <div className="flex items-center gap-1.5">
-            <p className="text-xl font-headline font-bold text-surface-900">
+            <p className="text-xl font-bold text-on-surface">
               {(prediction.confidence * 100).toFixed(0)}%
             </p>
             {prediction.confidenceLevel === 'HIGH' && (
-              <span className="material-symbols-outlined text-accent-success text-sm drop-shadow-[0_0_5px_#00f5a0]">
+              <span className="material-symbols-outlined text-secondary-container text-sm">
                 verified
               </span>
             )}
           </div>
         </div>
-        <div className="bg-surface-100/50 backdrop-blur p-3 border border-white/5">
-          <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-1">
+        <div className="bg-surface-container-low rounded-xl p-3">
+          <p className="text-[9px] font-mono text-on-surface-variant uppercase tracking-widest mb-1">
             SoH Impact
           </p>
-          <p className="text-lg font-headline font-bold text-surface-900">
+          <p className="text-lg font-bold text-on-surface">
             {prediction.soh_impact.toFixed(2)}%
           </p>
         </div>
-        <div className="bg-surface-100/50 backdrop-blur p-3 border border-white/5">
-          <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-1">
+        <div className="bg-surface-container-low rounded-xl p-3">
+          <p className="text-[9px] font-mono text-on-surface-variant uppercase tracking-widest mb-1">
             Route Cost
           </p>
-          <p className="text-lg font-headline font-bold text-neon-purple">
+          <p className="text-lg font-bold text-primary">
             {(prediction.route_cost * 100).toFixed(0)}
-            <span className="text-[10px] text-surface-800/40">/100</span>
+            <span className="text-[10px] text-on-surface-variant">/100</span>
           </p>
         </div>
       </div>
 
       {/* ── Route summary line ── */}
-      <div className="mb-3 p-2.5 bg-surface-100/30 border border-white/5 relative z-10">
+      <div className="mb-3 p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/10 relative z-10">
         <div className="flex items-center justify-between text-[10px] font-mono">
-          <span className="text-surface-800/50">
+          <span className="text-on-surface-variant">
             {(route.distance_m / 1000).toFixed(1)} km · {Math.round(route.duration_s / 60)} min
           </span>
-          <span className="text-surface-800/50">
+          <span className="text-on-surface-variant">
             Avg {prediction.avg_speed_kmh.toFixed(0)} km/h
           </span>
         </div>
@@ -442,16 +440,16 @@ function DecisionCard({
 
       {/* ── Charger recommendation ── */}
       {prediction.charger_stop && (
-        <div className="mb-3 p-3 bg-accent-warning/5 border border-accent-warning/20 relative z-10">
+        <div className="mb-3 p-3 bg-tertiary-container/5 border border-tertiary-container/20 rounded-xl relative z-10">
           <div className="flex items-start gap-2">
-            <span className="material-symbols-outlined text-accent-warning text-[16px] mt-0.5">
+            <span className="material-symbols-outlined text-tertiary-container text-[16px] mt-0.5">
               ev_station
             </span>
             <div>
-              <p className="text-[10px] font-mono font-bold text-accent-warning mb-0.5">
+              <p className="text-[10px] font-mono font-bold text-tertiary-container mb-0.5">
                 Charger Stop Recommended
               </p>
-              <p className="text-[10px] font-mono text-accent-warning/70">
+              <p className="text-[10px] font-mono text-tertiary-container/70">
                 {prediction.charger_stop}
               </p>
             </div>
@@ -461,19 +459,19 @@ function DecisionCard({
 
       {/* ── Weather & Elevation summary ── */}
       <div className="grid grid-cols-2 gap-2 mb-3 relative z-10">
-        <div className="p-2.5 bg-surface-100/30 border border-white/5">
-          <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-1">
+        <div className="p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/10">
+          <p className="text-[9px] font-mono text-on-surface-variant/50 uppercase tracking-widest mb-1">
             <span className="material-symbols-outlined text-[10px] align-middle mr-0.5">cloud</span>
             Weather
           </p>
-          <p className="text-[10px] text-surface-900/70 leading-snug">{prediction.weather_impact}</p>
+          <p className="text-[10px] text-on-surface/70 leading-snug">{prediction.weather_impact}</p>
         </div>
-        <div className="p-2.5 bg-surface-100/30 border border-white/5">
-          <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-1">
+        <div className="p-2.5 bg-surface-container-low rounded-xl border border-outline-variant/10">
+          <p className="text-[9px] font-mono text-on-surface-variant/50 uppercase tracking-widest mb-1">
             <span className="material-symbols-outlined text-[10px] align-middle mr-0.5">terrain</span>
             Elevation
           </p>
-          <p className="text-[10px] text-surface-900/70 leading-snug">{prediction.elevation_impact}</p>
+          <p className="text-[10px] text-on-surface/70 leading-snug">{prediction.elevation_impact}</p>
         </div>
       </div>
 
@@ -481,7 +479,7 @@ function DecisionCard({
       {routeCtx.warnings.length > 0 && (
         <div className="mb-3 space-y-1 relative z-10">
           {routeCtx.warnings.map((w, i) => (
-            <p key={i} className="text-[9px] font-mono text-accent-warning/70">
+            <p key={i} className="text-[9px] font-mono text-tertiary-container/70">
               ⚠ {w}
             </p>
           ))}
@@ -491,37 +489,37 @@ function DecisionCard({
       {/* ── Expandable energy breakdown ── */}
       {expanded && (
         <div className="mb-3 relative z-10" style={{ animation: 'slideUp 0.3s ease-out' }}>
-          <div className="p-3 bg-surface-100/30 border border-white/5">
-            <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-2">
+          <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/10">
+            <p className="text-[9px] font-mono text-on-surface-variant/50 uppercase tracking-widest mb-2">
               Energy Breakdown
             </p>
             <div className="space-y-1.5">
               {[
-                { label: 'Rolling Resistance', val: prediction.energy_breakdown.rolling, color: 'text-surface-900' },
-                { label: 'Aerodynamic Drag', val: prediction.energy_breakdown.aero, color: 'text-surface-900' },
-                { label: 'Grade (hills)', val: prediction.energy_breakdown.grade, color: 'text-surface-900' },
-                { label: 'Auxiliary (HVAC)', val: prediction.energy_breakdown.auxiliary, color: 'text-surface-900' },
+                { label: 'Rolling Resistance', val: prediction.energy_breakdown.rolling, color: 'text-on-surface' },
+                { label: 'Aerodynamic Drag', val: prediction.energy_breakdown.aero, color: 'text-on-surface' },
+                { label: 'Grade (hills)', val: prediction.energy_breakdown.grade, color: 'text-on-surface' },
+                { label: 'Auxiliary (HVAC)', val: prediction.energy_breakdown.auxiliary, color: 'text-on-surface' },
               ].map((item) => (
                 <div key={item.label} className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-surface-800/50">{item.label}</span>
+                  <span className="text-[10px] font-mono text-on-surface-variant/50">{item.label}</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-16 h-1 bg-surface-200/30 rounded-full overflow-hidden">
+                    <div className="w-16 h-1 bg-surface-container-highest/30 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-neon-blue/50 rounded-full"
+                        className="h-full bg-primary/50 rounded-full"
                         style={{
                           width: `${Math.min(100, (item.val / prediction.energy_kwh) * 100)}%`,
                         }}
                       />
                     </div>
-                    <span className="text-[10px] font-mono text-surface-900 w-14 text-right">
+                    <span className="text-[10px] font-mono text-on-surface w-14 text-right">
                       {item.val.toFixed(2)} kWh
                     </span>
                   </div>
                 </div>
               ))}
-              <div className="flex items-center justify-between border-t border-white/5 pt-1.5 mt-1.5">
-                <span className="text-[10px] font-mono text-neon-green/70">Regen Recovered</span>
-                <span className="text-[10px] font-mono text-neon-green font-bold">
+              <div className="flex items-center justify-between border-t border-outline-variant/10 pt-1.5 mt-1.5">
+                <span className="text-[10px] font-mono text-secondary-container/70">Regen Recovered</span>
+                <span className="text-[10px] font-mono text-secondary-container font-bold">
                   −{prediction.energy_breakdown.regen_recovered.toFixed(2)} kWh
                 </span>
               </div>
@@ -530,8 +528,8 @@ function DecisionCard({
 
           {/* Segment risk overview */}
           {prediction.segment_costs.length > 0 && (
-            <div className="p-3 bg-surface-100/30 border border-white/5 mt-2">
-              <p className="text-[9px] font-mono text-surface-800/50 uppercase tracking-widest mb-2">
+            <div className="p-3 bg-surface-container-low rounded-xl border border-outline-variant/10 mt-2">
+              <p className="text-[9px] font-mono text-on-surface-variant uppercase tracking-widest mb-2">
                 Segment Energy Map
               </p>
               <div className="flex gap-[2px] h-6 rounded-sm overflow-hidden">
@@ -549,8 +547,8 @@ function DecisionCard({
                 })}
               </div>
               <div className="flex justify-between mt-1">
-                <span className="text-[8px] font-mono text-neon-green/50">Low energy</span>
-                <span className="text-[8px] font-mono text-neon-red/50">High energy</span>
+                <span className="text-[8px] font-mono text-secondary-container/50">Low energy</span>
+                <span className="text-[8px] font-mono text-error/50">High energy</span>
               </div>
             </div>
           )}
@@ -560,14 +558,14 @@ function DecisionCard({
       {/* ── Action buttons ── */}
       <div className="flex gap-2 relative z-10">
         <button
-          className="flex-1 text-xs font-bold text-surface-900 py-3 rounded-lg bg-surface-100/80 hover:bg-surface-200 transition-colors border border-white/5"
+          className="flex-1 text-xs font-bold text-on-surface py-3 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors border border-outline-variant/10"
           aria-label="Toggle route details"
           onClick={() => setExpanded(!expanded)}
         >
           {expanded ? 'Less' : 'Breakdown'}
         </button>
         <button
-          className="flex-1 text-xs font-bold text-brand-bg py-3 rounded-lg bg-neon-green border border-neon-green hover:bg-[#00d68b] transition-colors shadow-[0_0_15px_rgba(0,245,160,0.3)] tracking-wide"
+          className="flex-1 text-xs font-bold text-on-primary py-3 rounded-xl bg-secondary-container hover:brightness-110 transition-all tracking-wide"
           aria-label="Start Navigation"
         >
           Start Nav
@@ -908,7 +906,7 @@ export default function RoutePlanner() {
   return (
     <div className={`flex-1 flex h-full overflow-hidden relative ${isMobile ? 'flex-col' : ''}`}>
       {/* ═══ Full-width Map ═══ */}
-      <div className="flex-1 relative bg-brand-bg">
+      <div className="flex-1 relative bg-background">
         <div ref={mapRef} className="h-full w-full z-0 opacity-90" />
         <div className="absolute inset-0 z-[5] pointer-events-none shadow-[inset_0_0_150px_rgba(10,14,23,1)]" />
 
@@ -932,7 +930,7 @@ export default function RoutePlanner() {
           <button
             onClick={() => navigate('/charging-stations')}
             aria-label="Navigate to Charging Stations"
-            className="px-3 py-2 rounded-lg text-xs font-bold font-mono tracking-widest uppercase flex items-center gap-2 transition-all duration-300 glass-dark text-neon-blue border border-neon-blue/40 shadow-[0_0_15px_rgba(0,180,216,0.2)] hover:bg-neon-blue/10 cursor-pointer"
+            className="px-3 py-2 rounded-lg text-xs font-bold font-mono tracking-widest uppercase flex items-center gap-2 transition-all duration-300 bg-surface-container-high/80 backdrop-blur text-primary border border-primary/40 hover:bg-surface-container-highest cursor-pointer"
           >
             <span className="material-symbols-outlined text-sm" aria-hidden="true">
               ev_station
@@ -960,14 +958,14 @@ export default function RoutePlanner() {
             }`}
             style={{ animation: 'slideUp 0.3s ease-out' }}
           >
-            <div className="glass-dark p-5 border border-neon-red/30">
+            <div className="bg-surface-container p-5 rounded-2xl border border-error/30">
               <div className="flex items-center gap-3 mb-2">
-                <span className="material-symbols-outlined text-neon-red">error</span>
-                <h4 className="text-sm font-headline font-bold text-neon-red">Route Error</h4>
+                <span className="material-symbols-outlined text-error">error</span>
+                <h4 className="text-sm font-bold text-error">Route Error</h4>
               </div>
-              <p className="text-xs text-surface-800/70">{error}</p>
+              <p className="text-xs text-on-surface-variant">{error}</p>
               <button
-                className="mt-3 w-full text-xs font-bold text-surface-900 py-2.5 rounded-lg bg-surface-100/80 hover:bg-surface-200 transition-colors border border-white/5"
+                className="mt-3 w-full text-xs font-bold text-on-surface py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-variant transition-colors"
                 onClick={() => { setError(null); setPipelineStage('idle') }}
               >
                 Dismiss
@@ -992,7 +990,7 @@ export default function RoutePlanner() {
       {isMobile && (
         <button
           onClick={() => setShowPanel(!showPanel)}
-          className="absolute top-20 left-3 z-[1100] w-11 h-11 rounded-full glass-dark border border-neon-blue/30 flex items-center justify-center text-neon-blue shadow-[0_0_15px_rgba(0,180,216,0.3)] active:scale-95 transition-transform"
+          className="absolute top-20 left-3 z-[1100] w-11 h-11 rounded-full bg-surface-container-high border border-primary/30 flex items-center justify-center text-primary active:scale-95 transition-transform"
           aria-label="Toggle route panel"
         >
           <span className="material-symbols-outlined text-xl">
@@ -1008,18 +1006,17 @@ export default function RoutePlanner() {
         }`}
       >
         <div
-          className={`glass-dark overflow-hidden flex flex-col pointer-events-auto border border-neon-blue/20 ${
+          className={`bg-surface-container-low/90 backdrop-blur-xl overflow-hidden flex flex-col pointer-events-auto border border-outline-variant/20 rounded-2xl ${
             isMobile ? 'max-h-[60vh]' : 'flex-1'
           }`}
           style={{ animation: 'slideRight 0.4s ease-out' }}
         >
           {/* Header */}
           <div className="p-6 pb-4 relative overflow-hidden shrink-0">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-neon-blue/10 rounded-full blur-[40px] -mr-10 -mt-10" />
-            <h3 className="text-2xl font-headline font-bold text-surface-900 mb-1 relative z-10">
+            <h3 className="text-2xl font-bold text-on-surface mb-1 relative z-10">
               Route Control
             </h3>
-            <p className="text-[10px] font-mono text-neon-blue/60 tracking-widest uppercase relative z-10">
+            <p className="text-[10px] font-mono text-primary/60 tracking-widest uppercase relative z-10">
               Neural Navigation Active
             </p>
           </div>
@@ -1028,9 +1025,9 @@ export default function RoutePlanner() {
           <div className="px-6 pb-5 shrink-0">
             <div className="flex gap-4">
               <div className="flex flex-col items-center py-3 shrink-0">
-                <div className="w-3.5 h-3.5 rounded-full bg-surface-50 border-[3px] border-neon-blue shadow-[0_0_10px_rgba(0,180,216,0.6)] z-10" />
-                <div className="w-[1px] flex-1 bg-gradient-to-b from-neon-blue via-surface-200 to-neon-green my-1" />
-                <div className="w-3.5 h-3.5 rounded-full bg-surface-50 border-[3px] border-neon-green shadow-[0_0_10px_rgba(0,245,160,0.6)] z-10" />
+                <div className="w-3.5 h-3.5 rounded-full bg-surface-container-lowest border-[3px] border-primary z-10" />
+                <div className="w-[1px] flex-1 bg-gradient-to-b from-primary via-outline-variant to-secondary-container my-1" />
+                <div className="w-3.5 h-3.5 rounded-full bg-surface-container-lowest border-[3px] border-secondary-container z-10" />
               </div>
 
               <div className="flex-1 space-y-3">
@@ -1056,14 +1053,14 @@ export default function RoutePlanner() {
             </div>
 
             {/* Model Selection Tuple */}
-            <div className="mt-4 flex rounded-xl overflow-hidden border border-neon-blue/20">
+            <div className="mt-4 flex rounded-xl overflow-hidden border border-outline-variant/20">
               {(['onnx', 'student', 'teacher'] as const).map(type => (
                 <button
                   key={type}
                   className={`flex-1 py-1.5 text-[9px] font-mono font-bold tracking-widest uppercase transition-all ${
                     modelType === type
-                      ? 'bg-neon-blue/20 text-neon-blue shadow-[0_0_10px_rgba(0,180,216,0.2)]'
-                      : 'bg-surface-100/50 text-surface-800/40 hover:text-surface-900/80 hover:bg-surface-200/50'
+                      ? 'bg-primary/20 text-primary'
+                      : 'bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
                   }`}
                   onClick={() => setModelType(type)}
                 >
@@ -1076,34 +1073,34 @@ export default function RoutePlanner() {
           {/* Route stats */}
           <div className="p-6 pt-0 flex-1 overflow-y-auto custom-scrollbar">
             <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="text-center p-3 glass-panel border-t border-neon-blue/30 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-neon-blue/5 to-transparent" />
-                <p className="text-[9px] font-mono text-neon-blue/60 uppercase tracking-widest relative z-10">
+              <div className="text-center p-3 bg-surface-container-high rounded-xl border-t border-primary/30 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
+                <p className="text-[9px] font-mono text-primary/60 uppercase tracking-widest relative z-10">
                   Distance
                 </p>
-                <p className="text-xl font-headline font-bold text-surface-900 mt-1 relative z-10">
+                <p className="text-xl font-mono font-bold text-on-surface mt-1 relative z-10">
                   {primaryRoute ? (primaryRoute.distance_m / 1000).toFixed(1) : '—'}
-                  <span className="text-[10px] ml-0.5 text-surface-800/40">km</span>
+                  <span className="text-[10px] ml-0.5 text-on-surface-variant/40">km</span>
                 </p>
               </div>
-              <div className="text-center p-3 glass-panel border-t border-neon-purple/30 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-neon-purple/5 to-transparent" />
-                <p className="text-[9px] font-mono text-neon-purple/60 uppercase tracking-widest relative z-10">
+              <div className="text-center p-3 bg-surface-container-high rounded-xl border-t border-outline-variant/30 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-outline-variant/5 to-transparent" />
+                <p className="text-[9px] font-mono text-on-surface-variant/60 uppercase tracking-widest relative z-10">
                   Duration
                 </p>
-                <p className="text-xl font-headline font-bold text-surface-900 mt-1 relative z-10">
+                <p className="text-xl font-mono font-bold text-on-surface mt-1 relative z-10">
                   {primaryRoute ? Math.round(primaryRoute.duration_s / 60) : '—'}
-                  <span className="text-[10px] ml-0.5 text-surface-800/40">min</span>
+                  <span className="text-[10px] ml-0.5 text-on-surface-variant/40">min</span>
                 </p>
               </div>
-              <div className="text-center p-3 glass-panel border-t border-neon-green/30 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-neon-green/5 to-transparent" />
-                <p className="text-[9px] font-mono text-neon-green/60 uppercase tracking-widest relative z-10">
+              <div className="text-center p-3 bg-surface-container-high rounded-xl border-t border-secondary-container/30 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-secondary-container/5 to-transparent" />
+                <p className="text-[9px] font-mono text-secondary-container/60 uppercase tracking-widest relative z-10">
                   Energy
                 </p>
-                <p className="text-xl font-headline font-bold text-surface-900 mt-1 relative z-10">
+                <p className="text-xl font-mono font-bold text-on-surface mt-1 relative z-10">
                   {prediction ? prediction.energy_kwh.toFixed(1) : '—'}
-                  <span className="text-[10px] ml-0.5 text-surface-800/40">kWh</span>
+                  <span className="text-[10px] ml-0.5 text-on-surface-variant/40">kWh</span>
                 </p>
               </div>
             </div>
@@ -1111,16 +1108,16 @@ export default function RoutePlanner() {
             {/* Route steps */}
             <div className="space-y-4 relative">
               {routeSteps.length > 0 && (
-                <div className="absolute left-4 top-2 bottom-6 w-px bg-surface-200/30 z-0" />
+                <div className="absolute left-4 top-2 bottom-6 w-px bg-outline-variant/30 z-0" />
               )}
               {routeSteps.length > 0
                 ? routeSteps.map((step, i) => (
                     <div key={i} className="flex items-start gap-4 relative z-10 group">
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-brand-bg transition-all ${
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border transition-all ${
                           step.highlight
-                            ? 'bg-neon-blue/20 text-neon-blue border-[1.5px] border-neon-blue shadow-[0_0_10px_rgba(0,180,216,0.3)]'
-                            : 'bg-surface-100 text-surface-800/50 group-hover:bg-surface-200 group-hover:text-surface-900'
+                            ? 'bg-primary/20 text-primary border-[1.5px] border-primary shadow-[0_0_10px_rgba(175,236,255,0.3)]'
+                            : 'bg-surface-container-high text-on-surface-variant/50 border-outline-variant/20 group-hover:bg-surface-container-highest group-hover:text-on-surface'
                         }`}
                       >
                         <span className="material-symbols-outlined text-[16px]">
@@ -1130,17 +1127,17 @@ export default function RoutePlanner() {
                       <div className="flex-1 min-w-0 pt-1">
                         <p
                           className={`text-sm font-semibold tracking-wide ${
-                            step.highlight ? 'text-neon-blue' : 'text-surface-900'
+                            step.highlight ? 'text-primary' : 'text-on-surface'
                           }`}
                         >
                           {step.text}
                         </p>
-                        <p className="text-[10px] font-mono text-surface-800/40 mt-0.5">
+                        <p className="text-[10px] font-mono text-on-surface-variant/40 mt-0.5">
                           {step.sub}
                         </p>
                       </div>
                       {step.dist && (
-                        <span className="text-[10px] font-mono text-surface-800/30 shrink-0 pt-1.5">
+                        <span className="text-[10px] font-mono text-on-surface-variant/30 shrink-0 pt-1.5">
                           {step.dist}
                         </span>
                       )}
@@ -1148,10 +1145,10 @@ export default function RoutePlanner() {
                   ))
                 : (
                     <div className="text-center py-8">
-                      <span className="material-symbols-outlined text-3xl text-surface-800/20 mb-2">
+                      <span className="material-symbols-outlined text-3xl text-on-surface-variant/20 mb-2">
                         route
                       </span>
-                      <p className="text-xs text-surface-800/30 font-mono">
+                      <p className="text-xs text-on-surface-variant/30 font-mono">
                         Enter origin & destination, then tap Start Sequence
                       </p>
                     </div>
@@ -1160,12 +1157,12 @@ export default function RoutePlanner() {
           </div>
 
           {/* Start Sequence Button */}
-          <div className="p-6 bg-surface-50/50 border-t border-white/5 shrink-0 backdrop-blur-md">
+          <div className="p-6 bg-surface-container-low border-t border-outline-variant/10 shrink-0 backdrop-blur-md">
             <button
               className={`w-full font-extrabold tracking-widest uppercase py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 relative overflow-hidden group ${
                 pipelineStage !== 'idle' && pipelineStage !== 'complete' && pipelineStage !== 'error'
-                  ? 'bg-surface-200/50 text-surface-800/40 cursor-wait'
-                  : 'bg-gradient-to-r from-neon-blue to-neon-green hover:from-[#00c5eb] hover:to-[#17ffae] text-brand-bg shadow-[0_4px_20px_rgba(0,180,216,0.25)]'
+                  ? 'bg-surface-container-high text-on-surface-variant/40 cursor-wait'
+                  : 'bg-gradient-to-r from-primary to-secondary-container hover:brightness-110 text-on-primary shadow-[0_4px_20px_rgba(175,236,255,0.2)]'
               }`}
               aria-label="Start Sequence Vector Calculation"
               onClick={handlePlanRoute}
@@ -1176,14 +1173,14 @@ export default function RoutePlanner() {
               }
             >
               <div
-                className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
+                className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"
                 aria-hidden="true"
               />
               {pipelineStage !== 'idle' &&
               pipelineStage !== 'complete' &&
               pipelineStage !== 'error' ? (
                 <>
-                  <div className="w-5 h-5 rounded-full border-2 border-surface-800/30 border-t-neon-blue animate-spin relative z-10" />
+                  <div className="w-5 h-5 rounded-full border-2 border-on-surface-variant/30 border-t-primary animate-spin relative z-10" />
                   <span className="relative z-10 text-sm">Computing...</span>
                 </>
               ) : (

@@ -1,247 +1,333 @@
-import { useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import CarModel from '../components/CarModel'
 import AnimatedNumber from '../components/AnimatedNumber'
 import VehicleSelector from '../components/VehicleSelector'
 import { useVehicle } from '../contexts/VehicleContext'
 
-function createMiniPinIcon() {
-  return L.divIcon({
-    className: '',
-    html: `<div style="width:24px;height:24px;background:rgba(10,14,23,0.8);backdrop-filter:blur(4px);border-radius:50%;border:2px solid #00E5CC;display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(0,229,204,0.5);font-size:12px;color:#00E5CC">⚡</div>`,
-    iconSize: [20, 20],
-    iconAnchor: [10, 20],
-  })
-}
+const VEHICLE_ORDER = ['model-v-performance', 'model-s-commuter', 'model-t-cargo']
+
+const BAR_HEIGHTS = [40, 60, 35, 80, 55, 45, 65, 40, 50, 30, 75, 90, 60, 45, 35, 85, 50, 40, 60, 70]
+const BAR_ACCENTS = new Set([4, 11, 16, 19]) // primary-coloured bars
+const BAR_SECONDARY = new Set([6, 13])        // secondary-container bars
 
 export default function Home() {
-  const mapRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
-  const { vehicle } = useVehicle()
+  const { vehicle, allVehicles, currentVehicle } = useVehicle()
+  const [activeRange, setActiveRange] = useState<'1H' | '6H' | '24H'>('6H')
 
-  useEffect(() => {
-    if (!mapRef.current) return
-    const map = L.map(mapRef.current, {
-      center: [52.3469, 4.9179], // FastNed Amstel
-      zoom: 14,
-      zoomControl: false,
-      attributionControl: false,
-      dragging: false,
-      keyboard: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-    })
+  // Determine prev/next ghost vehicles for carousel
+  const idx = VEHICLE_ORDER.indexOf(currentVehicle)
+  const prevVehicle = allVehicles[VEHICLE_ORDER[(idx + 2) % 3]]
+  const nextVehicle = allVehicles[VEHICLE_ORDER[(idx + 1) % 3]]
 
-    // Dark CARTO tiles for Blade Runner theme
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-    }).addTo(map)
+  // SVG circular progress for SoC
+  const radius = 40
+  const circumference = 2 * Math.PI * radius
+  const dashOffset = circumference * (1 - vehicle.battery.soc_percent / 100)
 
-    L.marker([52.3469, 4.9179], { icon: createMiniPinIcon() }).addTo(map)
-
-    return () => { map.remove() }
-  }, [])
+  // Model display name
+  const modelNames: Record<string, string> = {
+    'model-v-performance': 'MODEL V',
+    'model-s-commuter': 'MODEL S',
+    'model-t-cargo': 'MODEL T',
+  }
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 gap-4 md:gap-6 stagger-children pt-4">
-      
-      {/* ═══ Top Row (3 Columns) ═══ */}
-      <div className="flex-[4] flex gap-4 md:gap-6 min-h-0 flex-col md:flex-row">
-        
-        {/* Column 1: 3D Model Area */}
-        <div className="flex-[4] relative glass-dark  overflow-hidden card-hover min-h-[300px] md:min-h-0">
-          <div className="absolute inset-0 z-10 pointer-events-none" style={{
-            background: 'radial-gradient(circle at center, transparent 40%, rgba(10, 14, 23, 0.4) 100%)'
-          }} />
-          <div className="absolute top-8 left-8 z-20 max-w-[80%]">
+    <div className="flex flex-col h-full overflow-hidden bg-background">
+      {/* ── Main Row ── */}
+      <div className="flex flex-1 min-h-0 p-6 gap-6 overflow-hidden">
+
+        {/* Left Panel – Vehicle Display (55%) */}
+        <section className="w-[55%] relative flex flex-col justify-center items-center rounded-3xl bg-surface-container-lowest overflow-hidden">
+          {/* Radial glow */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#00d9ff10_0%,_transparent_70%)] pointer-events-none" />
+
+          {/* Vehicle Selector */}
+          <div className="absolute top-6 left-6 z-20">
             <VehicleSelector />
             <div className="flex items-center gap-2 mt-2">
               <div
-                className="vehicle-badge drop-shadow-[0_0_10px_currentColor] text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono tracking-widest border"
+                className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono tracking-widest border"
                 style={{
                   background: `linear-gradient(135deg, ${vehicle.badgeColor}22, ${vehicle.badgeColor}44)`,
                   borderColor: `${vehicle.badgeColor}55`,
-                  color: vehicle.badgeColor
+                  color: vehicle.badgeColor,
                 }}
               >
                 {vehicle.badge}
               </div>
-              <span className="text-[10px] font-mono text-surface-800/60 uppercase tracking-widest ml-2">Aero Mode Active</span>
             </div>
-
-            {/* ── Conditional warning banners ── */}
             {vehicle.battery.soh_percent < 85 && (
-              <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-accent-warning/10 border border-accent-warning/25 text-accent-warning text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
+              <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tertiary-container/10 border border-tertiary-container/25 text-tertiary-container text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
                 ⚠ Battery degradation detected ({vehicle.battery.soh_percent}% SoH)
               </div>
             )}
-            {vehicle.specs.mass_kg > 2000 && (
-              <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neon-blue/10 border border-neon-blue/25 text-neon-blue text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
-                ℹ Heavy vehicle — higher energy consumption
-              </div>
-            )}
-          </div>
-          <div className="transition-all duration-500 w-full h-full" data-vehicle={vehicle.id}>
-            <CarModel
-              batteryKwh={vehicle.battery.capacity_kwh}
-              tempC={vehicle.battery.temperature_c}
-              glowColor={vehicle.color}
-              modelPath={vehicle.modelPath}
-              regenActive={vehicle.realtime.regen_active}
-              maxPowerKw={vehicle.specs.max_power_kw}
-            />
-          </div>
-        </div>
-
-        {/* Column 2: Right Info Column (SoC + Sentry) */}
-        <div className="flex-[2] flex flex-col gap-4 md:gap-6 shrink-0 md:min-w-[260px]">
-          
-          {/* SoC Card */}
-          <div className="glass-dark  p-5 card-hover relative overflow-hidden flex-1 flex flex-col">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-blue/20 rounded-full blur-[40px]" />
-            <div className="flex justify-between items-start mb-auto relative z-10">
-              <span className="text-[10px] font-mono font-bold text-surface-800/60 uppercase tracking-widest">State of Charge</span>
-            </div>
-            <div className="relative z-10 mt-3">
-              <div className="flex items-baseline gap-1">
-                <AnimatedNumber value={vehicle.battery.soc_percent} duration={2000} className="text-7xl font-headline font-bold text-surface-900 tabular-nums tracking-tighter" />
-                <span className="text-3xl font-bold text-neon-blue">%</span>
-                <span className="material-symbols-outlined text-neon-blue/80 text-3xl ml-2 drop-shadow-[0_0_8px_rgba(0,180,216,0.6)] animate-pulse-slow">bolt</span>
-              </div>
-            </div>
-            <div className="mt-5 space-y-3 relative z-10">
-              <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
-                <span className="text-xs text-surface-800/60 font-mono">Health (SoH)</span>
-                <span className={`text-sm font-bold ${vehicle.battery.soh_percent < 85 ? 'text-accent-warning' : 'text-accent-success'}`}><AnimatedNumber value={vehicle.battery.soh_percent} duration={1500} suffix="%" /></span>
-              </div>
-              <div className="flex justify-between items-baseline border-b border-white/5 pb-3">
-                <span className="text-xs text-surface-800/60 font-mono">Est. Range</span>
-                <span className="text-sm font-bold text-surface-900 tabular-nums"><AnimatedNumber value={vehicle.range_km} duration={2000} /> <span className="text-[10px] text-surface-800/60 ml-1">km</span></span>
-              </div>
-              <div className="flex justify-between items-baseline border-b border-surface-200/50 pb-3">
-                <span className="text-xs text-surface-800/60 font-mono">Battery Core</span>
-                <span className="text-sm font-bold text-surface-900 tabular-nums">{vehicle.battery.temperature_c}°C</span>
-              </div>
-              <div className="flex justify-between items-baseline">
-                <span className="text-xs text-surface-800/60 font-mono">Power Draw</span>
-                <span className="text-sm font-bold text-neon-blue tabular-nums">{vehicle.realtime.power_draw_kw} <span className="text-[10px] text-surface-800/40 ml-1">kW</span></span>
-              </div>
-            </div>
           </div>
 
-          {/* Sentry Mode */}
-          <div className="glass-dark  p-5 flex items-center gap-4 card-hover shadow-md">
-            <div className="w-12 h-12  bg-neon-red/10 border border-neon-red/20 flex items-center justify-center text-neon-red shadow-[0_0_15px_rgba(255,62,108,0.2)]">
-              <span className="material-symbols-outlined">shield</span>
+          {/* Carousel area */}
+          <div className="relative w-full h-[400px] flex items-center justify-center">
+            {/* Ghost left */}
+            <div className="absolute -left-20 opacity-20 scale-75 blur-sm grayscale pointer-events-none">
+              <img
+                src={prevVehicle.carImage}
+                alt={prevVehicle.name}
+                className="w-[400px] object-contain"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+              />
             </div>
-            <div>
-              <h4 className="text-sm font-bold text-surface-900">Sentry Mode</h4>
-              <p className="text-[10px] text-surface-800/50 mt-0.5">Active • 2 Events Logged</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Column 3: Nearby Charger with Mini-Map */}
-        <div className="flex-[3] glass-dark  p-2 overflow-hidden card-hover relative group md:min-w-[280px]">
-          <div className="absolute inset-2  overflow-hidden z-0 pointer-events-none">
-            {/* The mini map container */}
-            <div ref={mapRef} className="w-full h-full opacity-60 mix-blend-screen scale-125 transition-transform duration-1000 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-bg via-brand-bg/80 to-transparent" />
-          </div>
-
-          <div className="relative z-10 h-full p-6 flex flex-col justify-between">
-            <div className="mt-2 ml-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-200/50 backdrop-blur-md border border-surface-200 rounded-full mb-3">
-                <span className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
-                <span className="text-[9px] font-mono font-bold text-surface-900 uppercase tracking-widest">Nearby Charger</span>
+            {/* Active vehicle */}
+            <div className="relative z-10 flex flex-col items-center w-full">
+              {/* Telemetry overlays */}
+              <div className="absolute top-1/4 -left-4 flex flex-col items-end pointer-events-none z-20">
+                <span className="font-mono text-[10px] text-primary uppercase mb-1 drop-shadow">Aero Winglet</span>
+                <div className="w-24 h-px bg-gradient-to-r from-primary to-transparent" />
               </div>
-              <h3 className="text-xl font-bold text-surface-900 flex items-center gap-2 drop-shadow-md">
-                Tesla M2
-              </h3>
-            </div>
-            
-            <div className="bg-surface-200/50 backdrop-blur-lg  p-5 border border-white/10 group-hover:border-neon-blue/30 transition-colors mb-1 shadow-xl">
-              <div className="flex justify-between items-end">
-                <div>
-                  <p className="text-[10px] font-mono text-neon-blue/90 uppercase tracking-widest mb-1 font-bold shadow-sm">Recommended</p>
-                  <p className="text-base font-bold text-surface-900">Tesla Supercharger M2</p>
-                  <p className="text-xs text-surface-800 mt-0.5 font-medium">250 kW • CCS2</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs text-surface-800 mb-2 font-mono font-bold">1.2 km away</p>
-                  <button onClick={() => navigate('/route-planner', { state: { destination: 'Tesla Supercharger M2' } })} className="w-11 h-11 rounded-full bg-neon-blue hover:bg-[#00c5eb] text-brand-bg border border-neon-blue flex items-center justify-center transition-colors shadow-[0_0_15px_rgba(0,180,216,0.4)] cursor-pointer">
-                    <span className="material-symbols-outlined text-[20px]">directions</span>
-                  </button>
-                </div>
+              <div className="absolute bottom-1/3 -right-4 flex flex-col items-start pointer-events-none z-20">
+                <span className="font-mono text-[10px] text-primary uppercase mb-1 drop-shadow">Rear Motor Array</span>
+                <div className="w-32 h-px bg-gradient-to-l from-primary to-transparent" />
+              </div>
+
+              {/* 3D Model */}
+              <div
+                className="w-full"
+                style={{ height: '320px' }}
+                data-vehicle={vehicle.id}
+              >
+                <CarModel
+                  batteryKwh={vehicle.battery.capacity_kwh}
+                  tempC={vehicle.battery.temperature_c}
+                  glowColor={vehicle.color}
+                  modelPath={vehicle.modelPath}
+                  regenActive={vehicle.realtime.regen_active}
+                  maxPowerKw={vehicle.specs.max_power_kw}
+                />
+              </div>
+
+              {/* Model name */}
+              <div className="text-center space-y-1 mt-2">
+                <h2 className="text-4xl font-black italic tracking-tighter text-white drop-shadow-lg">
+                  {modelNames[currentVehicle] ?? 'MODEL V'}
+                </h2>
+                <p className="font-label text-[10px] uppercase tracking-[0.3em] text-primary">
+                  {vehicle.subtitle}
+                </p>
               </div>
             </div>
-          </div>
-        </div>
 
-      </div>
-
-      {/* ═══ Bottom Row ═══ */}
-      <div className="flex-[3] flex min-h-0">
-        
-        {/* Efficiency Chart */}
-        <div className="flex-1 glass-dark  p-7 card-hover flex flex-col relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-t from-transparent via-transparent to-neon-blue/5 pointer-events-none" />
-          
-          <div className="flex justify-between items-start mb-6 relative z-10 w-full">
-            <h3 className="flex items-center gap-2 text-[10px] font-mono font-bold text-surface-800/60 uppercase tracking-widest">
-              <span className="material-symbols-outlined text-base text-neon-blue glow-neon">show_chart</span>
-              Energy Efficiency
-            </h3>
-            <div className="flex gap-1.5">
-              {['1H', '6H', '24H'].map((t) => (
-                <button
-                  key={t}
-                  className={`text-[9px] font-bold px-3 py-1.5 rounded-lg transition-colors ${
-                    t === '6H' ? 'bg-neon-blue/20 text-neon-blue border border-neon-blue/30' : 'text-surface-800/40 hover:text-surface-900 bg-surface-100'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
+            {/* Ghost right */}
+            <div className="absolute -right-20 opacity-20 scale-75 blur-sm grayscale pointer-events-none">
+              <img
+                src={nextVehicle.carImage}
+                alt={nextVehicle.name}
+                className="w-[400px] object-contain"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+              />
             </div>
           </div>
 
-          {/* Simulated Bar Chart */}
-          <div className="flex-1 flex items-end justify-between gap-3 px-2 pb-2 relative z-10 w-full">
-            {[20, 30, 15, 25, 35, 20, 22, 18, 25, 38, 22, 23, 19, 21, 28, 20, 19, 21, 28].map((val, i) => (
-              <div key={i} className="flex-1 flex justify-center group h-full items-end">
-                <div
-                  className="w-full max-w-[40px]  bg-gradient-to-t from-neon-blue/20 to-neon-blue/60 transition-all duration-500 group-hover:from-neon-blue/40 group-hover:to-neon-blue/90 relative"
-                  style={{ height: `${val + 10}%` }}
-                >
-                  <div className="opacity-0 group-hover:opacity-100 absolute -top-7 left-1/2 -translate-x-1/2 text-[10px] font-mono text-neon-blue font-bold transition-opacity bg-surface-200/80 px-1.5 py-0.5 rounded-md">
-                    {val * 3}
-                  </div>
-                </div>
-              </div>
+          {/* Carousel dots */}
+          <div className="absolute bottom-6 flex gap-3">
+            {VEHICLE_ORDER.map((id, i) => (
+              <span
+                key={id}
+                className={`h-1 rounded-full transition-all duration-300 ${
+                  i === idx
+                    ? 'w-12 bg-primary shadow-[0_0_8px_#afecff]'
+                    : 'w-8 bg-white/10'
+                }`}
+              />
             ))}
           </div>
+        </section>
 
-          <div className="flex gap-8 mt-4 pt-4 border-t border-white/5 relative z-10 w-full">
-            <div>
-              <p className="text-[10px] font-mono text-surface-800/50 uppercase">Average</p>
-              <p className="text-xl font-headline font-bold text-surface-900 mt-1">{vehicle.realtime.efficiency_wh_per_km} <span className="text-[10px] text-surface-800/50 font-sans tracking-wide">Wh/km</span></p>
+        {/* Right Panel – Stacked Cards (45%) */}
+        <section className="w-[45%] flex flex-col gap-5 overflow-y-auto no-scrollbar">
+
+          {/* SoC Card */}
+          <div className="bg-surface-container rounded-[20px] p-6 flex items-center justify-between group hover:bg-surface-variant transition-all duration-300">
+            <div className="space-y-1">
+              <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Battery Capacity</h3>
+              <div className="flex items-baseline gap-2">
+                <AnimatedNumber
+                  value={vehicle.battery.soc_percent}
+                  duration={2000}
+                  className="font-mono text-5xl font-bold text-white"
+                />
+                <span className="font-mono text-xl text-primary">%</span>
+              </div>
+              <div className="flex flex-col gap-1 mt-2">
+                <div className="flex justify-between text-xs font-mono text-on-surface-variant">
+                  <span>Health (SoH)</span>
+                  <span className={vehicle.battery.soh_percent < 85 ? 'text-tertiary-container' : 'text-secondary-container'}>
+                    {vehicle.battery.soh_percent}%
+                  </span>
+                </div>
+                <div className="flex justify-between text-xs font-mono text-on-surface-variant">
+                  <span>Range</span>
+                  <span className="text-on-surface">{vehicle.range_km} km</span>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-[10px] font-mono text-neon-purple/70 uppercase">Optimal</p>
-              <p className="text-xl font-headline font-bold text-neon-purple mt-1 drop-shadow-[0_0_8px_rgba(123,47,247,0.5)]">{vehicle.realtime.optimal_wh_per_km} <span className="text-[10px] text-neon-purple/50 font-sans tracking-wide">Wh/km</span></p>
-            </div>
-            <div className="ml-auto self-end">
-              <p className="text-[9px] font-mono text-surface-800/30 uppercase tracking-widest">Updated: 2 Sec Ago</p>
+            {/* Circular progress ring */}
+            <div className="relative w-24 h-24 shrink-0">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 96 96">
+                <circle
+                  className="text-surface-container-highest"
+                  cx="48" cy="48" r={radius}
+                  fill="transparent"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                />
+                <circle
+                  className="text-primary group-hover:text-secondary-container transition-colors duration-300"
+                  cx="48" cy="48" r={radius}
+                  fill="transparent"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeDasharray={`${circumference}`}
+                  strokeDashoffset={dashOffset}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span
+                  className="material-symbols-outlined text-primary text-3xl"
+                  style={{ fontVariationSettings: "'FILL' 1" }}
+                >
+                  bolt
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
+          {/* Nearby Charger Card */}
+          <div className="bg-surface-container rounded-[20px] p-6 flex items-center gap-5 hover:bg-surface-variant transition-all duration-300 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-3 opacity-10">
+              <span className="material-symbols-outlined text-6xl">ev_station</span>
+            </div>
+            <div className="w-14 h-14 bg-surface-container-highest rounded-xl flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-secondary-container">near_me</span>
+            </div>
+            <div className="flex-1 space-y-1 min-w-0">
+              <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Nearby Charger</h3>
+              <p className="text-lg font-bold text-white truncate">Tesla M2 - Supercharger</p>
+              <div className="flex items-center gap-3 font-mono text-[11px]">
+                <span className="text-secondary-container">1.2 MILES</span>
+                <span className="text-on-surface-variant">•</span>
+                <span className="text-on-surface-variant">4 SLOTS AVAIL.</span>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/route-planner', { state: { destination: 'Tesla Supercharger M2' } })}
+              className="w-10 h-10 rounded-full bg-primary-fixed-dim hover:brightness-110 flex items-center justify-center shrink-0 transition-all shadow-[0_0_15px_rgba(0,217,255,0.3)] cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-on-primary text-[18px]">directions</span>
+            </button>
+          </div>
+
+          {/* Sentry Mode Card */}
+          <div className="bg-surface-container rounded-[20px] p-6 flex items-center justify-between hover:bg-surface-variant transition-all duration-300">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center">
+                  <span className="material-symbols-outlined text-white">security</span>
+                </div>
+                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-surface-container animate-pulse" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Security Status</h3>
+                <p className="text-lg font-bold text-white">Sentry Mode Active</p>
+              </div>
+            </div>
+            <div className="font-mono text-[11px] text-on-surface-variant text-right">
+              3 EVENTS<br />LOGGED
+            </div>
+          </div>
+
+          {/* Climate Control Card */}
+          <div className="bg-surface-container rounded-[20px] p-6 flex flex-col gap-4 hover:bg-surface-variant transition-all duration-300">
+            <div className="flex justify-between items-center">
+              <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Climate Control</h3>
+              <span className="font-mono text-lg font-bold text-white">
+                {(vehicle.realtime.cabin_hvac_kw * 6 + 18).toFixed(1)}°C
+              </span>
+            </div>
+            <div className="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-primary to-secondary-container transition-all duration-500"
+                style={{ width: `${Math.min(100, (vehicle.realtime.cabin_hvac_kw / 4) * 100)}%` }}
+              />
+            </div>
+            <div className="flex justify-between font-mono text-[10px] text-on-surface-variant uppercase tracking-tighter">
+              <span>Min (16)</span>
+              <span>Auto Active • {vehicle.realtime.cabin_hvac_kw} kW</span>
+              <span>Max (28)</span>
+            </div>
+          </div>
+        </section>
       </div>
-      
+
+      {/* ── Bottom: Energy Consumption Chart ── */}
+      <section className="px-6 pb-6">
+        <div className="bg-surface-container-low rounded-[24px] p-6 h-52 flex flex-col">
+          <div className="flex justify-between items-end mb-4">
+            <div>
+              <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">
+                Energy Consumption
+              </h3>
+              <p className="font-mono text-xl font-bold text-white">
+                {vehicle.realtime.efficiency_wh_per_km}{' '}
+                <span className="text-secondary text-sm font-normal">Wh/km</span>
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-primary rounded-full" />
+                <span className="font-label text-[10px] uppercase text-on-surface-variant">Drive</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 bg-secondary-container rounded-full" />
+                <span className="font-label text-[10px] uppercase text-on-surface-variant">Climate</span>
+              </div>
+              {/* Time range buttons */}
+              <div className="flex gap-1.5 ml-4">
+                {(['1H', '6H', '24H'] as const).map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setActiveRange(t)}
+                    className={`text-[9px] font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                      t === activeRange
+                        ? 'bg-primary/20 text-primary border border-primary/30'
+                        : 'text-on-surface-variant hover:text-on-surface bg-surface-container-high'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Bar Chart */}
+          <div className="flex-1 flex items-end justify-between gap-1.5 px-2">
+            {BAR_HEIGHTS.map((h, i) => (
+              <div
+                key={i}
+                className={`w-full rounded-t-lg transition-all duration-300 hover:brightness-125 ${
+                  BAR_ACCENTS.has(i)
+                    ? 'bg-primary'
+                    : BAR_SECONDARY.has(i)
+                    ? 'bg-secondary-container'
+                    : 'bg-surface-container-highest hover:bg-primary/40'
+                }`}
+                style={{ height: `${h}%` }}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   )
 }
-
