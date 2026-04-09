@@ -7,9 +7,10 @@ import * as THREE from 'three'
    Per-model config overrides for centering/scaling
    ═══════════════════════════════════════════════ */
 const MODEL_CONFIG: Record<string, { targetSize: number; yOffset: number; rotationYOffset: number }> = {
-  '/models/car.glb':      { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 },
-  '/models/commuter.glb': { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 },
-  '/models/cargo.glb':    { targetSize: 4.0, yOffset: -0.4, rotationYOffset: 0 },
+  '/models/car.glb':         { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 },
+  '/models/commuter.glb':    { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 },
+  '/models/cargo.glb':       { targetSize: 4.0, yOffset: -0.4, rotationYOffset: 0 },
+  '/models/custom car.glb':  { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 },
 }
 
 const DEFAULT_CONFIG = { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 }
@@ -201,9 +202,9 @@ export default function CarModel({
   )
 }
 
-// Preload the model
 // Preload all models
 useGLTF.preload('/models/car.glb')
 useGLTF.preload('/models/commuter.glb')
 useGLTF.preload('/models/cargo.glb')
+useGLTF.preload('/models/custom car.glb')
 

@@ -31,6 +31,7 @@ export default function Home() {
     'model-v-performance': 'MODEL V',
     'model-s-commuter': 'MODEL S',
     'model-t-cargo': 'MODEL T',
+    'custom-lab': 'MODEL R',
   }
 
   return (
@@ -95,42 +96,14 @@ export default function Home() {
                 style={{ height: '320px' }}
                 data-vehicle={vehicle.id}
               >
-                {vehicle.isCustom ? (
-                  <div className="w-[400px] h-[280px] flex items-center justify-center relative mt-16 scale-125">
-                    {/* Abstract lab vehicle wireframe */}
-                    <svg viewBox="0 0 400 200" className="w-full opacity-60">
-                      {/* Simple sedan wireframe outline in purple */}
-                      <path 
-                        d="M60,140 L60,110 L100,70 L200,60 L300,70 L340,110 L340,140 Z"
-                        fill="none" 
-                        stroke="#A855F7" 
-                        strokeWidth="2"
-                        strokeDasharray="8 4"
-                      />
-                      <ellipse cx="120" cy="143" rx="28" ry="18" fill="none" stroke="#A855F7" strokeWidth="2"/>
-                      <ellipse cx="280" cy="143" rx="28" ry="18" fill="none" stroke="#A855F7" strokeWidth="2"/>
-                      {/* Glow effect */}
-                      <path d="M60,140 L60,110 L100,70 L200,60 L300,70 L340,110 L340,140 Z" fill="rgba(168,85,247,0.05)" />
-                    </svg>
-                    
-                    {/* Center label */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 mt-4">
-                      <span className="text-5xl">⚗️</span>
-                      <span className="text-[11px] font-mono text-[#A855F7] uppercase tracking-widest">
-                        Configuring...
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <CarModel
-                    batteryKwh={vehicle.battery.capacity_kwh}
-                    tempC={vehicle.battery.temperature_c}
-                    glowColor={vehicle.color}
-                    modelPath={vehicle.modelPath}
-                    regenActive={vehicle.realtime.regen_active}
-                    maxPowerKw={vehicle.specs.max_power_kw}
-                  />
-                )}
+                <CarModel
+                  batteryKwh={vehicle.battery.capacity_kwh}
+                  tempC={vehicle.battery.temperature_c}
+                  glowColor={vehicle.color}
+                  modelPath={vehicle.isCustom ? '/models/custom car.glb' : vehicle.modelPath}
+                  regenActive={vehicle.realtime.regen_active}
+                  maxPowerKw={vehicle.specs.max_power_kw}
+                />
               </div>
 
               {/* Model name */}
