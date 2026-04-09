@@ -22,8 +22,8 @@ export default function Profile() {
   const initials = profile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
 
   return (
-    <div className="w-full">
-      <div className="max-w-[680px] mx-auto px-6 pt-10 pb-16 flex flex-col gap-10">
+    <div className="w-full h-full overflow-y-auto no-scrollbar flex flex-col items-center bg-background">
+      <div className="w-full max-w-[680px] px-6 py-12 my-auto flex flex-col gap-10">
 
         {/* ── Header Card ── */}
         <div className="bg-surface-container-highest rounded-2xl p-7 flex items-start gap-6">

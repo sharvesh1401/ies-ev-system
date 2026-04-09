@@ -140,8 +140,8 @@ export default function SystemInsights() {
       <div className="grid grid-cols-12 gap-3 md:gap-4 shrink-0">
         
         {/* Profile Card (Ported from Profile.tsx) */}
-        <div className="col-span-12 lg:col-span-3 bg-surface-container p-5 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between">
-          <div className="mb-3">
+        <div className="col-span-12 lg:col-span-3 bg-surface-container p-7 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between">
+          <div className="mb-3 px-1">
             <VehicleSelector />
           </div>
           <div className="space-y-2 mt-auto text-[9px] font-mono text-on-surface-variant uppercase tracking-widest">
@@ -226,8 +226,8 @@ export default function SystemInsights() {
 
         {/* Right: Live metrics cards */}
         <div className="col-span-12 lg:col-span-4 grid grid-rows-2 gap-3 md:gap-4">
-          <div className="bg-surface-container p-5 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
-            <div className="flex items-center justify-between mb-4 relative z-10">
+          <div className="bg-surface-container p-7 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
+            <div className="flex items-center justify-between mb-4 relative z-10 px-1">
               <span className="text-[12px] font-mono text-primary uppercase tracking-widest font-bold">Inference Latency</span>
               <span className="material-symbols-outlined text-primary/50 text-xl">speed</span>
             </div>
@@ -238,8 +238,8 @@ export default function SystemInsights() {
               {renderSparkline(latencyData, '#afecff', 45)}
             </div>
           </div>
-          <div className="bg-surface-container p-5 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
-            <div className="flex items-center justify-between mb-4 relative z-10">
+          <div className="bg-surface-container p-7 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
+            <div className="flex items-center justify-between mb-4 relative z-10 px-1">
               <span className="text-[12px] font-mono text-secondary-container uppercase tracking-widest font-bold">Throughput</span>
               <span className="material-symbols-outlined text-secondary-container/50 text-xl">dns</span>
             </div>
@@ -257,9 +257,9 @@ export default function SystemInsights() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 shrink-0">
         {/* Terminal */}
         <div className="lg:col-span-2 bg-surface-container-lowest rounded-2xl overflow-hidden flex flex-col h-full lg:h-[220px] border border-secondary-container/10 relative shadow-md">
-          <div className="px-6 py-4 bg-surface-container-low border-b border-outline-variant/10 flex items-center justify-between shrink-0 relative z-10">
+          <div className="px-7 py-4 bg-surface-container-low border-b border-outline-variant/10 flex items-center justify-between shrink-0 relative z-10">
             <div className="flex items-center gap-4">
-              <div className="flex gap-1.5">
+              <div className="flex gap-1.5 px-1">
                 <div className="w-3 h-3 rounded-full bg-error" />
                 <div className="w-3 h-3 rounded-full bg-tertiary-container" />
                 <div className="w-3 h-3 rounded-full bg-secondary-container" />
@@ -280,8 +280,8 @@ export default function SystemInsights() {
         </div>
 
         {/* Diagnostics */}
-        <div className="bg-surface-container p-5 rounded-2xl flex flex-col h-full lg:h-[220px] border border-outline-variant/10 relative overflow-hidden">
-          <h4 className="font-bold text-on-surface text-[16px] mb-4 relative z-10 flex items-center gap-2 shrink-0">
+        <div className="bg-surface-container p-7 rounded-2xl flex flex-col h-full lg:h-[220px] border border-outline-variant/10 relative overflow-hidden">
+          <h4 className="font-bold text-on-surface text-[16px] mb-4 relative z-10 flex items-center gap-2 shrink-0 px-1">
             <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
             System Diagnostics
           </h4>

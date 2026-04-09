@@ -102,15 +102,15 @@ export default function BatteryAnalytics() {
   const maxCycle = Math.max(...CYCLE_DATA)
 
   return (
-    <div className="pt-6 px-8 pb-8 overflow-y-auto no-scrollbar h-full">
+    <div className="pt-4 px-6 pb-4 overflow-y-auto no-scrollbar h-full flex flex-col">
 
       {/* ══ Hero Stats Row ══ */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
 
         {/* Battery Health Index */}
-        <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span className="material-symbols-outlined text-6xl">health_and_safety</span>
+        <div className="bg-surface-container p-4 rounded-2xl border border-outline-variant/10 relative overflow-visible group hover:bg-surface-variant transition-all duration-300">
+          <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
+            <span className="material-symbols-outlined text-5xl">health_and_safety</span>
           </div>
           <p className="font-label text-[10px] uppercase tracking-[0.2em] text-primary/60 mb-2">Battery Health Index</p>
           <div className="flex items-baseline gap-2">
@@ -142,9 +142,9 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Discharge Cycles */}
-        <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span className="material-symbols-outlined text-6xl">sync</span>
+        <div className="bg-surface-container p-4 rounded-2xl border border-outline-variant/10 relative overflow-visible group hover:bg-surface-variant transition-all duration-300">
+          <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
+            <span className="material-symbols-outlined text-5xl">sync</span>
           </div>
           <p className="font-label text-[10px] uppercase tracking-[0.2em] text-primary/60 mb-2">Discharge Cycles</p>
           <div className="flex items-baseline gap-2">
@@ -163,9 +163,9 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Estimated Core Life */}
-        <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <span className="material-symbols-outlined text-6xl">hourglass_empty</span>
+        <div className="bg-surface-container p-4 rounded-2xl border border-outline-variant/10 relative overflow-visible group hover:bg-surface-variant transition-all duration-300">
+          <div className="absolute top-2 right-2 opacity-10 group-hover:opacity-20 transition-opacity">
+            <span className="material-symbols-outlined text-5xl">hourglass_empty</span>
           </div>
           <p className="font-label text-[10px] uppercase tracking-[0.2em] text-primary/60 mb-2">Estimated Core Life</p>
           <div className="flex items-baseline gap-2">
@@ -182,8 +182,8 @@ export default function BatteryAnalytics() {
       </div>
 
       {/* ══ Full Width SoH Trend Chart ══ */}
-      <div className="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/5 mb-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/5 mb-4">
+        <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-on-surface">SoH Degradation Trend</h2>
             <p className="text-sm text-on-surface-variant">Cubic spline analysis of capacity retention over time</p>
@@ -206,7 +206,7 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* SVG Chart */}
-        <div className="h-64 relative overflow-hidden">
+        <div className="h-44 relative overflow-hidden">
           <svg className="w-full h-full" viewBox={`0 0 ${chartW} ${chartH}`} preserveAspectRatio="none">
             <defs>
               <linearGradient id="sohGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -247,12 +247,12 @@ export default function BatteryAnalytics() {
       </div>
 
       {/* ══ Bottom Data Cluster ══ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Cell Voltage Map */}
-        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5">
-          <div className="flex justify-between items-start mb-6">
-            <h3 className="font-label text-xs uppercase tracking-widest text-primary">Cell Voltage Map</h3>
+        <div className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/5">
+          <div className="flex justify-between items-start mb-4">
+            <h3 className="font-label text-[10px] uppercase tracking-widest text-primary">Cell Voltage Map</h3>
             <span className="font-mono text-xs text-secondary-container">AVG 3.82V</span>
           </div>
           <div className="grid grid-cols-12 gap-1.5">
@@ -294,11 +294,11 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Core Temperature Gauge */}
-        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5 flex flex-col items-center">
+        <div className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/5 flex flex-col items-center">
           <div className="w-full flex justify-between items-start mb-2">
             <h3 className="font-label text-xs uppercase tracking-widest text-primary">Core Temperature</h3>
           </div>
-          <div className="relative w-48 h-48 flex items-center justify-center">
+          <div className="relative w-40 h-40 flex items-center justify-center">
             <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
               <circle
                 cx="50" cy="50" r="42"
@@ -339,7 +339,7 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Monthly Cycles + Maintenance */}
-        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5 flex flex-col">
+        <div className="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/5 flex flex-col">
           <h3 className="font-label text-xs uppercase tracking-widest text-primary mb-1">Monthly Cycles</h3>
           <p className="text-[10px] font-mono text-on-surface/40 uppercase tracking-widest mb-4">Last 12 months</p>
 
@@ -371,15 +371,15 @@ export default function BatteryAnalytics() {
       </div>
 
       {/* ══ Full Width Inspection Banner ══ */}
-      <div className={`mt-8 p-5 rounded-2xl border flex items-center justify-between ${
+      <div className={`mt-4 p-3 rounded-2xl border flex items-center justify-between ${
         serviceUrgent ? 'border-primary/30 bg-primary/5' : 'border-outline-variant/20 bg-surface-container'
       }`}>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-            <span className="material-symbols-outlined text-primary text-2xl">build</span>
+          <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary text-xl">build</span>
           </div>
           <div>
-            <p className="text-base font-bold text-on-surface">Next Inspection Interval</p>
+            <p className="text-sm font-bold text-on-surface">Next Inspection Interval</p>
             <p className="text-[11px] font-mono text-on-surface-variant">
               Calibration check required in 2,450 km or {vehicle.health.next_service_days} days
             </p>

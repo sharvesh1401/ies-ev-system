@@ -161,10 +161,10 @@ export default function ChargingStations() {
         {/* Selected Station Popup (Bottom Left) */}
         {selectedStation && (
           <div className={`absolute z-[1000] ${isMobile ? 'bottom-2 left-2 right-2 w-auto' : 'bottom-5 left-5 w-[360px]'}`} style={{ animation: 'slideUp 0.3s ease-out' }}>
-            <div className="bg-surface-container-high p-5 rounded-2xl border border-outline-variant/20 relative overflow-hidden shadow-2xl">
+            <div className="bg-surface-container-high p-7 rounded-2xl border border-outline-variant/20 relative overflow-hidden shadow-2xl">
               <button
                 onClick={() => setSelectedStation(null)}
-                className="absolute top-4 right-4 w-7 h-7 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center text-on-surface-variant hover:text-error hover:border-error/30 transition-all z-10"
+                className="absolute top-5 right-5 w-7 h-7 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center text-on-surface-variant hover:text-error hover:border-error/30 transition-all z-10"
                 aria-label="Close station details"
               >
                 <span className="material-symbols-outlined text-[16px]">close</span>
@@ -308,7 +308,7 @@ export default function ChargingStations() {
                 }`}
               >
                 {/* Header: Name + Distance */}
-                <div className="flex items-start justify-between mb-3">
+                <div className="flex items-start justify-between mb-3 px-1">
                   <h4 className={`text-sm font-semibold leading-tight pr-2 transition-colors ${isSelected ? 'text-primary' : 'text-on-surface group-hover:text-primary'}`}>
                     {s.AddressInfo.Title}
                   </h4>

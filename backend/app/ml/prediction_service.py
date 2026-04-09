@@ -18,7 +18,7 @@ except ImportError:
     torch = None
     TORCH_AVAILABLE = False
 
-from .model_loader import get_models
+from .model_loader import get_models, get_model_loader
 
 logger = logging.getLogger(__name__)
 

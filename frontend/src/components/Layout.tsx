@@ -12,7 +12,7 @@ import { useVehicle } from '../contexts/VehicleContext'
 export default function Layout() {
   const location = useLocation()
   const { isMobile } = useWindowSize()
-  const { isCustomMode } = useVehicle()
+  const { isCustomMode, isLabMinimized } = useVehicle()
 
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-background relative">
@@ -33,7 +33,7 @@ export default function Layout() {
           isMobile ? 'pt-16 pb-16' : ''
         }`}
         style={{
-          marginRight: isCustomMode && !isMobile ? '320px' : '0px'
+          marginRight: isCustomMode && !isLabMinimized && !isMobile ? '320px' : '0px'
         }}
       >
         {/* Desktop Top Bar — hidden on mobile */}

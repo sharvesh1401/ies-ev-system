@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -39,6 +40,12 @@ class Settings(BaseSettings):
     OPENWEATHER_API_KEY: Optional[str] = None
     OPENCHARGE_API_KEY: Optional[str] = None
     
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True, extra="ignore")
-
+    model_config = SettingsConfigDict(
+        env_file=[
+            str(Path(__file__).resolve().parents[2] / ".env"),
+            ".env"
+        ],
+        case_sensitive=True, 
+        extra="ignore"
+    )
 settings = Settings()

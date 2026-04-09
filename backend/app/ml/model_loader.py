@@ -405,7 +405,7 @@ class ModelLoader:
 _model_loader: Optional[ModelLoader] = None
 
 
-def get_model_loader(models_dir: str = "models") -> ModelLoader:
+def get_model_loader(models_dir: str = None) -> ModelLoader:
     """
     Get / create singleton ModelLoader.
 
@@ -415,6 +415,8 @@ def get_model_loader(models_dir: str = "models") -> ModelLoader:
     global _model_loader
 
     if _model_loader is None:
+        if models_dir is None:
+            models_dir = str(Path(__file__).resolve().parents[2] / "models")
         _model_loader = ModelLoader(models_dir=models_dir)
         _model_loader.load_all()
 

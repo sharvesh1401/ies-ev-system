@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'
+import { useVehicle } from '../contexts/VehicleContext'
 
 const navItems = [
   { to: '/', icon: 'home', label: 'Home' },
@@ -11,6 +12,8 @@ const navItems = [
 
 export default function Sidebar() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { currentVehicle, switchVehicle, setLabMinimized } = useVehicle()
   const [profileOpen, setProfileOpen] = useState(false)
   const [isLight, setIsLight] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -59,11 +62,64 @@ export default function Sidebar() {
 
       {/* ── Navigation ── */}
       <nav className="flex flex-col gap-[36px] pl-8 pr-0">
-        {navItems.map((item) => (
+        {/* Home */}
+        <button
+          onClick={() => {
+            if (currentVehicle === 'custom-lab') {
+              switchVehicle('model-v-performance')
+              setLabMinimized(false)
+            }
+            navigate('/')
+          }}
+          className={`w-full flex items-center gap-5 transition-colors duration-200 relative ${
+            location.pathname === '/' && currentVehicle !== 'custom-lab'
+              ? 'text-primary font-semibold'
+              : 'text-on-surface-variant hover:text-on-surface font-medium'
+          }`}
+        >
+          <span
+            className="material-symbols-outlined text-[48px] shrink-0"
+            style={{ fontVariationSettings: location.pathname === '/' && currentVehicle !== 'custom-lab' ? "'FILL' 1, 'wght' 500" : "'FILL' 0, 'wght' 300" }}
+          >
+            home
+          </span>
+          <span className="text-[22px] font-medium">Home</span>
+          {location.pathname === '/' && currentVehicle !== 'custom-lab' && (
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-[4px] bg-primary rounded-l-md" />
+          )}
+        </button>
+
+        {/* Custom Lab */}
+        <button
+          onClick={() => {
+            switchVehicle('custom-lab')
+            setLabMinimized(false)
+            navigate('/')
+          }}
+          className={`w-full flex items-center gap-5 transition-colors duration-200 relative ${
+            currentVehicle === 'custom-lab'
+              ? 'font-semibold'
+              : 'text-on-surface-variant hover:text-on-surface font-medium'
+          }`}
+          style={{ color: currentVehicle === 'custom-lab' ? '#A855F7' : undefined }}
+        >
+          <span
+            className="material-symbols-outlined text-[48px] shrink-0"
+            style={{ fontVariationSettings: currentVehicle === 'custom-lab' ? "'FILL' 1, 'wght' 500" : "'FILL' 0, 'wght' 300" }}
+          >
+            science
+          </span>
+          <span className="text-[22px] font-medium">Custom Lab</span>
+          {currentVehicle === 'custom-lab' && (
+            <span className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-[4px] rounded-l-md" style={{ background: '#A855F7' }} />
+          )}
+        </button>
+
+        {/* Remaining nav items */}
+        {navItems.slice(1).map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            end={item.to === '/'}
             className={({ isActive }) =>
               `w-full flex items-center gap-5 transition-colors duration-200 relative ${
                 isActive
@@ -81,8 +137,6 @@ export default function Sidebar() {
                   {item.icon}
                 </span>
                 <span className="text-[22px] font-medium">{item.label}</span>
-                
-                {/* Right-edge active indicator */}
                 {isActive && (
                   <span className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-[4px] bg-primary rounded-l-md" />
                 )}
@@ -148,7 +202,7 @@ export default function Sidebar() {
             {/* Menu items */}
             <div className="p-2">
               <button
-                onClick={() => { navigate('/profile'); setProfileOpen(false) }}
+                onClick={() => { navigate('/settings'); setProfileOpen(false) }}
                 className="w-full flex items-center justify-between px-3 py-2.5 rounded-[10px] text-left hover:bg-surface-variant/40 transition-colors duration-150 group"
               >
                 <div className="flex items-center gap-3">
@@ -169,30 +223,38 @@ export default function Sidebar() {
                 </div>
               </button>
 
-              {/* Theme Toggle */}
-              <div className="flex items-center justify-between px-3 py-2.5 rounded-[10px] mt-1">
+              {/* Premium Theme Toggle */}
+              <div className="flex items-center justify-between px-3 py-2.5 rounded-[10px] mt-1 group">
                 <div className="flex items-center gap-3">
-                  <span className="material-symbols-outlined text-on-surface-variant">dark_mode</span>
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors duration-200">
+                    {isLight ? 'light_mode' : 'dark_mode'}
+                  </span>
                   <span className="text-sm font-medium text-on-surface">Theme Mode</span>
                 </div>
-                <div className="flex bg-surface-container-lowest rounded-[10px] overflow-hidden border border-[var(--stitch-outline-variant)] p-0.5 gap-0.5">
-                  <button
-                    onClick={() => { if (isLight) toggleTheme() }}
-                    className={`px-3 py-1 text-[10px] rounded-lg font-mono font-bold uppercase tracking-widest transition-all duration-150 ${
-                      !isLight ? 'bg-primary text-stitch-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+                
+                {/* Premium Slider Track */}
+                <button
+                  onClick={toggleTheme}
+                  className={`relative w-[52px] h-[28px] rounded-full p-1 transition-colors duration-300 ${
+                    isLight ? 'bg-primary/20 shadow-[inset_0_2px_4px_rgba(0,217,255,0.1)]' : 'bg-surface-container-highest shadow-inner'
+                  }`}
+                >
+                  {/* Slider Thumb */}
+                  <div
+                    className={`absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+                      isLight 
+                        ? 'translate-x-[24px] bg-primary text-on-primary shadow-[0_2px_8px_rgba(0,217,255,0.4)]' 
+                        : 'translate-x-0 bg-on-surface-variant text-surface-container-highest shadow-[0_2px_5px_rgba(0,0,0,0.5)]'
                     }`}
                   >
-                    Dark
-                  </button>
-                  <button
-                    onClick={() => { if (!isLight) toggleTheme() }}
-                    className={`px-3 py-1 text-[10px] rounded-lg font-mono font-bold uppercase tracking-widest transition-all duration-150 ${
-                      isLight ? 'bg-primary text-stitch-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
-                    }`}
-                  >
-                    Light
-                  </button>
-                </div>
+                    <span 
+                      className="material-symbols-outlined text-[14px]"
+                      style={{ fontVariationSettings: "'FILL' 1" }}
+                    >
+                      {isLight ? 'light_mode' : 'dark_mode'}
+                    </span>
+                  </div>
+                </button>
               </div>
             </div>
 

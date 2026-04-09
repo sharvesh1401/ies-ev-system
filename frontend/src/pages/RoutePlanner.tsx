@@ -174,13 +174,13 @@ function PipelineStepper({
 
   return (
     <div
-      className={`bg-surface-container p-5 rounded-2xl border ${
+      className={`bg-surface-container p-7 rounded-2xl border ${
         isComplete ? 'border-secondary-container/30' : stage === 'error' ? 'border-error/30' : 'border-primary/20'
       }`}
       style={{ animation: 'slideUp 0.4s ease-out' }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 px-1">
         <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-primary/60">
           {isComplete ? 'Pipeline Complete' : stage === 'error' ? 'Pipeline Error' : 'Computing Route'}
         </p>
@@ -303,11 +303,11 @@ function DecisionCard({
 
   return (
     <div
-      className="bg-surface-container p-5 rounded-2xl border border-outline-variant/15 relative overflow-hidden"
+      className="bg-surface-container p-7 rounded-2xl border border-outline-variant/15 relative overflow-hidden"
       style={{ animation: 'slideUp 0.5s ease-out' }}
     >
       {/* ── Header with method badge ── */}
-      <div className="flex items-center justify-between mb-4 relative z-10">
+      <div className="flex items-center justify-between mb-4 relative z-10 px-1">
         <h4 className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-widest">
           Route Decision
         </h4>

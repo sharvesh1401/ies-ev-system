@@ -296,6 +296,8 @@ interface VehicleContextType {
   allVehicles: Record<string, VehicleProfile>;
   updateCustomVehicle: (updates: any) => void;
   isCustomMode: boolean;
+  isLabMinimized: boolean;
+  setLabMinimized: (v: boolean) => void;
 }
 
 const VehicleContext = createContext<VehicleContextType | undefined>(undefined);
@@ -304,13 +306,14 @@ export function VehicleProvider({ children }: { children: ReactNode }) {
   const [vehicleProfiles, setVehicleProfiles] = useState<Record<string, VehicleProfile>>(VEHICLE_PROFILES);
   const [currentVehicle, setCurrentVehicle] = useState('model-v-performance');
   const [liveRealtime, setLiveRealtime] = useState<RealtimeData | null>(null);
+  const [isLabMinimized, setLabMinimized] = useState(false);
 
   // Range estimation formula (physics-based approximation)
-  const calculateCustomRange = (soh: number, mass: number, capacity: number) => {
+  const calculateCustomRange = (soh: number, soc: number, mass: number, capacity: number) => {
     const baseEfficiency = 118;
     const massPenalty = (mass - 1600) * 0.04;
     const healthPenalty = (100 - soh) * 0.8;
-    const effectiveCapacity = capacity * (soh / 100);
+    const effectiveCapacity = capacity * (soh / 100) * (soc / 100);
     const adjustedEfficiency = baseEfficiency * (1 + (massPenalty + healthPenalty) / 100);
     return Math.round((effectiveCapacity * 1000) / adjustedEfficiency);
   };
@@ -332,6 +335,7 @@ export function VehicleProvider({ children }: { children: ReactNode }) {
           },
           range_km: calculateCustomRange(
             updates.battery?.soh_percent ?? prevCustom.battery.soh_percent,
+            updates.battery?.soc_percent ?? prevCustom.battery.soc_percent,
             updates.specs?.mass_kg ?? prevCustom.specs.mass_kg,
             updates.battery?.capacity_kwh ?? prevCustom.battery.capacity_kwh
           ),
@@ -424,6 +428,8 @@ export function VehicleProvider({ children }: { children: ReactNode }) {
     allVehicles: vehicleProfiles,
     updateCustomVehicle,
     isCustomMode: currentVehicle === 'custom-lab',
+    isLabMinimized,
+    setLabMinimized,
   };
 
   return (

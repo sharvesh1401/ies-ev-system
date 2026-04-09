@@ -4,8 +4,9 @@ import CarModel from '../components/CarModel'
 import AnimatedNumber from '../components/AnimatedNumber'
 import VehicleSelector from '../components/VehicleSelector'
 import { useVehicle } from '../contexts/VehicleContext'
+import CustomLabPage from './CustomLabPage'
 
-const VEHICLE_ORDER = ['model-v-performance', 'model-s-commuter', 'model-t-cargo', 'custom-lab']
+const VEHICLE_ORDER = ['model-v-performance', 'model-s-commuter', 'model-t-cargo']
 
 const BAR_HEIGHTS = [40, 60, 35, 80, 55, 45, 65, 40, 50, 30, 75, 90, 60, 45, 35, 85, 50, 40, 60, 70]
 const BAR_ACCENTS = new Set([4, 11, 16, 19]) // primary-coloured bars
@@ -13,7 +14,7 @@ const BAR_SECONDARY = new Set([6, 13])        // secondary-container bars
 
 export default function Home() {
   const navigate = useNavigate()
-  const { vehicle, allVehicles, currentVehicle } = useVehicle()
+  const { vehicle, allVehicles, currentVehicle, isCustomMode, isLabMinimized, setLabMinimized } = useVehicle() as any
   const [activeRange, setActiveRange] = useState<'1H' | '6H' | '24H'>('6H')
 
   // Determine prev/next ghost vehicles for carousel
@@ -33,6 +34,8 @@ export default function Home() {
     'model-t-cargo': 'MODEL T',
     'custom-lab': 'MODEL R',
   }
+
+  if (isCustomMode) return <CustomLabPage />
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-background">
@@ -205,7 +208,7 @@ export default function Home() {
 
           {/* Nearby Charger Card */}
           <div className="bg-surface-container rounded-2xl p-6 flex items-center gap-5 hover:bg-surface-variant transition-all duration-300 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-3 opacity-10">
+            <div className="absolute top-2 right-2 p-2 opacity-10">
               <span className="material-symbols-outlined text-6xl">ev_station</span>
             </div>
             <div className="w-14 h-14 bg-surface-container-highest rounded-xl flex items-center justify-center shrink-0">
@@ -267,15 +270,16 @@ export default function Home() {
               <span>Max (28)</span>
             </div>
           </div>
+
         </section>
       </div>
 
       {/* ── Bottom: Energy Consumption Chart ── */}
       <section className="px-6 pb-6">
         <div className="bg-surface-container-low rounded-2xl p-6 h-52 flex flex-col">
-          <div className="flex justify-between items-end mb-4">
+          <div className="flex justify-between items-end mb-4 px-1">
             <div>
-              <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">
+              <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1 ml-0.5">
                 Energy Consumption
               </h3>
               <p className="font-mono text-xl font-bold text-on-surface">
