@@ -31,6 +31,9 @@ class OrsDirectionsRequest(BaseModel):
     # Forward any optional ORS parameters the client may include
     radiuses: List[float] | None = Field(default=None, max_length=25)
     units: str | None = Field(default=None, max_length=10)
+    alternative_routes: dict | None = Field(default=None)
+    instructions: bool | None = Field(default=None)
+    geometry: bool | None = Field(default=None)
 
     @field_validator("coordinates")
     @classmethod
