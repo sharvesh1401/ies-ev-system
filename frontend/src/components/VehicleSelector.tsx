@@ -114,7 +114,7 @@ function VehicleSelector() {
             role="listbox"
             aria-label="Select vehicle"
           >
-            {Object.values(allVehicles).map((v) => (
+            {Object.values(allVehicles).filter(v => !v.isCustom).map((v) => (
               <button
                 key={v.id}
                 role="option"
@@ -137,6 +137,42 @@ function VehicleSelector() {
                 </div>
                 {v.id === vehicle.id && (
                   <div className="selected-check">✓</div>
+                )}
+              </button>
+            ))}
+
+            <div className="px-4 py-2 flex items-center gap-3">
+              <div className="flex-1 h-px bg-outline-variant/20"></div>
+              <span className="text-[9px] text-slate-500 uppercase tracking-widest font-mono">
+                Research
+              </span>
+              <div className="flex-1 h-px bg-outline-variant/20"></div>
+            </div>
+
+            {Object.values(allVehicles).filter(v => v.isCustom).map((v) => (
+              <button
+                key={v.id}
+                className={`vehicle-option w-full flex items-center gap-3 px-4 py-3
+                  border-b border-outline-variant/10 last:border-0 text-left
+                  transition-all duration-200 cursor-pointer
+                  ${v.id === vehicle.id 
+                    ? 'bg-surface-container-highest border-l-[3px] border-[#A855F7]' 
+                    : 'bg-transparent hover:bg-surface-container'
+                  }`}
+                onClick={() => handleSelect(v.id)}
+              >
+                <div className="text-2xl">⚗️</div>
+                <div className="flex-1">
+                  <div className="text-sm font-semibold text-white">Custom Lab</div>
+                  <div className="text-[11px] text-slate-400 mb-1">
+                    Configurable • Research Profile
+                  </div>
+                  <div className="text-[10px] text-[#A855F7] font-mono">
+                    Click to configure any parameter →
+                  </div>
+                </div>
+                {v.id === vehicle.id && (
+                  <div className="text-[#A855F7] text-lg">✓</div>
                 )}
               </button>
             ))}

@@ -5,7 +5,7 @@ import AnimatedNumber from '../components/AnimatedNumber'
 import VehicleSelector from '../components/VehicleSelector'
 import { useVehicle } from '../contexts/VehicleContext'
 
-const VEHICLE_ORDER = ['model-v-performance', 'model-s-commuter', 'model-t-cargo']
+const VEHICLE_ORDER = ['model-v-performance', 'model-s-commuter', 'model-t-cargo', 'custom-lab']
 
 const BAR_HEIGHTS = [40, 60, 35, 80, 55, 45, 65, 40, 50, 30, 75, 90, 60, 45, 35, 85, 50, 40, 60, 70]
 const BAR_ACCENTS = new Set([4, 11, 16, 19]) // primary-coloured bars
@@ -18,8 +18,8 @@ export default function Home() {
 
   // Determine prev/next ghost vehicles for carousel
   const idx = VEHICLE_ORDER.indexOf(currentVehicle)
-  const prevVehicle = allVehicles[VEHICLE_ORDER[(idx + 2) % 3]]
-  const nextVehicle = allVehicles[VEHICLE_ORDER[(idx + 1) % 3]]
+  const prevVehicle = allVehicles[VEHICLE_ORDER[(idx + VEHICLE_ORDER.length - 1) % VEHICLE_ORDER.length]]
+  const nextVehicle = allVehicles[VEHICLE_ORDER[(idx + 1) % VEHICLE_ORDER.length]]
 
   // SVG circular progress for SoC
   const radius = 40
@@ -89,20 +89,48 @@ export default function Home() {
                 <div className="w-32 h-px bg-gradient-to-l from-primary to-transparent" />
               </div>
 
-              {/* 3D Model */}
+              {/* 3D Model or Lab SVG */}
               <div
-                className="w-full"
+                className="w-full flex items-center justify-center relative"
                 style={{ height: '320px' }}
                 data-vehicle={vehicle.id}
               >
-                <CarModel
-                  batteryKwh={vehicle.battery.capacity_kwh}
-                  tempC={vehicle.battery.temperature_c}
-                  glowColor={vehicle.color}
-                  modelPath={vehicle.modelPath}
-                  regenActive={vehicle.realtime.regen_active}
-                  maxPowerKw={vehicle.specs.max_power_kw}
-                />
+                {vehicle.isCustom ? (
+                  <div className="w-[400px] h-[280px] flex items-center justify-center relative mt-16 scale-125">
+                    {/* Abstract lab vehicle wireframe */}
+                    <svg viewBox="0 0 400 200" className="w-full opacity-60">
+                      {/* Simple sedan wireframe outline in purple */}
+                      <path 
+                        d="M60,140 L60,110 L100,70 L200,60 L300,70 L340,110 L340,140 Z"
+                        fill="none" 
+                        stroke="#A855F7" 
+                        strokeWidth="2"
+                        strokeDasharray="8 4"
+                      />
+                      <ellipse cx="120" cy="143" rx="28" ry="18" fill="none" stroke="#A855F7" strokeWidth="2"/>
+                      <ellipse cx="280" cy="143" rx="28" ry="18" fill="none" stroke="#A855F7" strokeWidth="2"/>
+                      {/* Glow effect */}
+                      <path d="M60,140 L60,110 L100,70 L200,60 L300,70 L340,110 L340,140 Z" fill="rgba(168,85,247,0.05)" />
+                    </svg>
+                    
+                    {/* Center label */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 mt-4">
+                      <span className="text-5xl">⚗️</span>
+                      <span className="text-[11px] font-mono text-[#A855F7] uppercase tracking-widest">
+                        Configuring...
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <CarModel
+                    batteryKwh={vehicle.battery.capacity_kwh}
+                    tempC={vehicle.battery.temperature_c}
+                    glowColor={vehicle.color}
+                    modelPath={vehicle.modelPath}
+                    regenActive={vehicle.realtime.regen_active}
+                    maxPowerKw={vehicle.specs.max_power_kw}
+                  />
+                )}
               </div>
 
               {/* Model name */}

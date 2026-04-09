@@ -1063,6 +1063,14 @@ export default function RoutePlanner() {
               </h3>
               <span className="text-[9px] font-mono font-bold text-on-surface-variant bg-surface-container-highest px-2.5 py-1 rounded-full uppercase tracking-widest">v2.4.0</span>
             </div>
+            {vehicle.isCustom && (
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#A855F7]/10 border border-[#A855F7]/20 mt-4">
+                <span className="text-[#A855F7] text-sm">⚗️</span>
+                <span className="text-[11px] text-[#A855F7]">
+                  Using custom lab parameters for prediction
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Origin / Waypoint / Destination — 3-input timeline */}

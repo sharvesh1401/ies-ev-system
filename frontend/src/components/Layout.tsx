@@ -6,10 +6,13 @@ import AnimatedBackground from './AnimatedBackground'
 import MobileTopBar from './Mobile/MobileTopBar'
 import MobileBottomNav from './Mobile/MobileBottomNav'
 import useWindowSize from '../hooks/useWindowSize'
+import CustomVehicleEditor from './CustomVehicleEditor'
+import { useVehicle } from '../contexts/VehicleContext'
 
 export default function Layout() {
   const location = useLocation()
   const { isMobile } = useWindowSize()
+  const { isCustomMode } = useVehicle()
 
   return (
     <div className="flex h-[100dvh] w-full overflow-hidden bg-background relative">
@@ -26,9 +29,12 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-1 flex flex-col relative overflow-hidden ${
+        className={`flex-1 flex flex-col relative overflow-hidden transition-all duration-300 ease-out ${
           isMobile ? 'pt-16 pb-16' : ''
         }`}
+        style={{
+          marginRight: isCustomMode && !isMobile ? '320px' : '0px'
+        }}
       >
         {/* Desktop Top Bar — hidden on mobile */}
         {!isMobile && <TopBar />}
@@ -51,6 +57,8 @@ export default function Layout() {
 
       {/* Mobile Bottom Navigation — only on mobile */}
       {isMobile && <MobileBottomNav />}
+
+      <CustomVehicleEditor />
     </div>
   )
 }

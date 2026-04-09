@@ -59,6 +59,7 @@ export interface VehicleProfile {
   carImage: string;
   modelPath: string;
   description: string;
+  isCustom?: boolean;
 }
 
 // Vehicle profiles data
@@ -116,7 +117,7 @@ const VEHICLE_PROFILES: Record<string, VehicleProfile> = {
 
     range_km: 312,
     carImage: '/assets/model-v-yellow.png',
-    modelPath: '/models/car.glb',
+    modelPath: '/models/sport car.glb',
     description: 'High-performance electric sedan with healthy battery pack. Optimal efficiency and range.',
   },
 
@@ -233,6 +234,59 @@ const VEHICLE_PROFILES: Record<string, VehicleProfile> = {
     modelPath: '/models/cargo.glb',
     description: 'Heavy-duty electric truck. High energy consumption.',
   },
+
+  'custom-lab': {
+    id: 'custom-lab',
+    name: 'Custom Lab',
+    subtitle: 'Configurable • Research Profile',
+    icon: '⚗️',
+    color: '#A855F7',
+    badge: 'CUSTOM',
+    badgeColor: '#A855F7',
+    battery: {
+      capacity_kwh: 75,
+      soc_percent: 76,
+      soh_percent: 85,
+      temperature_c: 30,
+      voltage_v: 390,
+      charge_cycles: 300,
+      cell_deviation_mv: 6,
+    },
+    realtime: {
+      power_draw_kw: 8.0,
+      regen_active: true,
+      motor_temp_c: 52,
+      inverter_temp_c: 46,
+      coolant_temp_c: 38,
+      cabin_hvac_kw: 1.8,
+      auxiliary_kw: 0.6,
+      efficiency_wh_per_km: 175,
+      optimal_wh_per_km: 118,
+    },
+    specs: {
+      mass_kg: 2000,
+      drag_coefficient: 0.35,
+      rolling_resistance: 0.012,
+      frontal_area_m2: 2.8,
+      motor_efficiency: 0.88,
+      regen_efficiency: 0.70,
+      max_power_kw: 280,
+      max_torque_nm: 450,
+    },
+    health: {
+      soh_percent: 85,
+      charge_cycles: 300,
+      lifetime_years_remaining: 4.5,
+      degradation_rate_per_month: 0.09,
+      next_service_days: 45,
+      cell_voltage_map: 'deviation',
+    },
+    range_km: 265,
+    carImage: '',
+    modelPath: '/models/car.glb',
+    description: 'Fully configurable research profile. Adjust parameters to simulate any real-world vehicle condition.',
+    isCustom: true,
+  },
 };
 
 interface VehicleContextType {
@@ -240,28 +294,66 @@ interface VehicleContextType {
   currentVehicle: string;
   switchVehicle: (id: string) => void;
   allVehicles: Record<string, VehicleProfile>;
+  updateCustomVehicle: (updates: any) => void;
+  isCustomMode: boolean;
 }
 
 const VehicleContext = createContext<VehicleContextType | undefined>(undefined);
 
 export function VehicleProvider({ children }: { children: ReactNode }) {
+  const [vehicleProfiles, setVehicleProfiles] = useState<Record<string, VehicleProfile>>(VEHICLE_PROFILES);
   const [currentVehicle, setCurrentVehicle] = useState('model-v-performance');
   const [liveRealtime, setLiveRealtime] = useState<RealtimeData | null>(null);
+
+  // Range estimation formula (physics-based approximation)
+  const calculateCustomRange = (soh: number, mass: number, capacity: number) => {
+    const baseEfficiency = 118;
+    const massPenalty = (mass - 1600) * 0.04;
+    const healthPenalty = (100 - soh) * 0.8;
+    const effectiveCapacity = capacity * (soh / 100);
+    const adjustedEfficiency = baseEfficiency * (1 + (massPenalty + healthPenalty) / 100);
+    return Math.round((effectiveCapacity * 1000) / adjustedEfficiency);
+  };
+
+  const updateCustomVehicle = (updates: any) => {
+    setVehicleProfiles((prev) => {
+      const prevCustom = prev['custom-lab'];
+      return {
+        ...prev,
+        'custom-lab': {
+          ...prevCustom,
+          battery: { ...prevCustom.battery, ...(updates.battery || {}) },
+          specs: { ...prevCustom.specs, ...(updates.specs || {}) },
+          realtime: { ...prevCustom.realtime, ...(updates.realtime || {}) },
+          health: {
+            ...prevCustom.health,
+            soh_percent: updates.battery?.soh_percent ?? prevCustom.health.soh_percent,
+            ...(updates.health || {})
+          },
+          range_km: calculateCustomRange(
+            updates.battery?.soh_percent ?? prevCustom.battery.soh_percent,
+            updates.specs?.mass_kg ?? prevCustom.specs.mass_kg,
+            updates.battery?.capacity_kwh ?? prevCustom.battery.capacity_kwh
+          ),
+        }
+      };
+    });
+  };
 
   // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('selectedVehicle');
-    if (saved && VEHICLE_PROFILES[saved]) {
+    if (saved && vehicleProfiles[saved]) {
       setCurrentVehicle(saved);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Save to localStorage when changed
   useEffect(() => {
     localStorage.setItem('selectedVehicle', currentVehicle);
   }, [currentVehicle]);
 
-  const baseVehicle = VEHICLE_PROFILES[currentVehicle];
+  const baseVehicle = vehicleProfiles[currentVehicle];
 
   // Reset live data when vehicle changes
   useEffect(() => {
@@ -320,7 +412,7 @@ export function VehicleProvider({ children }: { children: ReactNode }) {
     : baseVehicle;
 
   const switchVehicle = (vehicleId: string) => {
-    if (VEHICLE_PROFILES[vehicleId]) {
+    if (vehicleProfiles[vehicleId]) {
       setCurrentVehicle(vehicleId);
     }
   };
@@ -329,7 +421,9 @@ export function VehicleProvider({ children }: { children: ReactNode }) {
     vehicle,
     currentVehicle,
     switchVehicle,
-    allVehicles: VEHICLE_PROFILES,
+    allVehicles: vehicleProfiles,
+    updateCustomVehicle,
+    isCustomMode: currentVehicle === 'custom-lab',
   };
 
   return (
