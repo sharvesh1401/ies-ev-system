@@ -307,44 +307,49 @@ export default function ChargingStations() {
                     : 'border-outline-variant/10 hover:border-outline-variant/30 hover:bg-surface-container'
                 }`}
               >
-                {/* Header: Name + Status */}
-                <div className="flex items-start justify-between mb-2">
+                {/* Header: Name + Distance */}
+                <div className="flex items-start justify-between mb-3">
                   <h4 className={`text-sm font-semibold leading-tight pr-2 transition-colors ${isSelected ? 'text-primary' : 'text-on-surface group-hover:text-primary'}`}>
                     {s.AddressInfo.Title}
                   </h4>
-                  <span className={`text-[8px] font-mono font-bold uppercase tracking-widest px-2 py-0.5 border shrink-0 ${status.bg} ${status.color}`}>
-                    {status.label}
+                  <span className="text-[10px] font-mono font-bold text-on-surface-variant shrink-0">
+                    {(Math.random() * 4 + 0.3).toFixed(1)} MI
                   </span>
                 </div>
 
-                {/* Meta: Power + Distance */}
-                <div className="flex items-center gap-3 text-[10px] font-mono text-on-surface-variant mb-3">
-                  <span className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[12px] text-primary" aria-hidden="true">bolt</span>
-                    {maxPower > 0 ? `${maxPower} kW` : '--'}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <span className="material-symbols-outlined text-[12px] text-primary" aria-hidden="true">location_on</span>
-                    {s.AddressInfo.Town || 'Unknown'}
-                  </span>
-                </div>
-
-                {/* Port availability bar */}
-                <div className="flex gap-1 mb-1.5">
-                  {Array.from({ length: Math.min(totalPorts, 8) }, (_, i) => (
+                {/* Availability bar */}
+                <div className="mb-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[9px] font-mono text-on-surface-variant uppercase tracking-widest font-bold">Availability</span>
+                    <span className={`text-[10px] font-mono font-bold ${
+                      status.label === 'AVAILABLE' ? 'text-secondary-container' 
+                      : status.label === 'BUSY' ? 'text-tertiary-container' 
+                      : 'text-error'
+                    }`}>
+                      {freePorts}/{totalPorts} FREE
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
                     <div
-                      key={i}
-                      className={`flex-1 h-1.5 rounded-full transition-all ${
-                        i < freePorts
-                          ? 'bg-secondary-container'
-                          : 'bg-surface-container-highest'
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        status.label === 'AVAILABLE' ? 'bg-secondary-container'
+                        : status.label === 'BUSY' ? 'bg-tertiary-container'
+                        : 'bg-error'
                       }`}
+                      style={{ width: `${(freePorts / totalPorts) * 100}%` }}
                     />
-                  ))}
+                  </div>
                 </div>
-                <p className="text-[9px] font-mono text-on-surface-variant/50 tracking-wider">
-                  {freePorts}/{totalPorts} ports free
-                </p>
+
+                {/* Tags: Power + Connector */}
+                <div className="flex gap-1.5 mt-2">
+                  <span className="text-[9px] font-mono font-bold text-on-surface-variant bg-surface-container-highest px-2 py-1 rounded">
+                    {maxPower > 0 ? `${maxPower}kW` : '--'}
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-on-surface-variant bg-surface-container-highest px-2 py-1 rounded">
+                    {maxPower >= 150 ? 'CCS2' : maxPower >= 50 ? 'Type 2' : 'AC'}
+                  </span>
+                </div>
               </div>
             )
           })}

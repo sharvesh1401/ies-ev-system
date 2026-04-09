@@ -45,7 +45,7 @@ function generateCellData(cellMap: 'balanced' | 'deviation' | 'critical', deviat
 
 /* ── SoH historical data points ── */
 const SOH_DATA = [100, 99.8, 99.5, 99.1, 98.6, 98.0, 97.5, 97.1, 96.5, 96.0, 95.4, 94.8, 94.2]
-const SOH_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan']
+const SOH_LABELS = ['2021', '', '', '2022', '', '', '2023', '', '', '2024', '', '', 'PRESENT']
 
 /* ── Charge cycle distribution ── */
 const CYCLE_DATA = [12, 18, 22, 28, 35, 40, 32, 25, 30, 38, 42, 28]
@@ -108,7 +108,7 @@ export default function BatteryAnalytics() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
         {/* Battery Health Index */}
-        <div className="bg-surface-container p-6 rounded-3xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
+        <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <span className="material-symbols-outlined text-6xl">health_and_safety</span>
           </div>
@@ -135,11 +135,14 @@ export default function BatteryAnalytics() {
             }`}>
               {vehicle.health.soh_percent >= 90 ? 'Nominal' : vehicle.health.soh_percent >= 80 ? 'Aging' : 'Critical'}
             </span>
+            <span className="text-[10px] font-mono py-1 px-2 rounded bg-secondary-container/10 text-secondary-container">
+              +0.2% from prev. check
+            </span>
           </div>
         </div>
 
         {/* Discharge Cycles */}
-        <div className="bg-surface-container p-6 rounded-3xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
+        <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <span className="material-symbols-outlined text-6xl">sync</span>
           </div>
@@ -160,7 +163,7 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Estimated Core Life */}
-        <div className="bg-surface-container p-6 rounded-3xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
+        <div className="bg-surface-container p-6 rounded-2xl border border-outline-variant/10 relative overflow-hidden group hover:bg-surface-variant transition-all duration-300">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
             <span className="material-symbols-outlined text-6xl">hourglass_empty</span>
           </div>
@@ -173,13 +176,13 @@ export default function BatteryAnalytics() {
             Degradation: {vehicle.health.degradation_rate_per_month}%/mo
           </p>
           <p className="text-[10px] font-mono text-on-surface/40">
-            Next service in <span className={serviceUrgent ? 'text-error font-bold' : 'text-primary font-bold'}>{vehicle.health.next_service_days} days</span>
+            Expected EoL: <span className="text-on-surface font-bold">Q{Math.ceil((new Date().getMonth() + 1 + lifetimeYears * 12) % 12 / 3) || 4} {new Date().getFullYear() + Math.round(lifetimeYears)}</span>
           </p>
         </div>
       </div>
 
       {/* ══ Full Width SoH Trend Chart ══ */}
-      <div className="bg-surface-container-low p-8 rounded-[32px] border border-outline-variant/5 mb-8">
+      <div className="bg-surface-container-low p-8 rounded-2xl border border-outline-variant/5 mb-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h2 className="text-xl font-bold tracking-tight text-on-surface">SoH Degradation Trend</h2>
@@ -237,7 +240,7 @@ export default function BatteryAnalytics() {
 
         {/* X-axis */}
         <div className="flex justify-between mt-4 px-2">
-          {SOH_MONTHS.filter((_, i) => i % 3 === 0).map((m, i) => (
+          {SOH_LABELS.filter((_, i) => i % 3 === 0).map((m, i) => (
             <span key={i} className="font-mono text-[10px] text-on-surface/20">{m}</span>
           ))}
         </div>
@@ -247,7 +250,7 @@ export default function BatteryAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Cell Voltage Map */}
-        <div className="bg-surface-container-low p-6 rounded-[32px] border border-outline-variant/5">
+        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5">
           <div className="flex justify-between items-start mb-6">
             <h3 className="font-label text-xs uppercase tracking-widest text-primary">Cell Voltage Map</h3>
             <span className="font-mono text-xs text-secondary-container">AVG 3.82V</span>
@@ -291,7 +294,7 @@ export default function BatteryAnalytics() {
         </div>
 
         {/* Core Temperature Gauge */}
-        <div className="bg-surface-container-low p-6 rounded-[32px] border border-outline-variant/5 flex flex-col items-center">
+        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5 flex flex-col items-center">
           <div className="w-full flex justify-between items-start mb-2">
             <h3 className="font-label text-xs uppercase tracking-widest text-primary">Core Temperature</h3>
           </div>
@@ -322,17 +325,21 @@ export default function BatteryAnalytics() {
               </span>
             </div>
           </div>
-          <div className="w-full flex justify-between text-[10px] font-mono text-on-surface/40 mt-4 border-t border-white/5 pt-4">
-            <span>Liquid Cooling</span>
-            <span className="text-secondary-container flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary-container animate-pulse" />
-              ACTIVE
-            </span>
+          {/* Peak / Ambient */}
+          <div className="w-full flex justify-around text-center mt-4 border-t border-white/5 pt-4">
+            <div>
+              <p className="text-[9px] font-mono text-on-surface/40 uppercase tracking-widest">Peak</p>
+              <p className="text-sm font-mono font-bold text-tertiary-container">{(vehicle.battery.temperature_c + 16).toFixed(1)}°</p>
+            </div>
+            <div>
+              <p className="text-[9px] font-mono text-on-surface/40 uppercase tracking-widest">Ambient</p>
+              <p className="text-sm font-mono font-bold text-on-surface">{(vehicle.battery.temperature_c - 8).toFixed(1)}°</p>
+            </div>
           </div>
         </div>
 
         {/* Monthly Cycles + Maintenance */}
-        <div className="bg-surface-container-low p-6 rounded-[32px] border border-outline-variant/5 flex flex-col">
+        <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5 flex flex-col">
           <h3 className="font-label text-xs uppercase tracking-widest text-primary mb-1">Monthly Cycles</h3>
           <p className="text-[10px] font-mono text-on-surface/40 uppercase tracking-widest mb-4">Last 12 months</p>
 
@@ -355,23 +362,32 @@ export default function BatteryAnalytics() {
             })}
           </div>
 
-          {/* Maintenance row */}
-          <div className={`mt-6 p-4 rounded-xl border flex items-center gap-3 ${
-            serviceUrgent ? 'border-error/30 bg-error-container/10' : 'border-outline-variant/20 bg-surface-container'
-          }`}>
-            <span className={`material-symbols-outlined text-2xl ${serviceUrgent ? 'text-error' : 'text-primary'}`}>
-              {serviceUrgent ? 'warning' : 'verified_user'}
-            </span>
-            <div>
-              <p className="text-xs font-mono text-on-surface font-bold">
-                {serviceUrgent ? 'Service Urgent' : 'No Service Needed'}
-              </p>
-              <p className="text-[10px] font-mono text-on-surface-variant">
-                Next check in {vehicle.health.next_service_days} days
-              </p>
-            </div>
+          {/* Total Active Time */}
+          <div className="flex justify-between items-center mt-4 pt-3 border-t border-white/5">
+            <span className="text-[9px] font-mono text-on-surface/40 uppercase tracking-widest">Total Active Time</span>
+            <span className="text-[11px] font-mono font-bold text-on-surface">422h 12m</span>
           </div>
         </div>
+      </div>
+
+      {/* ══ Full Width Inspection Banner ══ */}
+      <div className={`mt-8 p-5 rounded-2xl border flex items-center justify-between ${
+        serviceUrgent ? 'border-primary/30 bg-primary/5' : 'border-outline-variant/20 bg-surface-container'
+      }`}>
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary text-2xl">build</span>
+          </div>
+          <div>
+            <p className="text-base font-bold text-on-surface">Next Inspection Interval</p>
+            <p className="text-[11px] font-mono text-on-surface-variant">
+              Calibration check required in 2,450 km or {vehicle.health.next_service_days} days
+            </p>
+          </div>
+        </div>
+        <button className="px-6 py-3 bg-primary text-on-primary font-extrabold text-[10px] font-mono uppercase tracking-widest rounded-xl transition-all hover:brightness-110 hover:scale-[1.02] shadow-[0_4px_20px_rgba(0,217,255,0.25)]">
+          Schedule Now
+        </button>
       </div>
     </div>
   )

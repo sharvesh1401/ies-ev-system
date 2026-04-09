@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { useState, useRef, useEffect } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 const navItems = [
   { to: '/', icon: 'home', label: 'Home' },
@@ -10,8 +10,11 @@ const navItems = [
 ]
 
 export default function Sidebar() {
+  const navigate = useNavigate()
   const [profileOpen, setProfileOpen] = useState(false)
   const [isLight, setIsLight] = useState(false)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
 
   const toggleTheme = () => {
     const root = document.documentElement
@@ -24,111 +27,187 @@ export default function Sidebar() {
     }
   }
 
+  useEffect(() => {
+    if (!profileOpen) return
+    function handleClick(e: MouseEvent) {
+      const t = e.target as Node
+      if (!dropdownRef.current?.contains(t) && !triggerRef.current?.contains(t)) {
+        setProfileOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [profileOpen])
+
   return (
-    <aside className="w-[260px] hidden md:flex flex-col h-full z-50 shrink-0 bg-surface-container-low border-r border-white/5">
-      {/* Logo */}
-      <div className="px-6 py-6 mb-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0">
-            <img src="/logo.png" alt="Meridian Logo" className="w-full h-full object-cover" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tighter text-primary leading-none">
-              Meridian
-            </h1>
-            <p className="text-sm font-medium tracking-tight text-on-surface/60 mt-0.5">
-              Automotive Intelligence
-            </p>
-          </div>
+    <aside className="w-[260px] hidden md:flex flex-col h-full z-50 shrink-0 bg-[#181c24] border-r border-white/5">
+
+      {/* ── Logo ── */}
+      <div className="px-4 pt-6">
+        <div className="bg-surface-container border border-outline-variant/20 rounded-2xl px-5 py-4">
+          <h1 className="text-[32px] font-bold tracking-tight text-primary leading-none">
+            Meridian
+          </h1>
+          <p className="text-[12px] font-medium text-on-surface-variant/70 mt-1.5 leading-snug">
+            Automotive Intelligence
+          </p>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-0">
+      {/* Spacer between logo and nav */}
+      <div className="h-20 shrink-0" />
+
+      {/* ── Navigation ── */}
+      <nav className="flex flex-col gap-[36px] pl-8 pr-0">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
             end={item.to === '/'}
             className={({ isActive }) =>
-              `flex items-center px-6 py-3 space-x-3 text-sm font-medium tracking-tight transition-all duration-200 ease-in-out ${
+              `w-full flex items-center gap-5 transition-colors duration-200 relative ${
                 isActive
-                  ? 'text-primary font-bold border-r-2 border-primary bg-surface-container'
-                  : 'text-on-surface/60 hover:bg-surface-container hover:text-primary'
+                  ? 'text-primary font-semibold'
+                  : 'text-on-surface-variant hover:text-on-surface font-medium'
               }`
             }
           >
             {({ isActive }) => (
               <>
                 <span
-                  className="material-symbols-outlined text-[22px]"
-                  style={isActive ? { fontVariationSettings: "'FILL' 1, 'wght' 500" } : {}}
+                  className="material-symbols-outlined text-[48px] shrink-0"
+                  style={{ fontVariationSettings: isActive ? "'FILL' 1, 'wght' 500" : "'FILL' 0, 'wght' 300" }}
                 >
                   {item.icon}
                 </span>
-                <span>{item.label}</span>
+                <span className="text-[22px] font-medium">{item.label}</span>
+                
+                {/* Right-edge active indicator */}
+                {isActive && (
+                  <span className="absolute right-0 top-1/2 -translate-y-1/2 h-8 w-[4px] bg-primary rounded-l-md" />
+                )}
               </>
             )}
           </NavLink>
         ))}
       </nav>
 
-      {/* User Profile */}
-      <div className="px-3 pt-6 border-t border-white/5 relative">
+      {/* Spacer to push user block to bottom */}
+      <div className="flex-1" />
+
+      {/* ── User Block ── */}
+      <div className="px-3 pt-4 pb-5 border-t border-[var(--stitch-outline-variant)] relative">
         <div
+          ref={triggerRef}
           onClick={() => setProfileOpen(!profileOpen)}
-          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container transition-all duration-200 cursor-pointer"
+          className="flex items-center gap-3 px-3 py-3 rounded-xl cursor-pointer hover:bg-surface-variant/40 transition-all duration-200"
         >
-          <div className="w-9 h-9 shrink-0 rounded-full flex items-center justify-center text-xs font-bold bg-surface-container-highest text-primary border border-primary/20">
-            SH
+          {/* Avatar */}
+          <div className="w-11 h-11 rounded-full bg-surface-container border border-[var(--stitch-outline-variant)] flex items-center justify-center shrink-0">
+            <span
+              className="material-symbols-outlined text-on-surface-variant text-[28px]"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              person
+            </span>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <p className="text-sm font-semibold text-on-surface truncate">Sharvesh</p>
-            <p className="text-[10px] uppercase tracking-widest text-primary/60">System Developer</p>
+
+          {/* Name + role */}
+          <div className="flex-1 min-w-0">
+            <p className="text-[14px] font-semibold text-on-surface leading-tight">Sharvesh</p>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-on-surface-variant mt-0.5 font-bold">
+              Lead Architect
+            </p>
           </div>
-          <span className={`material-symbols-outlined text-on-surface/40 text-sm transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`}>
-            expand_more
-          </span>
         </div>
 
-        {/* Dropdown popup */}
+        {/* ── Profile Dropdown ── */}
         {profileOpen && (
-          <div className="absolute bottom-[72px] left-3 right-3 bg-surface-container-high border border-white/5 rounded-xl shadow-2xl overflow-hidden z-30" style={{ animation: 'slideUp 0.25s ease-out' }}>
-            <div className="p-4 border-b border-white/5">
+          <div
+            ref={dropdownRef}
+            className="absolute bottom-[84px] left-3 right-3 bg-surface-container-high border border-[var(--stitch-outline-variant)] rounded-2xl shadow-xl overflow-hidden z-[100]"
+            style={{ animation: 'dropdownIn 150ms ease-out', transformOrigin: 'bottom center' }}
+          >
+            {/* User header */}
+            <div
+              className="p-4 border-b border-[var(--stitch-outline-variant)] cursor-pointer hover:bg-surface-variant/40 transition-colors duration-150"
+              onClick={() => { navigate('/profile'); setProfileOpen(false) }}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-sm font-bold text-primary border border-primary/20">
+                <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-stitch-on-primary shrink-0">
                   SH
                 </div>
                 <div>
                   <p className="font-bold text-on-surface text-sm">Sharvesh</p>
-                  <p className="text-[11px] text-on-surface-variant">ss1405@srmist.edu.in</p>
+                  <p className="text-[10px] font-mono uppercase tracking-[0.15em] text-on-surface-variant font-bold">System Developer</p>
+                  <p className="text-[11px] text-on-surface-variant/80">s_sharvesh@outlook.com</p>
                 </div>
               </div>
             </div>
+
+            {/* Menu items */}
             <div className="p-2">
-              {[
-                { icon: 'settings', label: 'Settings', sub: 'App preferences', onClick: () => {} },
-                { icon: 'notifications', label: 'Notifications', sub: '3 unread', onClick: () => {} },
-                { icon: isLight ? 'light_mode' : 'dark_mode', label: 'Theme', sub: isLight ? 'Light mode active' : 'Dark mode active', onClick: toggleTheme },
-              ].map((item) => (
-                <button
-                  key={item.label}
-                  onClick={item.onClick}
-                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-surface-container transition-colors group"
-                >
-                  <span className="material-symbols-outlined text-on-surface-variant text-lg group-hover:text-primary transition-colors">{item.icon}</span>
-                  <div>
-                    <p className="text-sm text-on-surface">{item.label}</p>
-                    <p className="text-[10px] text-on-surface-variant">{item.sub}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <div className="p-2 border-t border-white/5">
-              <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-error-container/20 transition-colors group">
-                <span className="material-symbols-outlined text-error/50 text-lg">logout</span>
-                <span className="text-sm text-error/70 group-hover:text-error">Sign Out</span>
+              <button
+                onClick={() => { navigate('/profile'); setProfileOpen(false) }}
+                className="w-full flex items-center justify-between px-3 py-2.5 rounded-[10px] text-left hover:bg-surface-variant/40 transition-colors duration-150 group"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors duration-150">settings</span>
+                  <span className="text-sm font-medium text-on-surface">Settings</span>
+                </div>
+                <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
               </button>
+
+              <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-[10px] text-left hover:bg-surface-variant/40 transition-colors duration-150 group">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors duration-150">notifications</span>
+                  <span className="text-sm font-medium text-on-surface">Notifications</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="bg-primary text-stitch-on-primary text-[10px] font-mono font-bold px-2 py-0.5 rounded-full min-w-[22px] text-center">3</span>
+                  <span className="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+                </div>
+              </button>
+
+              {/* Theme Toggle */}
+              <div className="flex items-center justify-between px-3 py-2.5 rounded-[10px] mt-1">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-on-surface-variant">dark_mode</span>
+                  <span className="text-sm font-medium text-on-surface">Theme Mode</span>
+                </div>
+                <div className="flex bg-surface-container-lowest rounded-[10px] overflow-hidden border border-[var(--stitch-outline-variant)] p-0.5 gap-0.5">
+                  <button
+                    onClick={() => { if (isLight) toggleTheme() }}
+                    className={`px-3 py-1 text-[10px] rounded-lg font-mono font-bold uppercase tracking-widest transition-all duration-150 ${
+                      !isLight ? 'bg-primary text-stitch-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+                    }`}
+                  >
+                    Dark
+                  </button>
+                  <button
+                    onClick={() => { if (!isLight) toggleTheme() }}
+                    className={`px-3 py-1 text-[10px] rounded-lg font-mono font-bold uppercase tracking-widest transition-all duration-150 ${
+                      isLight ? 'bg-primary text-stitch-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'
+                    }`}
+                  >
+                    Light
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Sign Out */}
+            <div className="p-2 border-t border-[var(--stitch-outline-variant)]">
+              <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-left hover:bg-error/10 transition-colors duration-150 group">
+                <span className="material-symbols-outlined text-error group-hover:text-error/80">logout</span>
+                <span className="text-sm text-error font-medium group-hover:text-error/80">Sign Out</span>
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="px-4 py-3 border-t border-[var(--stitch-outline-variant)] flex justify-between text-[9px] font-mono text-on-surface-variant/70 uppercase tracking-widest bg-surface-container-lowest">
+              <span>Last Login: {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
+              <span>v.4.2.0-stable</span>
             </div>
           </div>
         )}

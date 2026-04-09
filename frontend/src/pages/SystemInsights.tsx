@@ -140,7 +140,7 @@ export default function SystemInsights() {
       <div className="grid grid-cols-12 gap-3 md:gap-4 shrink-0">
         
         {/* Profile Card (Ported from Profile.tsx) */}
-        <div className="col-span-12 lg:col-span-3 bg-surface-container p-5 rounded-3xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between">
+        <div className="col-span-12 lg:col-span-3 bg-surface-container p-5 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between">
           <div className="mb-3">
             <VehicleSelector />
           </div>
@@ -169,7 +169,7 @@ export default function SystemInsights() {
         </div>
 
         {/* Hybrid Prediction Engine */}
-        <div className="col-span-12 lg:col-span-5 bg-surface-container px-5 py-4 rounded-3xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between">
+        <div className="col-span-12 lg:col-span-5 bg-surface-container px-5 py-4 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between">
           <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-[60px] -mr-40 -mt-40 pointer-events-none" />
 
           <div className="relative z-10 flex items-center justify-between mb-6">
@@ -226,7 +226,7 @@ export default function SystemInsights() {
 
         {/* Right: Live metrics cards */}
         <div className="col-span-12 lg:col-span-4 grid grid-rows-2 gap-3 md:gap-4">
-          <div className="bg-surface-container p-5 rounded-3xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
+          <div className="bg-surface-container p-5 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
             <div className="flex items-center justify-between mb-4 relative z-10">
               <span className="text-[12px] font-mono text-primary uppercase tracking-widest font-bold">Inference Latency</span>
               <span className="material-symbols-outlined text-primary/50 text-xl">speed</span>
@@ -238,7 +238,7 @@ export default function SystemInsights() {
               {renderSparkline(latencyData, '#afecff', 45)}
             </div>
           </div>
-          <div className="bg-surface-container p-5 rounded-3xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
+          <div className="bg-surface-container p-5 rounded-2xl border border-outline-variant/10 relative overflow-hidden flex flex-col justify-between group hover:bg-surface-variant transition-colors">
             <div className="flex items-center justify-between mb-4 relative z-10">
               <span className="text-[12px] font-mono text-secondary-container uppercase tracking-widest font-bold">Throughput</span>
               <span className="material-symbols-outlined text-secondary-container/50 text-xl">dns</span>
@@ -280,7 +280,7 @@ export default function SystemInsights() {
         </div>
 
         {/* Diagnostics */}
-        <div className="bg-surface-container p-5 rounded-3xl flex flex-col h-full lg:h-[220px] border border-outline-variant/10 relative overflow-hidden">
+        <div className="bg-surface-container p-5 rounded-2xl flex flex-col h-full lg:h-[220px] border border-outline-variant/10 relative overflow-hidden">
           <h4 className="font-bold text-on-surface text-[16px] mb-4 relative z-10 flex items-center gap-2 shrink-0">
             <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
             System Diagnostics
@@ -335,7 +335,7 @@ export default function SystemInsights() {
       </div>
 
       {/* ═══ Neural Network Live Visualization ═══ */}
-      <div className="bg-surface-container-low p-6 rounded-3xl border border-outline-variant/5 relative overflow-hidden flex-1 min-h-[200px] flex flex-col">
+      <div className="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/5 relative overflow-hidden flex-1 min-h-[200px] flex flex-col">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(175,236,255,0.03)_0%,transparent_70%)] pointer-events-none z-0" />
 
         <div className="flex justify-between items-start mb-4 relative z-10">

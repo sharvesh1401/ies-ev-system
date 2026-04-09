@@ -246,6 +246,7 @@ const VehicleContext = createContext<VehicleContextType | undefined>(undefined);
 
 export function VehicleProvider({ children }: { children: ReactNode }) {
   const [currentVehicle, setCurrentVehicle] = useState('model-v-performance');
+  const [liveRealtime, setLiveRealtime] = useState<RealtimeData | null>(null);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -260,7 +261,63 @@ export function VehicleProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('selectedVehicle', currentVehicle);
   }, [currentVehicle]);
 
-  const vehicle = VEHICLE_PROFILES[currentVehicle];
+  const baseVehicle = VEHICLE_PROFILES[currentVehicle];
+
+  // Reset live data when vehicle changes
+  useEffect(() => {
+    setLiveRealtime(null);
+  }, [currentVehicle]);
+
+  // Live telemetry simulation — fluctuates realtime values every 3s
+  useEffect(() => {
+    const base = baseVehicle.realtime;
+    const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+
+    const id = setInterval(() => {
+      setLiveRealtime((prev) => {
+        const r = prev ?? { ...base };
+        return {
+          ...r,
+          power_draw_kw: clamp(
+            r.power_draw_kw + (Math.random() - 0.5) * 0.8,
+            base.power_draw_kw * 0.7,
+            base.power_draw_kw * 1.3
+          ),
+          motor_temp_c: clamp(
+            r.motor_temp_c + (Math.random() - 0.5) * 0.6,
+            base.motor_temp_c - 4,
+            base.motor_temp_c + 4
+          ),
+          inverter_temp_c: clamp(
+            r.inverter_temp_c + (Math.random() - 0.5) * 0.4,
+            base.inverter_temp_c - 3,
+            base.inverter_temp_c + 3
+          ),
+          coolant_temp_c: clamp(
+            r.coolant_temp_c + (Math.random() - 0.5) * 0.3,
+            base.coolant_temp_c - 2,
+            base.coolant_temp_c + 2
+          ),
+          efficiency_wh_per_km: clamp(
+            r.efficiency_wh_per_km + (Math.random() - 0.5) * 3,
+            base.efficiency_wh_per_km - 8,
+            base.efficiency_wh_per_km + 8
+          ),
+          cabin_hvac_kw: r.cabin_hvac_kw,
+          auxiliary_kw: r.auxiliary_kw,
+          optimal_wh_per_km: r.optimal_wh_per_km,
+          regen_active: r.regen_active,
+        };
+      });
+    }, 3000);
+
+    return () => clearInterval(id);
+  }, [baseVehicle]);
+
+  // Merge live realtime data onto the base profile
+  const vehicle: VehicleProfile = liveRealtime
+    ? { ...baseVehicle, realtime: liveRealtime }
+    : baseVehicle;
 
   const switchVehicle = (vehicleId: string) => {
     if (VEHICLE_PROFILES[vehicleId]) {

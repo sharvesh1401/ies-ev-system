@@ -4,16 +4,29 @@ import { OrbitControls, Html, Environment, ContactShadows, useGLTF } from '@reac
 import * as THREE from 'three'
 
 /* ═══════════════════════════════════════════════
+   Per-model config overrides for centering/scaling
+   ═══════════════════════════════════════════════ */
+const MODEL_CONFIG: Record<string, { targetSize: number; yOffset: number; rotationYOffset: number }> = {
+  '/models/car.glb':      { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 },
+  '/models/commuter.glb': { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 },
+  '/models/cargo.glb':    { targetSize: 4.0, yOffset: -0.4, rotationYOffset: 0 },
+}
+
+const DEFAULT_CONFIG = { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 }
+
+/* ═══════════════════════════════════════════════
    Load .glb car model from /models/car.glb
    ═══════════════════════════════════════════════ */
 function CarGLB({ batteryKwh, tempC, modelPath, regenActive, maxPowerKw }: { batteryKwh: number; tempC: number; modelPath: string; regenActive: boolean; maxPowerKw: number }) {
   const groupRef = useRef<THREE.Group>(null!)
   const { scene } = useGLTF(modelPath)
+  const cfg = MODEL_CONFIG[modelPath] ?? DEFAULT_CONFIG
 
   useEffect(() => {
     // 1. Reset
     scene.scale.setScalar(1)
     scene.position.set(0, 0, 0)
+    scene.rotation.set(0, 0, 0)
     scene.updateMatrixWorld(true)
 
     // 2. Normalizing the scale from VISIBLE MESHES ONLY to ignore lights/cameras
@@ -34,7 +47,7 @@ function CarGLB({ batteryKwh, tempC, modelPath, regenActive, maxPowerKw }: { bat
     }
     
     if (maxDim > 0 && isFinite(maxDim)) {
-      const scale = 4.5 / maxDim
+      const scale = cfg.targetSize / maxDim
       scene.scale.setScalar(scale)
     }
 
@@ -55,7 +68,7 @@ function CarGLB({ batteryKwh, tempC, modelPath, regenActive, maxPowerKw }: { bat
     
     scene.position.x -= center.x
     scene.position.z -= center.z
-    scene.position.y += (-0.5 - scaledBox.min.y)
+    scene.position.y += (cfg.yOffset - scaledBox.min.y)
 
     scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -63,7 +76,7 @@ function CarGLB({ batteryKwh, tempC, modelPath, regenActive, maxPowerKw }: { bat
         child.receiveShadow = true
       }
     })
-  }, [scene])
+  }, [scene, cfg])
 
   useFrame(({ clock }) => {
     if (groupRef.current) {

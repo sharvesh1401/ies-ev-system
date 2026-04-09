@@ -9,6 +9,7 @@ const RoutePlanner = lazy(() => import('./pages/RoutePlanner'))
 const BatteryAnalytics = lazy(() => import('./pages/BatteryAnalytics'))
 const ChargingStations = lazy(() => import('./pages/ChargingStations'))
 const SystemInsights = lazy(() => import('./pages/SystemInsights'))
+const Profile = lazy(() => import('./pages/Profile'))
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/battery-analytics" element={<BatteryAnalytics />} />
             <Route path="/charging-stations" element={<ChargingStations />} />
             <Route path="/system-insights" element={<SystemInsights />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

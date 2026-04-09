@@ -39,7 +39,7 @@ export default function Home() {
       <div className="flex flex-1 min-h-0 p-6 gap-6 overflow-hidden">
 
         {/* Left Panel – Vehicle Display (55%) */}
-        <section className="w-[55%] relative flex flex-col justify-center items-center rounded-3xl bg-surface-container-lowest overflow-hidden">
+        <section className="w-[55%] relative flex flex-col justify-center items-center rounded-2xl bg-surface-container-lowest overflow-hidden">
           {/* Radial glow */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#00d9ff10_0%,_transparent_70%)] pointer-events-none" />
 
@@ -107,7 +107,7 @@ export default function Home() {
 
               {/* Model name */}
               <div className="text-center space-y-1 mt-2">
-                <h2 className="text-4xl font-black italic tracking-tighter text-white drop-shadow-lg">
+                <h2 className="text-4xl font-black italic tracking-tighter text-on-surface drop-shadow-lg">
                   {modelNames[currentVehicle] ?? 'MODEL V'}
                 </h2>
                 <p className="font-label text-[10px] uppercase tracking-[0.3em] text-primary">
@@ -146,14 +146,14 @@ export default function Home() {
         <section className="w-[45%] flex flex-col gap-5 overflow-y-auto no-scrollbar">
 
           {/* SoC Card */}
-          <div className="bg-surface-container rounded-[20px] p-6 flex items-center justify-between group hover:bg-surface-variant transition-all duration-300">
+          <div className="bg-surface-container rounded-2xl p-6 flex items-center justify-between group hover:bg-surface-variant transition-all duration-300">
             <div className="space-y-1">
               <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Battery Capacity</h3>
               <div className="flex items-baseline gap-2">
                 <AnimatedNumber
                   value={vehicle.battery.soc_percent}
                   duration={2000}
-                  className="font-mono text-5xl font-bold text-white"
+                  className="font-mono text-5xl font-bold text-on-surface"
                 />
                 <span className="font-mono text-xl text-primary">%</span>
               </div>
@@ -203,7 +203,7 @@ export default function Home() {
           </div>
 
           {/* Nearby Charger Card */}
-          <div className="bg-surface-container rounded-[20px] p-6 flex items-center gap-5 hover:bg-surface-variant transition-all duration-300 relative overflow-hidden">
+          <div className="bg-surface-container rounded-2xl p-6 flex items-center gap-5 hover:bg-surface-variant transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-3 opacity-10">
               <span className="material-symbols-outlined text-6xl">ev_station</span>
             </div>
@@ -212,7 +212,7 @@ export default function Home() {
             </div>
             <div className="flex-1 space-y-1 min-w-0">
               <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Nearby Charger</h3>
-              <p className="text-lg font-bold text-white truncate">Tesla M2 - Supercharger</p>
+              <p className="text-lg font-bold text-on-surface truncate">Tesla M2 - Supercharger</p>
               <div className="flex items-center gap-3 font-mono text-[11px]">
                 <span className="text-secondary-container">1.2 MILES</span>
                 <span className="text-on-surface-variant">•</span>
@@ -228,7 +228,7 @@ export default function Home() {
           </div>
 
           {/* Sentry Mode Card */}
-          <div className="bg-surface-container rounded-[20px] p-6 flex items-center justify-between hover:bg-surface-variant transition-all duration-300">
+          <div className="bg-surface-container rounded-2xl p-6 flex items-center justify-between hover:bg-surface-variant transition-all duration-300">
             <div className="flex items-center gap-4">
               <div className="relative">
                 <div className="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center">
@@ -238,7 +238,7 @@ export default function Home() {
               </div>
               <div className="space-y-1">
                 <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Security Status</h3>
-                <p className="text-lg font-bold text-white">Sentry Mode Active</p>
+                <p className="text-lg font-bold text-on-surface">Sentry Mode Active</p>
               </div>
             </div>
             <div className="font-mono text-[11px] text-on-surface-variant text-right">
@@ -247,10 +247,10 @@ export default function Home() {
           </div>
 
           {/* Climate Control Card */}
-          <div className="bg-surface-container rounded-[20px] p-6 flex flex-col gap-4 hover:bg-surface-variant transition-all duration-300">
+          <div className="bg-surface-container rounded-2xl p-6 flex flex-col gap-4 hover:bg-surface-variant transition-all duration-300">
             <div className="flex justify-between items-center">
               <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Climate Control</h3>
-              <span className="font-mono text-lg font-bold text-white">
+              <span className="font-mono text-lg font-bold text-on-surface">
                 {(vehicle.realtime.cabin_hvac_kw * 6 + 18).toFixed(1)}°C
               </span>
             </div>
@@ -271,14 +271,14 @@ export default function Home() {
 
       {/* ── Bottom: Energy Consumption Chart ── */}
       <section className="px-6 pb-6">
-        <div className="bg-surface-container-low rounded-[24px] p-6 h-52 flex flex-col">
+        <div className="bg-surface-container-low rounded-2xl p-6 h-52 flex flex-col">
           <div className="flex justify-between items-end mb-4">
             <div>
               <h3 className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant mb-1">
                 Energy Consumption
               </h3>
-              <p className="font-mono text-xl font-bold text-white">
-                {vehicle.realtime.efficiency_wh_per_km}{' '}
+              <p className="font-mono text-xl font-bold text-on-surface">
+                {vehicle.realtime.efficiency_wh_per_km.toFixed(1)}{' '}
                 <span className="text-secondary text-sm font-normal">Wh/km</span>
               </p>
             </div>

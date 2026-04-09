@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import useWindowSize from '../hooks/useWindowSize'
-import GeoSearch, { GeoSearchResult } from '../components/GeoSearch'
 import {
   orchestrateRoute,
   type LatLng,
@@ -21,10 +20,10 @@ import { useVehicle } from '../contexts/VehicleContext'
 
 function createStationIcon(status: string) {
   const pinColor =
-    status === 'available' ? '#00E5CC' : status === 'busy' ? '#FFB300' : '#FF3D00'
+    status === 'available' ? '#00B25B' : status === 'busy' ? '#FFB800' : '#DC2626'
   return L.divIcon({
     className: '',
-    html: `<div style="width:26px;height:26px;background:rgba(10,14,23,0.85);backdrop-filter:blur(4px);border-radius:50%;border:2px solid ${pinColor};display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px ${pinColor}80, inset 0 0 8px ${pinColor}40;font-size:13px;color:${pinColor};cursor:pointer;transition:transform 0.3s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">⚡</div>`,
+    html: `<div style="width:26px;height:26px;background:var(--stitch-surface-container-highest);backdrop-filter:blur(4px);border-radius:50%;border:2px solid ${pinColor};display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px ${pinColor}80, inset 0 0 8px ${pinColor}40;font-size:13px;color:${pinColor};cursor:pointer;transition:transform 0.3s" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">⚡</div>`,
     iconSize: [26, 26],
     iconAnchor: [13, 26],
     popupAnchor: [0, -26],
@@ -34,7 +33,7 @@ function createStationIcon(status: string) {
 function createEndpointIcon(label: string, color: string) {
   return L.divIcon({
     className: '',
-    html: `<div style="width:32px;height:32px;background:rgba(10,14,23,0.8);backdrop-filter:blur(4px);border-radius:50%;border:2px solid ${color};display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px ${color}80, inset 0 0 10px ${color}40;font-size:12px;font-weight:bold;color:${color};">${label}</div>`,
+    html: `<div style="width:32px;height:32px;background:var(--stitch-surface-container-highest);backdrop-filter:blur(4px);border-radius:50%;border:2px solid ${color};display:flex;align-items:center;justify-content:center;box-shadow:0 0 15px ${color}80, inset 0 0 10px ${color}40;font-size:12px;font-weight:bold;color:${color};">${label}</div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
@@ -591,15 +590,29 @@ function getStepIcon(type: number, idx: number, total: number): string {
 // Main Component
 // ═════════════════════════════════════════════════════════════════════════════
 
+function useIsDarkTheme() {
+  const [isDark, setIsDark] = useState(() => !document.documentElement.classList.contains('light'))
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(!document.documentElement.classList.contains('light'))
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+  return isDark
+}
+
 export default function RoutePlanner() {
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<L.Map | null>(null)
+  const layerControlRef = useRef<L.TileLayer | null>(null)
   const layersRef = useRef<L.Layer[]>([])
   const location = useLocation()
   const navigate = useNavigate()
   const defaultDest = location.state?.destination || ''
   const { isMobile } = useWindowSize()
   const { vehicle } = useVehicle()
+  const isDark = useIsDarkTheme()
 
   // ── State
   const [showPanel, setShowPanel] = useState(false)
@@ -613,6 +626,7 @@ export default function RoutePlanner() {
   const [originName, setOriginName] = useState('Amsterdam Centraal')
   const [destName, setDestName] = useState(defaultDest || 'Rotterdam Centraal')
   const [modelType, setModelType] = useState<'onnx'|'student'|'teacher'>('onnx')
+  const [tollRoads, setTollRoads] = useState(true)
 
   // ── Initialize Map
   useEffect(() => {
@@ -624,10 +638,6 @@ export default function RoutePlanner() {
       zoomControl: false,
     })
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 19,
-    }).addTo(map)
-
     L.control.zoom({ position: 'topright' }).addTo(map)
     leafletMap.current = map
 
@@ -636,6 +646,19 @@ export default function RoutePlanner() {
       leafletMap.current = null
     }
   }, [])
+
+  // ── Update Map Tiles for Theme
+  useEffect(() => {
+    if (!leafletMap.current) return
+    if (layerControlRef.current) {
+      layerControlRef.current.remove()
+    }
+    const tileUrl = isDark
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+
+    layerControlRef.current = L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(leafletMap.current)
+  }, [isDark])
 
   // ── Clear map layers
   const clearLayers = useCallback(() => {
@@ -668,12 +691,12 @@ export default function RoutePlanner() {
 
         // Popup with comparison info
         line.bindPopup(
-          `<div class="text-[#FFFFFF] text-xs" style="min-width:140px">
-            <div style="font-weight:bold;margin-bottom:4px;color:#FFB300">Alternative Route ${i + 1}</div>
+          `<div class="text-[var(--stitch-on-surface)] text-xs" style="min-width:140px">
+            <div style="font-weight:bold;margin-bottom:4px;color:var(--stitch-tertiary-container)">Alternative Route ${i + 1}</div>
             <div>${(route.distance_m / 1000).toFixed(1)} km · ${Math.round(route.duration_s / 60)} min</div>
             ${altPred ? `<div>Energy: ${altPred.energy_kwh.toFixed(1)} kWh</div>
             <div>Arrival SoC: ${altPred.arrival_soc.toFixed(0)}%</div>` : ''}
-            <div style="color:#888;margin-top:4px;font-size:9px">Click to select this route</div>
+            <div class="text-[var(--stitch-on-surface-variant)]" style="margin-top:4px;font-size:9px">Click to select this route</div>
           </div>`
         )
 
@@ -728,11 +751,11 @@ export default function RoutePlanner() {
             }).addTo(map)
 
             line.bindPopup(
-              `<div class="text-[#FFFFFF] text-xs" style="min-width:120px">
+              `<div class="text-[var(--stitch-on-surface)] text-xs" style="min-width:120px">
                 <div style="font-weight:bold;margin-bottom:3px">Segment ${i + 1}</div>
                 <div>Energy: ${cost.toFixed(2)} kWh</div>
                 <div>Gradient: ${seg.gradient.toFixed(1)}%</div>
-                <div>Risk: <span style="color:${riskToColor(risk)}">${risk.toUpperCase()}</span></div>
+                <div>Risk: <span style="font-weight:bold;color:${riskToColor(risk)}">${risk.toUpperCase()}</span></div>
               </div>`
             )
             layersRef.current.push(line)
@@ -752,20 +775,20 @@ export default function RoutePlanner() {
       const end = primary.geometry[primary.geometry.length - 1]
 
       const startMarker = L.marker([start.lat, start.lng], {
-        icon: createEndpointIcon('A', '#00b4d8'),
+        icon: createEndpointIcon('A', 'var(--stitch-primary)'),
       })
         .addTo(map)
         .bindPopup(
-          `<div class="text-[#FFFFFF]"><b>Start:</b> ${ctx.originName}</div>`
+          `<div class="text-[var(--stitch-on-surface)]"><b>Start:</b> ${ctx.originName}</div>`
         )
       layersRef.current.push(startMarker)
 
       const endMarker = L.marker([end.lat, end.lng], {
-        icon: createEndpointIcon('B', '#00f5a0'),
+        icon: createEndpointIcon('B', 'var(--stitch-secondary-container)'),
       })
         .addTo(map)
         .bindPopup(
-          `<div class="text-[#FFFFFF]"><b>Destination:</b> ${ctx.destinationName}</div>`
+          `<div class="text-[var(--stitch-on-surface)]"><b>Destination:</b> ${ctx.destinationName}</div>`
         )
       layersRef.current.push(endMarker)
 
@@ -776,10 +799,10 @@ export default function RoutePlanner() {
         })
           .addTo(map)
           .bindPopup(
-            `<div class="text-[#FFFFFF] text-xs">
+            `<div class="text-[var(--stitch-on-surface)] text-xs">
               <b>${ch.name}</b><br/>
               ${ch.powerKw} kW · ${ch.operator}<br/>
-              <span style="color:${ch.status === 'available' ? '#00E5CC' : ch.status === 'busy' ? '#FFB300' : '#FF3D00'}">${ch.status.toUpperCase()}</span>
+              <span style="font-weight:bold;color:${ch.status === 'available' ? 'var(--stitch-secondary-container)' : ch.status === 'busy' ? 'var(--stitch-tertiary-container)' : 'var(--stitch-error)'}">${ch.status.toUpperCase()}</span>
               · ${ch.numPorts} ports
             </div>`
           )
@@ -910,34 +933,55 @@ export default function RoutePlanner() {
         <div ref={mapRef} className="h-full w-full z-0 opacity-90" />
         <div className="absolute inset-0 z-[5] pointer-events-none shadow-[inset_0_0_150px_rgba(10,14,23,1)]" />
 
-        {/* ── Top search bar overlay ── */}
-        <div className="absolute top-5 left-5 right-5 lg:left-[440px] lg:right-auto lg:w-[400px] z-[1000]">
-          <GeoSearch
-            variant="glass"
-            color="blue"
-            placeholder="Search places, addresses…"
-            onSelect={(result: GeoSearchResult) => {
-              setDestData({ lat: parseFloat(result.lat), lng: parseFloat(result.lon) })
-              setDestName(result.display_name.split(',')[0])
-              const map = leafletMap.current
-              if (map) map.flyTo([parseFloat(result.lat), parseFloat(result.lon)], 14, { animate: true, duration: 1 })
-            }}
-          />
-        </div>
+        {/* ── Top-left stats overlay (Active Latency + Signal Strength) ── */}
+        {!isMobile && (
+          <div className="absolute top-4 left-[440px] z-[1000] flex gap-0 rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-low/90 backdrop-blur-xl">
+            <div className="px-4 py-2.5 border-r border-outline-variant/20">
+              <p className="text-[8px] font-mono font-bold text-on-surface-variant/60 uppercase tracking-widest">Active Latency</p>
+              <p className="text-sm font-mono font-bold text-on-surface mt-0.5">12ms</p>
+            </div>
+            <div className="px-4 py-2.5">
+              <p className="text-[8px] font-mono font-bold text-primary uppercase tracking-widest">Signal Strength</p>
+              <p className="text-sm font-mono font-bold text-on-surface mt-0.5">98.4%</p>
+            </div>
+          </div>
+        )}
 
         {/* ── Map layer toggle ── */}
-        <div className="absolute top-5 right-5 z-[1000] flex flex-col gap-2">
+        <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
           <button
             onClick={() => navigate('/charging-stations')}
             aria-label="Navigate to Charging Stations"
-            className="px-3 py-2 rounded-lg text-xs font-bold font-mono tracking-widest uppercase flex items-center gap-2 transition-all duration-300 bg-surface-container-high/80 backdrop-blur text-primary border border-primary/40 hover:bg-surface-container-highest cursor-pointer"
+            className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 bg-surface-container-high/80 backdrop-blur text-on-surface-variant border border-outline-variant/20 hover:text-primary cursor-pointer"
           >
-            <span className="material-symbols-outlined text-sm" aria-hidden="true">
-              ev_station
+            <span className="material-symbols-outlined text-lg" aria-hidden="true">
+              layers
             </span>
-            Chargers
           </button>
         </div>
+
+        {/* ── Next Maneuver card (bottom of map) ── */}
+        {primaryRoute && prediction && !isMobile && (
+          <div className="absolute bottom-4 left-[440px] right-4 z-[1000]">
+            <div className="bg-surface-container/95 backdrop-blur-xl rounded-2xl border border-outline-variant/20 p-4 max-w-[480px]">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="material-symbols-outlined text-primary text-lg">navigation</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-on-surface">Next Maneuver</p>
+                    <p className="text-[10px] font-mono text-on-surface-variant">{routeSteps[0]?.text || 'Awaiting route data'}</p>
+                  </div>
+                </div>
+                <p className="text-lg font-mono font-bold text-primary">{routeSteps[0]?.sub || '—'}</p>
+              </div>
+              <div className="mt-2 h-1 rounded-full bg-surface-container-highest overflow-hidden">
+                <div className="h-full w-3/4 rounded-full bg-gradient-to-r from-primary to-primary/40" />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Pipeline Status Stepper (Center Overlay — persistent) ── */}
         {pipelineStage !== 'idle' && (
@@ -1013,99 +1057,130 @@ export default function RoutePlanner() {
         >
           {/* Header */}
           <div className="p-6 pb-4 relative overflow-hidden shrink-0">
-            <h3 className="text-2xl font-bold text-on-surface mb-1 relative z-10">
-              Route Control
-            </h3>
-            <p className="text-[10px] font-mono text-primary/60 tracking-widest uppercase relative z-10">
-              Neural Navigation Active
-            </p>
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold text-on-surface relative z-10">
+                Route Planner
+              </h3>
+              <span className="text-[9px] font-mono font-bold text-on-surface-variant bg-surface-container-highest px-2.5 py-1 rounded-full uppercase tracking-widest">v2.4.0</span>
+            </div>
           </div>
 
-          {/* Origin/Destination inputs */}
+          {/* Origin / Waypoint / Destination — 3-input timeline */}
           <div className="px-6 pb-5 shrink-0">
             <div className="flex gap-4">
+              {/* Timeline dots + line */}
               <div className="flex flex-col items-center py-3 shrink-0">
                 <div className="w-3.5 h-3.5 rounded-full bg-surface-container-lowest border-[3px] border-primary z-10" />
-                <div className="w-[1px] flex-1 bg-gradient-to-b from-primary via-outline-variant to-secondary-container my-1" />
+                <div className="w-[1px] flex-1 bg-gradient-to-b from-primary to-outline-variant my-1" />
+                <div className="w-3.5 h-3.5 rounded-full bg-surface-container-lowest border-[3px] border-primary/40 z-10 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[8px] text-primary/60">ev_station</span>
+                </div>
+                <div className="w-[1px] flex-1 bg-gradient-to-b from-outline-variant to-secondary-container my-1" />
                 <div className="w-3.5 h-3.5 rounded-full bg-surface-container-lowest border-[3px] border-secondary-container z-10" />
               </div>
 
               <div className="flex-1 space-y-3">
-                <LocationAutocomplete
-                  placeholder="Start point..."
-                  defaultValue="Amsterdam Centraal"
-                  color="blue"
-                  onSelect={(r: any) => {
-                    setOriginData({ lat: parseFloat(r.lat), lng: parseFloat(r.lon) })
-                    setOriginName(r.display_name.split(',')[0])
-                  }}
-                />
-                <LocationAutocomplete
-                  placeholder="Destination..."
-                  defaultValue={defaultDest || 'Rotterdam Centraal'}
-                  color="green"
-                  onSelect={(r: any) => {
-                    setDestData({ lat: parseFloat(r.lat), lng: parseFloat(r.lon) })
-                    setDestName(r.display_name.split(',')[0])
-                  }}
-                />
+                {/* Origin */}
+                <div>
+                  <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">Origin Point</p>
+                  <LocationAutocomplete
+                    placeholder="Start point..."
+                    defaultValue="Amsterdam Centraal"
+                    color="blue"
+                    onSelect={(r: any) => {
+                      setOriginData({ lat: parseFloat(r.lat), lng: parseFloat(r.lon) })
+                      setOriginName(r.display_name.split(',')[0])
+                    }}
+                  />
+                </div>
+                {/* Smart Charging Stop */}
+                <div>
+                  <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">Smart Charging Stop</p>
+                  <input
+                    type="text"
+                    placeholder="Add waypoints..."
+                    className="w-full bg-surface-container-lowest border border-outline-variant/20 text-on-surface text-sm px-4 py-3.5 rounded-[10px] outline-none focus:bg-surface-container focus:border-primary/50 transition-all placeholder:text-on-surface-variant/30"
+                  />
+                </div>
+                {/* Destination */}
+                <div>
+                  <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">Destination</p>
+                  <LocationAutocomplete
+                    placeholder="Destination..."
+                    defaultValue={defaultDest || 'Rotterdam Centraal'}
+                    color="green"
+                    onSelect={(r: any) => {
+                      setDestData({ lat: parseFloat(r.lat), lng: parseFloat(r.lon) })
+                      setDestName(r.display_name.split(',')[0])
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Model Selection Tuple */}
-            <div className="mt-4 flex rounded-xl overflow-hidden border border-outline-variant/20">
-              {(['onnx', 'student', 'teacher'] as const).map(type => (
-                <button
-                  key={type}
-                  className={`flex-1 py-1.5 text-[9px] font-mono font-bold tracking-widest uppercase transition-all ${
-                    modelType === type
-                      ? 'bg-primary/20 text-primary'
-                      : 'bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
-                  }`}
-                  onClick={() => setModelType(type)}
-                >
-                  {type}
-                </button>
-              ))}
+            {/* Optimization Model */}
+            <div className="mt-5">
+              <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest mb-2">Optimization Model</p>
+              <div className="flex rounded-xl overflow-hidden border border-outline-variant/20">
+                {(['onnx', 'student', 'teacher'] as const).map(type => (
+                  <button
+                    key={type}
+                    className={`flex-1 py-2.5 text-[10px] font-mono font-bold tracking-widest uppercase transition-all duration-150 ${
+                      modelType === type
+                        ? 'bg-primary text-on-primary'
+                        : 'bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                    }`}
+                    onClick={() => setModelType(type)}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Est. Time + Battery at Arrival */}
+            <div className="mt-4 grid grid-cols-2 gap-3">
+              <div className="bg-surface-container rounded-xl p-4 border border-outline-variant/10">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="material-symbols-outlined text-primary text-sm">schedule</span>
+                  <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest">Est. Time</p>
+                </div>
+                <p className="text-lg font-mono font-bold text-on-surface">
+                  {primaryRoute ? `${Math.floor(primaryRoute.duration_s / 3600)}h ${Math.round((primaryRoute.duration_s % 3600) / 60)}m` : '—'}
+                </p>
+              </div>
+              <div className="bg-surface-container rounded-xl p-4 border border-outline-variant/10">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="material-symbols-outlined text-secondary-container text-sm">bolt</span>
+                  <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest">Battery at Arrival</p>
+                </div>
+                <p className="text-lg font-mono font-bold text-on-surface">
+                  {prediction ? `${prediction.arrival_soc.toFixed(0)}%` : '—'}
+                </p>
+              </div>
+            </div>
+
+            {/* Toll Roads Toggle */}
+            <div className="mt-4 bg-surface-container rounded-xl p-4 border border-outline-variant/10 flex items-center justify-between">
+              <div>
+                <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest mb-0.5">Toll Roads</p>
+                <p className="text-sm font-medium text-on-surface">Minimize Highway Costs</p>
+              </div>
+              <button
+                onClick={() => setTollRoads(!tollRoads)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-150 ${
+                  tollRoads ? 'bg-primary' : 'bg-surface-container-highest'
+                }`}
+              >
+                <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform duration-150 ${
+                  tollRoads ? 'translate-x-6' : 'translate-x-1'
+                }`} />
+              </button>
             </div>
           </div>
 
-          {/* Route stats */}
+          {/* Route steps — scrollable area */}
           <div className="p-6 pt-0 flex-1 overflow-y-auto custom-scrollbar">
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="text-center p-3 bg-surface-container-high rounded-xl border-t border-primary/30 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent" />
-                <p className="text-[9px] font-mono text-primary/60 uppercase tracking-widest relative z-10">
-                  Distance
-                </p>
-                <p className="text-xl font-mono font-bold text-on-surface mt-1 relative z-10">
-                  {primaryRoute ? (primaryRoute.distance_m / 1000).toFixed(1) : '—'}
-                  <span className="text-[10px] ml-0.5 text-on-surface-variant/40">km</span>
-                </p>
-              </div>
-              <div className="text-center p-3 bg-surface-container-high rounded-xl border-t border-outline-variant/30 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-outline-variant/5 to-transparent" />
-                <p className="text-[9px] font-mono text-on-surface-variant/60 uppercase tracking-widest relative z-10">
-                  Duration
-                </p>
-                <p className="text-xl font-mono font-bold text-on-surface mt-1 relative z-10">
-                  {primaryRoute ? Math.round(primaryRoute.duration_s / 60) : '—'}
-                  <span className="text-[10px] ml-0.5 text-on-surface-variant/40">min</span>
-                </p>
-              </div>
-              <div className="text-center p-3 bg-surface-container-high rounded-xl border-t border-secondary-container/30 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-b from-secondary-container/5 to-transparent" />
-                <p className="text-[9px] font-mono text-secondary-container/60 uppercase tracking-widest relative z-10">
-                  Energy
-                </p>
-                <p className="text-xl font-mono font-bold text-on-surface mt-1 relative z-10">
-                  {prediction ? prediction.energy_kwh.toFixed(1) : '—'}
-                  <span className="text-[10px] ml-0.5 text-on-surface-variant/40">kWh</span>
-                </p>
-              </div>
-            </div>
-
-            {/* Route steps */}
             <div className="space-y-4 relative">
               {routeSteps.length > 0 && (
                 <div className="absolute left-4 top-2 bottom-6 w-px bg-outline-variant/30 z-0" />

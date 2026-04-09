@@ -1,152 +1,237 @@
+import { useState } from 'react'
+
 export default function Profile() {
+  const [isEditing, setIsEditing] = useState(false)
+  const [profile, setProfile] = useState({
+    name: 'Sharvesh',
+    role: 'System Developer',
+    email: 's_sharvesh@outlook.com',
+    location: 'Chennai, India',
+    timezone: 'IST (UTC +5:30)',
+    focus: 'EV Telemetry, RTOS Systems',
+    joinDate: 'October 2023',
+    website: 'meridian-ev.io',
+    github: 'github.com/sharvesh',
+    repo: 'github.com/sharvesh/meridian-ies-ev',
+  })
+  const [draft, setDraft] = useState({ ...profile })
+
+  const handleSave = () => { setProfile({ ...draft }); setIsEditing(false) }
+  const handleCancel = () => { setDraft({ ...profile }); setIsEditing(false) }
+
+  const initials = profile.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto overflow-y-auto space-y-6 no-scrollbar">
+    <div className="w-full">
+      <div className="max-w-[680px] mx-auto px-6 pt-10 pb-16 flex flex-col gap-10">
 
-      {/* ═══ Header Card ═══ */}
-      <div className="glass-dark p-6 md:p-8 card-hover relative overflow-hidden border border-neon-cyan/20">
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-neon-cyan/10 rounded-full blur-[60px]" />
-        <div className="flex items-center gap-5 relative z-10">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-neon-cyan to-neon-green flex items-center justify-center shadow-[0_0_30px_rgba(0,229,204,0.4)] shrink-0">
-            <span className="text-4xl">⚡</span>
-          </div>
-          <div>
-            <h1 className="text-2xl font-headline font-bold text-surface-900 tracking-tight">Sharvesh Selvakumar</h1>
-            <div className="flex flex-wrap gap-2 mt-2">
-              <span className="px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-widest bg-gradient-to-r from-neon-cyan/20 to-neon-green/10 text-neon-cyan border border-neon-cyan/30 shadow-[0_0_10px_rgba(0,229,204,0.2)] rounded-full">
-                System Developer
-              </span>
-              <span className="px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-widest border border-neon-purple/30 text-neon-purple bg-neon-purple/10 rounded-full">
-                ML Engineer
-              </span>
+        {/* ── Header Card ── */}
+        <div className="bg-surface-container-highest rounded-2xl p-7 flex items-start gap-6">
+
+          {/* Avatar + ONLINE badge */}
+          <div className="relative shrink-0">
+            <div className="w-[96px] h-[96px] rounded-2xl bg-white flex items-center justify-center shadow-sm border border-outline-variant/20">
+              <span className="text-[30px] font-black text-primary leading-none">{initials}</span>
             </div>
-            <p className="text-sm text-surface-800/60 mt-2 font-medium">@ SRM Institute of Science & Technology</p>
+            <div className="absolute -bottom-3 left-3 flex items-center gap-1.5 bg-[#00C853] px-3 py-[5px] rounded-full shadow-sm z-10">
+              <span className="w-[6px] h-[6px] rounded-full bg-white animate-pulse shrink-0" />
+              <span className="text-[9px] font-black text-white uppercase tracking-[0.15em]">Online</span>
+            </div>
+          </div>
+
+          {/* Name / role / email */}
+          <div className="flex-1 min-w-0 pt-1">
+            {isEditing ? (
+              <div className="space-y-2">
+                <input
+                  value={draft.name}
+                  onChange={e => setDraft({ ...draft, name: e.target.value })}
+                  className="text-[22px] font-black text-on-surface bg-surface-container border border-outline-variant/30 rounded-xl px-3 py-1.5 outline-none focus:border-primary/50 w-full"
+                />
+                <input
+                  value={draft.role}
+                  onChange={e => setDraft({ ...draft, role: e.target.value })}
+                  className="text-[11px] font-mono font-black uppercase tracking-[0.2em] text-primary bg-surface-container border border-outline-variant/30 rounded-xl px-3 py-1.5 outline-none focus:border-primary/50 w-full"
+                />
+                <input
+                  value={draft.email}
+                  onChange={e => setDraft({ ...draft, email: e.target.value })}
+                  className="text-[13px] text-on-surface-variant bg-surface-container border border-outline-variant/30 rounded-xl px-3 py-1.5 outline-none focus:border-primary/50 w-full"
+                />
+              </div>
+            ) : (
+              <>
+                <h1 className="text-[22px] font-black text-on-surface leading-tight">{profile.name}</h1>
+                <p className="text-[11px] font-mono font-bold text-primary uppercase tracking-[0.2em] mt-1.5">{profile.role}</p>
+                <p className="text-[13px] text-on-surface-variant mt-2">{profile.email}</p>
+              </>
+            )}
+          </div>
+
+          {/* Edit / Save buttons — top-right aligned */}
+          <div className="shrink-0 pt-1">
+            {isEditing ? (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleCancel}
+                  className="px-4 py-2 rounded-xl border border-outline-variant/40 text-[13px] font-semibold text-on-surface hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 rounded-xl bg-primary text-on-primary text-[13px] font-semibold hover:brightness-110 transition-all"
+                >
+                  Save
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant/40 text-[13px] font-semibold text-on-surface hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+              >
+                <span className="material-symbols-outlined text-[16px]">edit</span>
+                Edit Profile
+              </button>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* ═══ Quick Links ═══ */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 stagger-children">
-        {[
-          { icon: 'code', title: 'GitHub', subtitle: '@sharvesh1401', href: 'https://github.com/sharvesh1401', stat: '15 repositories', color: 'neon-cyan' },
-          { icon: 'work', title: 'Portfolio', subtitle: 'sharveshportfolio.com', href: 'https://sharveshportfolio.com', stat: '5 major projects', color: 'neon-green' },
-          { icon: 'group', title: 'LinkedIn', subtitle: 'Connect', href: 'https://linkedin.com/in/sharvesh-selvakumar', stat: '500+ connections', color: 'neon-purple' },
-        ].map((link) => (
-          <a
-            key={link.title}
-            href={link.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glass-dark p-5 card-hover border border-neon-cyan/10 group block"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className={`w-10 h-10 rounded-full bg-${link.color}/10 border border-${link.color}/20 flex items-center justify-center text-${link.color} group-hover:shadow-[0_0_15px_currentColor] transition-shadow`}>
-                <span className="material-symbols-outlined text-lg">{link.icon}</span>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-surface-900">{link.title}</p>
-                <p className="text-[10px] text-surface-800/40 font-mono">{link.subtitle}</p>
-              </div>
-            </div>
-            <p className="text-[10px] font-mono text-surface-800/40 uppercase tracking-widest">{link.stat}</p>
-          </a>
-        ))}
-      </div>
-
-      {/* ═══ About ═══ */}
-      <div className="glass-dark p-6 card-hover border border-neon-cyan/10">
-        <h3 className="font-headline font-bold text-surface-900 tracking-tight mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-neon-cyan text-lg">info</span>
-          About the Developer
-        </h3>
-        <p className="text-sm text-surface-800/70 leading-relaxed mb-3">
-          Built <strong className="text-surface-900">IES_EV</strong> — a hybrid ML+Physics system for electric vehicle energy management that combines transformer-based
-          neural networks with physics validation. Published research achieving
-          <strong className="text-neon-cyan"> 2.1% MAPE</strong> (4× better than industry standards).
-        </p>
-        <p className="text-sm text-surface-800/70 leading-relaxed">
-          Specializes in <strong className="text-surface-900">edge AI deployment</strong>, real-time systems, and battery analytics.
-          This platform demonstrates production-ready ML inference running on constrained hardware with sub-second latency.
-        </p>
-      </div>
-
-      {/* ═══ Skills & Technologies ═══ */}
-      <div className="glass-dark p-6 card-hover border border-neon-cyan/10">
-        <h3 className="font-headline font-bold text-surface-900 tracking-tight mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-neon-cyan text-lg">build</span>
-          Skills & Technologies
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {[
-            { name: 'Python', level: 'expert' },
-            { name: 'PyTorch', level: 'expert' },
-            { name: 'Transformers', level: 'expert' },
-            { name: 'XGBoost', level: 'expert' },
-            { name: 'React', level: 'advanced' },
-            { name: 'TypeScript', level: 'advanced' },
-            { name: 'Node.js', level: 'advanced' },
-            { name: 'FastAPI', level: 'advanced' },
-            { name: 'Docker', level: 'intermediate' },
-            { name: 'Mapbox', level: 'intermediate' },
-          ].map((skill) => (
-            <span
-              key={skill.name}
-              className={`px-4 py-2 text-sm font-medium border transition-all hover:scale-105 cursor-default rounded-full ${
-                skill.level === 'expert'
-                  ? 'bg-accent-success/10 border-accent-success/30 text-accent-success shadow-[0_0_8px_rgba(0,230,118,0.15)]'
-                  : skill.level === 'advanced'
-                  ? 'bg-neon-cyan/10 border-neon-cyan/30 text-neon-cyan shadow-[0_0_8px_rgba(0,229,204,0.15)]'
-                  : 'bg-surface-200/50 border-surface-300/50 text-surface-800'
-              }`}
-            >
-              {skill.name}
+        {/* ── Personal Information ── */}
+        <div className="flex flex-col gap-5">
+          {/* Section header */}
+          <div className="flex items-center gap-5">
+            <span className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-[0.2em] shrink-0">
+              Personal Information
             </span>
-          ))}
-        </div>
-      </div>
+            <div className="flex-1 h-px bg-outline-variant" />
+          </div>
 
-      {/* ═══ Research & Publications ═══ */}
-      <div className="glass-dark p-6 card-hover border border-neon-cyan/10">
-        <h3 className="font-headline font-bold text-surface-900 tracking-tight mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-neon-cyan text-lg">science</span>
-          Research & Publications
-        </h3>
-        <div className="bg-surface-200/30 border border-neon-cyan/10 p-5 group hover:border-neon-cyan/20 transition-colors rounded-xl">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h4 className="text-sm font-bold text-surface-900 group-hover:text-neon-cyan transition-colors leading-snug">
-                Development of Intelligent Energy & Routing System for On-board Electric Vehicles
-              </h4>
-              <p className="text-[11px] text-surface-800/50 mt-2 font-mono">IEEE Conference • 2026</p>
-            </div>
-            <span className="px-3 py-1 text-[9px] font-mono font-bold uppercase tracking-widest bg-neon-yellow/10 border border-neon-yellow/30 text-neon-yellow shrink-0 shadow-[0_0_10px_rgba(255,214,0,0.15)] rounded-full">
-              Submitted
-            </span>
+          {/* 2×2 grid */}
+          <div className="grid grid-cols-2 gap-4">
+            {([
+              { label: 'Base Location', key: 'location' as const },
+              { label: 'Timezone',      key: 'timezone'  as const },
+              { label: 'Focus Areas',  key: 'focus'     as const },
+              { label: 'Join Date',    key: 'joinDate'  as const },
+            ]).map(item => (
+              <div
+                key={item.label}
+                className="bg-surface-container-high rounded-2xl px-5 py-4 min-h-[84px] flex flex-col justify-center"
+              >
+                <p className="text-[9px] font-mono font-bold text-on-surface-variant uppercase tracking-[0.15em] mb-2">
+                  {item.label}
+                </p>
+                {isEditing ? (
+                  <input
+                    value={draft[item.key]}
+                    onChange={e => setDraft({ ...draft, [item.key]: e.target.value })}
+                    className="text-[15px] font-medium text-on-surface bg-surface-container border border-outline-variant/30 rounded-lg px-2 py-1 outline-none focus:border-primary/50 w-full"
+                  />
+                ) : (
+                  <p className="text-[15px] font-medium text-on-surface">{profile[item.key]}</p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* ═══ Contact ═══ */}
-      <div className="glass-dark p-6 card-hover border border-neon-cyan/10">
-        <h3 className="font-headline font-bold text-surface-900 tracking-tight mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-neon-cyan text-lg">contact_mail</span>
-          Contact
-        </h3>
-        <div className="space-y-3">
-          {[
-            { icon: 'mail', text: 'ss1405@srmist.edu.in' },
-            { icon: 'phone', text: '+91 XXXXX XXXXX' },
-            { icon: 'location_on', text: 'Chennai, Tamil Nadu, India' },
-          ].map((item) => (
-            <div key={item.icon} className="flex items-center gap-3 group">
-              <div className="w-9 h-9 rounded-full bg-surface-200/50 border border-surface-300/30 flex items-center justify-center text-surface-800/50 group-hover:text-neon-cyan group-hover:border-neon-cyan/30 transition-colors">
-                <span className="material-symbols-outlined text-base">{item.icon}</span>
+        {/* ── Professional Links ── */}
+        <div className="flex flex-col gap-5">
+          {/* Section header */}
+          <div className="flex items-center gap-5">
+            <span className="text-[10px] font-mono font-bold text-on-surface-variant uppercase tracking-[0.2em] shrink-0">
+              Professional Links
+            </span>
+            <div className="flex-1 h-px bg-outline-variant" />
+          </div>
+
+          {/* Link rows */}
+          <div className="flex flex-col gap-3">
+            {([
+              {
+                icon: 'language',
+                label: 'Website',
+                key: 'website' as const,
+                href: 'https://meridian-ev.io',
+                iconBg: 'bg-primary/15',
+                iconColor: 'text-primary',
+              },
+              {
+                icon: 'laptop_mac',
+                label: 'GitHub',
+                key: 'github' as const,
+                href: 'https://github.com/sharvesh1401',
+                iconBg: 'bg-on-surface/8',
+                iconColor: 'text-on-surface-variant',
+              },
+              {
+                icon: 'account_tree',
+                label: 'GitHub Repository',
+                key: 'repo' as const,
+                href: 'https://github.com/sharvesh1401/ies-ev-system',
+                iconBg: 'bg-secondary-container/15',
+                iconColor: 'text-secondary-container',
+              },
+            ]).map(link => (
+              <div
+                key={link.label}
+                className="flex items-center gap-5 px-5 py-4 bg-surface-container-high rounded-2xl"
+              >
+                {/* Icon circle */}
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${link.iconBg} ${link.iconColor}`}>
+                  <span
+                    className="material-symbols-outlined text-[20px]"
+                    style={{ fontVariationSettings: "'FILL' 1" }}
+                  >
+                    {link.icon}
+                  </span>
+                </div>
+
+                {/* Label + URL */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-[15px] font-semibold text-on-surface leading-tight">{link.label}</p>
+                  {isEditing ? (
+                    <input
+                      value={draft[link.key]}
+                      onChange={e => setDraft({ ...draft, [link.key]: e.target.value })}
+                      className="text-[11px] font-mono text-on-surface-variant bg-surface-container border border-outline-variant/30 rounded-lg px-2 py-0.5 mt-1 outline-none focus:border-primary/50 w-full"
+                    />
+                  ) : (
+                    <p className="text-[11px] font-mono text-on-surface-variant mt-0.5 truncate">{profile[link.key]}</p>
+                  )}
+                </div>
+
+                {/* Arrow */}
+                {!isEditing && (
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-8 h-8 flex items-center justify-center shrink-0 text-primary hover:text-primary/70 transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[20px]">north_east</span>
+                  </a>
+                )}
               </div>
-              <span className="text-sm text-surface-800/70 font-mono group-hover:text-surface-900 transition-colors">{item.text}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
 
+        {/* ── Footer status bar ── */}
+        <div className="flex items-center justify-between pt-6 border-t border-outline-variant">
+          <div className="flex items-center gap-2">
+            <span className="w-[7px] h-[7px] rounded-full bg-[#00C853] animate-pulse shrink-0" />
+            <span className="text-[9px] font-mono text-on-surface-variant uppercase tracking-[0.15em]">
+              Secure Handshake: Meridian-AES-256
+            </span>
+          </div>
+          <span className="text-[9px] font-mono text-on-surface-variant uppercase tracking-[0.15em]">
+            System Node ID: 882-XQ-Profile
+          </span>
+        </div>
+
+      </div>
     </div>
   )
 }
