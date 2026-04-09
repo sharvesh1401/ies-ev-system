@@ -5,6 +5,7 @@ import AnimatedNumber from '../components/AnimatedNumber'
 import VehicleSelector from '../components/VehicleSelector'
 import { useVehicle } from '../contexts/VehicleContext'
 import CustomLabPage from './CustomLabPage'
+import useWindowSize from '../hooks/useWindowSize'
 
 const VEHICLE_ORDER = ['model-v-performance', 'model-s-commuter', 'model-t-cargo']
 
@@ -16,6 +17,7 @@ export default function Home() {
   const navigate = useNavigate()
   const { vehicle, allVehicles, currentVehicle, isCustomMode, isLabMinimized, setLabMinimized } = useVehicle() as any
   const [activeRange, setActiveRange] = useState<'1H' | '6H' | '24H'>('6H')
+  const { isMobile } = useWindowSize()
 
   // Determine prev/next ghost vehicles for carousel
   const idx = VEHICLE_ORDER.indexOf(currentVehicle)
@@ -38,12 +40,12 @@ export default function Home() {
   if (isCustomMode) return <CustomLabPage />
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className={`flex flex-col h-full bg-background ${isMobile ? 'overflow-y-auto no-scrollbar' : 'overflow-hidden'}`}>
       {/* ── Main Row ── */}
-      <div className="flex flex-1 min-h-0 p-6 gap-6 overflow-hidden">
+      <div className={`flex gap-6 ${isMobile ? 'flex-col p-3 shrink-0' : 'flex-1 min-h-0 p-6 overflow-hidden'}`}>
 
         {/* Left Panel – Vehicle Display (55%) */}
-        <section className="w-[55%] relative flex flex-col justify-center items-center rounded-2xl bg-surface-container-lowest overflow-hidden">
+        <section className={`relative flex flex-col justify-center items-center rounded-2xl bg-surface-container-lowest overflow-hidden ${isMobile ? 'w-full' : 'w-[55%]'}`}>
           {/* Radial glow */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#00d9ff10_0%,_transparent_70%)] pointer-events-none" />
 
@@ -70,9 +72,9 @@ export default function Home() {
           </div>
 
           {/* Carousel area */}
-          <div className="relative w-full h-[400px] flex items-center justify-center">
+          <div className={`relative w-full flex items-center justify-center ${isMobile ? 'h-[260px]' : 'h-[400px]'}`}>
             {/* Ghost left */}
-            <div className="absolute -left-20 opacity-20 scale-75 blur-sm grayscale pointer-events-none">
+            <div className={`absolute -left-20 opacity-20 scale-75 blur-sm grayscale pointer-events-none${isMobile ? ' hidden' : ''}`}>
               <img
                 src={prevVehicle.carImage}
                 alt={prevVehicle.name}
@@ -84,19 +86,23 @@ export default function Home() {
             {/* Active vehicle */}
             <div className="relative z-10 flex flex-col items-center w-full">
               {/* Telemetry overlays */}
-              <div className="absolute top-1/4 -left-4 flex flex-col items-end pointer-events-none z-20">
-                <span className="font-mono text-[10px] text-primary uppercase mb-1 drop-shadow">Aero Winglet</span>
-                <div className="w-24 h-px bg-gradient-to-r from-primary to-transparent" />
-              </div>
-              <div className="absolute bottom-1/3 -right-4 flex flex-col items-start pointer-events-none z-20">
-                <span className="font-mono text-[10px] text-primary uppercase mb-1 drop-shadow">Rear Motor Array</span>
-                <div className="w-32 h-px bg-gradient-to-l from-primary to-transparent" />
-              </div>
+              {!isMobile && (
+                <>
+                  <div className="absolute top-1/4 -left-4 flex flex-col items-end pointer-events-none z-20">
+                    <span className="font-mono text-[10px] text-primary uppercase mb-1 drop-shadow">Aero Winglet</span>
+                    <div className="w-24 h-px bg-gradient-to-r from-primary to-transparent" />
+                  </div>
+                  <div className="absolute bottom-1/3 -right-4 flex flex-col items-start pointer-events-none z-20">
+                    <span className="font-mono text-[10px] text-primary uppercase mb-1 drop-shadow">Rear Motor Array</span>
+                    <div className="w-32 h-px bg-gradient-to-l from-primary to-transparent" />
+                  </div>
+                </>
+              )}
 
               {/* 3D Model or Lab SVG */}
               <div
                 className="w-full flex items-center justify-center relative"
-                style={{ height: '320px' }}
+                style={{ height: isMobile ? '200px' : '320px' }}
                 data-vehicle={vehicle.id}
               >
                 <CarModel
@@ -111,7 +117,7 @@ export default function Home() {
 
               {/* Model name */}
               <div className="text-center space-y-1 mt-2">
-                <h2 className="text-4xl font-black italic tracking-tighter text-on-surface drop-shadow-lg">
+                <h2 className={`${isMobile ? 'text-2xl' : 'text-4xl'} font-black italic tracking-tighter text-on-surface drop-shadow-lg`}>
                   {modelNames[currentVehicle] ?? 'MODEL V'}
                 </h2>
                 <p className="font-label text-[10px] uppercase tracking-[0.3em] text-primary">
@@ -121,7 +127,7 @@ export default function Home() {
             </div>
 
             {/* Ghost right */}
-            <div className="absolute -right-20 opacity-20 scale-75 blur-sm grayscale pointer-events-none">
+            <div className={`absolute -right-20 opacity-20 scale-75 blur-sm grayscale pointer-events-none${isMobile ? ' hidden' : ''}`}>
               <img
                 src={nextVehicle.carImage}
                 alt={nextVehicle.name}
@@ -147,7 +153,7 @@ export default function Home() {
         </section>
 
         {/* Right Panel – Stacked Cards (45%) */}
-        <section className="w-[45%] flex flex-col gap-5 overflow-y-auto no-scrollbar">
+        <section className={`flex flex-col gap-5 ${isMobile ? 'w-full' : 'w-[45%] overflow-y-auto no-scrollbar'}`}>
 
           {/* SoC Card */}
           <div className="bg-surface-container rounded-2xl p-6 flex items-center justify-between group hover:bg-surface-variant transition-all duration-300">
@@ -275,7 +281,7 @@ export default function Home() {
       </div>
 
       {/* ── Bottom: Energy Consumption Chart ── */}
-      <section className="px-6 pb-6">
+      <section className="px-3 pb-3 md:px-6 md:pb-6">
         <div className="bg-surface-container-low rounded-2xl p-6 h-52 flex flex-col">
           <div className="flex justify-between items-end mb-4 px-1">
             <div>

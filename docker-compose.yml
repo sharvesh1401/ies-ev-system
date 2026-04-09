@@ -41,6 +41,9 @@ services:
     env_file:
       - .env
     environment:
+      # BACKEND_URL: used by the Vite dev-server proxy (server-side, never sent to browser)
+      - BACKEND_URL=http://backend:8000
+      # VITE_API_URL: used by browser code for direct fetch calls
       - VITE_API_URL=http://localhost:8000
     depends_on:
       - backend

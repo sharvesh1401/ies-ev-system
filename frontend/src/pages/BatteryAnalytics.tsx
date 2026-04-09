@@ -371,7 +371,7 @@ export default function BatteryAnalytics() {
       </div>
 
       {/* ══ Full Width Inspection Banner ══ */}
-      <div className={`mt-4 p-3 rounded-2xl border flex items-center justify-between ${
+      <div className={`mt-4 p-3 rounded-2xl border flex items-center justify-between flex-wrap gap-4 ${
         serviceUrgent ? 'border-primary/30 bg-primary/5' : 'border-outline-variant/20 bg-surface-container'
       }`}>
         <div className="flex items-center gap-4">
@@ -385,7 +385,7 @@ export default function BatteryAnalytics() {
             </p>
           </div>
         </div>
-        <button className="px-6 py-3 bg-primary text-on-primary font-extrabold text-[10px] font-mono uppercase tracking-widest rounded-xl transition-all hover:brightness-110 hover:scale-[1.02] shadow-[0_4px_20px_rgba(0,217,255,0.25)]">
+        <button className="px-6 py-3 bg-primary text-on-primary font-extrabold text-[10px] font-mono uppercase tracking-widest rounded-xl transition-all hover:brightness-110 hover:scale-[1.02] shadow-[0_4px_20px_rgba(0,217,255,0.25)] max-md:w-full">
           Schedule Now
         </button>
       </div>

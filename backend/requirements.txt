@@ -12,6 +12,11 @@ httpx-sse==0.4.0
 prometheus-fastapi-instrumentator==7.0.0
 numpy==1.26.4
 
+# Security & rate limiting
+slowapi>=0.1.9
+limits>=3.6.0
+sentry-sdk[fastapi]>=1.40.0
+
 # Optional ML dependencies (handled by try/except in code)
 # Install for ML features, skip for physics-only mode:
 # torch>=2.0.0

@@ -1,6 +1,7 @@
 import { useVehicle } from '../contexts/VehicleContext'
 import AnimatedNumber from '../components/AnimatedNumber'
 import CarModel from '../components/CarModel'
+import useWindowSize from '../hooks/useWindowSize'
 
 const BAR_HEIGHTS = [40, 60, 35, 80, 55, 45, 65, 40, 50, 30, 75, 90, 60, 45, 35, 85, 50, 40, 60, 70]
 const BAR_ACCENTS = new Set([4, 11, 16, 19])
@@ -8,6 +9,7 @@ const BAR_SECONDARY = new Set([6, 13])
 
 export default function CustomLabPage() {
   const { vehicle, setLabMinimized } = useVehicle()
+  const { isMobile } = useWindowSize()
 
   const soh = vehicle.battery.soh_percent
   const soc = vehicle.battery.soc_percent
@@ -30,13 +32,13 @@ export default function CustomLabPage() {
   const availableEnergy = (vehicle.battery.capacity_kwh * (soh / 100) * (soc / 100)).toFixed(1)
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-background">
+    <div className={`flex flex-col bg-background ${isMobile ? 'overflow-y-auto no-scrollbar' : 'h-full overflow-hidden'}`}>
 
       {/* ── Main Row ── */}
-      <div className="flex flex-1 min-h-0 p-6 gap-6 overflow-hidden">
+      <div className={`flex gap-6 ${isMobile ? 'flex-col p-3 shrink-0' : 'flex-1 min-h-0 p-6 overflow-hidden'}`}>
 
-        {/* ── LEFT — Blueprint View (55%) ── */}
-        <section className="w-[55%] relative flex flex-col rounded-2xl bg-surface-container-lowest overflow-hidden">
+        {/* ── LEFT — Blueprint View ── */}
+        <section className={`relative flex flex-col rounded-2xl bg-surface-container-lowest overflow-hidden ${isMobile ? 'w-full' : 'w-[55%]'}`}>
 
           {/* Radial glow — shifts with accent */}
           <div
@@ -59,7 +61,7 @@ export default function CustomLabPage() {
           </div>
 
           {/* 3D Car Model */}
-          <div className="flex-1 relative" style={{ minHeight: 0 }}>
+          <div className={`relative ${isMobile ? 'h-[260px]' : 'flex-1'}`} style={isMobile ? undefined : { minHeight: 0 }}>
             {/* Telemetry overlays positioned over the 3D model */}
             <div className="absolute top-1/4 left-2 flex flex-col items-start pointer-events-none z-10">
               <span className="font-mono text-[10px] text-primary uppercase drop-shadow mb-1">Aero Winglet</span>
@@ -121,8 +123,8 @@ export default function CustomLabPage() {
           </div>
         </section>
 
-        {/* ── RIGHT — Parameter Impact Cards (45%) ── */}
-        <section className="w-[45%] flex flex-col gap-5 overflow-y-auto no-scrollbar">
+        {/* ── RIGHT — Parameter Impact Cards ── */}
+        <section className={`flex flex-col gap-5 ${isMobile ? 'w-full' : 'w-[45%] overflow-y-auto no-scrollbar'}`}>
 
           {/* Card 1 — Battery Status */}
           <div className="bg-surface-container rounded-2xl p-6 flex items-center justify-between group hover:bg-surface-variant transition-all duration-300">
@@ -316,7 +318,7 @@ export default function CustomLabPage() {
       </div>
 
       {/* ── Bottom — Parameter Impact Chart ── */}
-      <section className="px-6 pb-6">
+      <section className={`${isMobile ? 'px-3 pb-3 shrink-0' : 'px-6 pb-6'}`}>
         <div className="bg-surface-container-low rounded-2xl p-6 h-52 flex flex-col">
           <div className="flex justify-between items-end mb-4">
             <div>

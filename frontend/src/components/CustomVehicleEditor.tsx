@@ -1,5 +1,6 @@
 import { useVehicle } from '../contexts/VehicleContext';
 import { useState } from 'react';
+import useWindowSize from '../hooks/useWindowSize';
 
 /*
 DEMO SCRIPT — CUSTOM LAB VEHICLE:
@@ -134,6 +135,7 @@ function BlueprintWireframe({ soh, regenActive }: { soh: number; regenActive: bo
 /* ─── Main Component ─── */
 export default function CustomVehicleEditor() {
   const { vehicle, isCustomMode, updateCustomVehicle, isLabMinimized, setLabMinimized } = useVehicle();
+  const { isMobile } = useWindowSize();
   const [saving, setSaving] = useState(false);
 
   if (!isCustomMode || isLabMinimized) return null;
@@ -169,6 +171,154 @@ export default function CustomVehicleEditor() {
   const rangeDiff = vehicle.range_km - 312;
   const rangePercent = Math.round((rangeDiff / 312) * 100);
   const predictedEnergy = ((50 * 1000) / (vehicle.range_km * 1000 / vehicle.battery.capacity_kwh)).toFixed(1);
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Scrim */}
+        <div
+          className="fixed inset-0 z-[149] bg-black/60"
+          onClick={() => setLabMinimized(true)}
+        />
+        {/* Bottom sheet */}
+        <div
+          className="fixed left-0 right-0 bottom-0 z-[150] bg-[#181c24] rounded-t-3xl flex flex-col"
+          style={{
+            height: '78dvh',
+            animation: 'sheetUp 220ms cubic-bezier(0.32,0.72,0,1)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
+          }}
+        >
+          {/* Drag handle */}
+          <div className="flex justify-center pt-3 pb-1 shrink-0">
+            <div className="w-10 h-1 rounded-full bg-white/20" />
+          </div>
+
+          {/* Header */}
+          <div className="flex items-center justify-between px-5 py-3 border-b border-white/5 shrink-0">
+            <div>
+              <h2 className="text-sm font-bold text-white tracking-tight">⚗️ Custom Lab</h2>
+              <p className="text-[10px] text-slate-400 uppercase tracking-widest mt-0.5">Live Parameter Editor</p>
+            </div>
+            <button
+              onClick={() => setLabMinimized(true)}
+              className="w-8 h-8 rounded-full bg-white/8 flex items-center justify-center text-slate-400 active:scale-95 transition-transform"
+            >
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+
+          {/* Stat pills */}
+          <div className="flex gap-2.5 px-4 py-3 shrink-0">
+            <div className="flex-1 bg-white/5 rounded-xl px-3 py-2.5 border border-white/8 text-center">
+              <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Range</p>
+              <p className="text-xs font-mono font-bold text-white">{vehicle.range_km} km</p>
+            </div>
+            <div
+              className="flex-1 rounded-xl px-3 py-2.5 border text-center"
+              style={{
+                background: soc >= 60 ? 'rgba(0,255,136,0.07)' : soc >= 30 ? 'rgba(255,184,0,0.07)' : 'rgba(255,68,68,0.07)',
+                borderColor: soc >= 60 ? 'rgba(0,255,136,0.22)' : soc >= 30 ? 'rgba(255,184,0,0.22)' : 'rgba(255,68,68,0.22)',
+              }}
+            >
+              <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">SoC</p>
+              <p className="text-xs font-mono font-bold" style={{ color: soc >= 60 ? '#00FF88' : soc >= 30 ? '#FFB800' : '#FF4444' }}>{soc}%</p>
+            </div>
+            <div className="flex-1 bg-white/5 rounded-xl px-3 py-2.5 border border-white/8 text-center">
+              <p className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">Cap.</p>
+              <p className="text-xs font-mono font-bold text-white">{vehicle.battery.capacity_kwh} kWh</p>
+            </div>
+          </div>
+
+          {/* Reset / Save */}
+          <div className="flex gap-3 px-4 pb-3 shrink-0">
+            <button
+              onClick={resetToDefaults}
+              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-white/10 text-slate-300 active:bg-white/5 transition-all font-mono text-[11px] font-bold uppercase tracking-widest"
+            >
+              <span className="leading-none">↺</span> Reset
+            </button>
+            <button
+              onClick={saveProfile}
+              className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-mono text-[11px] font-bold uppercase tracking-widest transition-all ${
+                saving
+                  ? 'bg-green-500/20 border border-green-500/40 text-green-400'
+                  : 'bg-[#A855F7]/20 border border-[#A855F7]/50 text-[#A855F7]'
+              }`}
+            >
+              <span className="leading-none">{saving ? '✓' : '⬇'}</span>
+              {saving ? 'Saved!' : 'Save & Close'}
+            </button>
+          </div>
+
+          {/* Scrollable sliders */}
+          <div className="flex-1 overflow-y-auto no-scrollbar border-t border-white/5">
+            <Section title="Battery Health" defaultOpen={true}>
+              <LabSlider
+                label="State of Charge (SoC)" value={soc} min={0} max={100} step={1} unit="%"
+                markers={[{ value: 0, label: '0%' }, { value: 20, label: 'Low' }, { value: 50, label: '50%' }, { value: 80, label: 'Good' }, { value: 100, label: 'Full' }]}
+                onChange={(v: number) => updateCustomVehicle({ battery: { soc_percent: v } })}
+              />
+              <LabSlider
+                label="State of Health (SoH)" value={soh} min={50} max={100} step={1} unit="%"
+                markers={[{ value: 50, label: '50%' }, { value: 75, label: '75%' }, { value: 100, label: '100%' }]}
+                onChange={(v: number) => updateCustomVehicle({ battery: { soh_percent: v } })}
+              />
+              <LabSlider
+                label="Battery Capacity" value={vehicle.battery.capacity_kwh} min={40} max={150} step={5} unit=" kWh"
+                onChange={(v: number) => updateCustomVehicle({ battery: { capacity_kwh: v } })}
+              />
+              <LabSlider
+                label="Temperature" value={vehicle.battery.temperature_c} min={10} max={80} step={1} unit="°C"
+                onChange={(v: number) => updateCustomVehicle({ battery: { temperature_c: v } })}
+              />
+            </Section>
+            <Section title="Vehicle Mass & Aero" defaultOpen={false}>
+              <LabSlider
+                label="Vehicle Mass" value={vehicle.specs.mass_kg} min={1200} max={4000} step={50} unit=" kg"
+                markers={[{ value: 1200, label: 'Compact' }, { value: 2500, label: 'SUV' }, { value: 4000, label: 'Heavy' }]}
+                onChange={(v: number) => updateCustomVehicle({ specs: { mass_kg: v } })}
+              />
+              <LabSlider
+                label="Drag Coefficient (Cd)" value={vehicle.specs.drag_coefficient} min={0.20} max={0.55} step={0.01} unit=""
+                markers={[{ value: 0.20, label: 'Aero' }, { value: 0.35, label: 'Avg' }, { value: 0.55, label: 'Brick' }]}
+                onChange={(v: number) => updateCustomVehicle({ specs: { drag_coefficient: v } })}
+              />
+            </Section>
+            <Section title="Motor & Drivetrain" defaultOpen={false}>
+              <LabSlider
+                label="Motor Efficiency" value={Math.round(vehicle.specs.motor_efficiency * 100)} min={70} max={98} step={1} unit="%"
+                onChange={(v: number) => updateCustomVehicle({ specs: { motor_efficiency: v / 100 } })}
+              />
+              <LabSlider
+                label="Regen Efficiency" value={Math.round(vehicle.specs.regen_efficiency * 100)} min={40} max={80} step={1} unit="%"
+                onChange={(v: number) => updateCustomVehicle({ specs: { regen_efficiency: v / 100 } })}
+              />
+              <div
+                className="flex justify-between items-center cursor-pointer py-1"
+                onClick={() => updateCustomVehicle({ realtime: { regen_active: !vehicle.realtime.regen_active } })}
+              >
+                <span className="text-[11px] text-slate-400 uppercase tracking-wider">Regen Brake Active</span>
+                <div className={`w-9 h-5 rounded-full p-0.5 transition-colors ${vehicle.realtime.regen_active ? 'bg-[#A855F7]' : 'bg-white/10'}`}>
+                  <div className={`w-4 h-4 rounded-full bg-white transition-transform shadow ${vehicle.realtime.regen_active ? 'translate-x-4' : 'translate-x-0'}`} />
+                </div>
+              </div>
+            </Section>
+            <Section title="Power & Load" defaultOpen={false}>
+              <LabSlider
+                label="Avg Power Draw" value={vehicle.realtime.power_draw_kw} min={1} max={50} step={0.5} unit=" kW"
+                onChange={(v: number) => updateCustomVehicle({ realtime: { power_draw_kw: v } })}
+              />
+              <LabSlider
+                label="HVAC Load" value={vehicle.realtime.cabin_hvac_kw} min={0} max={5} step={0.1} unit=" kW"
+                onChange={(v: number) => updateCustomVehicle({ realtime: { cabin_hvac_kw: v } })}
+              />
+            </Section>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="fixed right-0 top-0 bottom-0 w-[320px] bg-[#181c24] border-l border-white/5 z-[45] flex flex-col pt-14">

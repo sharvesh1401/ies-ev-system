@@ -29,11 +29,13 @@ export default function Layout() {
 
       <main
         id="main-content"
-        className={`flex-1 flex flex-col relative overflow-hidden transition-all duration-300 ease-out ${
-          isMobile ? 'pt-16 pb-16' : ''
-        }`}
+        className="flex-1 flex flex-col relative overflow-hidden transition-all duration-300 ease-out"
         style={{
-          marginRight: isCustomMode && !isLabMinimized && !isMobile ? '320px' : '0px'
+          marginRight: isCustomMode && !isLabMinimized && !isMobile ? '320px' : '0px',
+          ...(isMobile ? {
+            paddingTop: 'calc(4rem + env(safe-area-inset-top))',
+            paddingBottom: 'calc(4rem + env(safe-area-inset-bottom))',
+          } : {}),
         }}
       >
         {/* Desktop Top Bar — hidden on mobile */}

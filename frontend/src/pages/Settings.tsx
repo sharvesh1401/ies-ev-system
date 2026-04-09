@@ -56,17 +56,17 @@ export default function Settings() {
   return (
     <div className="w-full h-full flex flex-col md:flex-row overflow-hidden bg-background">
       {/* Sidebar Navigation */}
-      <div className="w-full md:w-[280px] shrink-0 border-r border-outline-variant/30 bg-surface-container-low flex flex-col">
-        <div className="p-8 pb-4">
+      <div className="w-full md:w-[280px] shrink-0 bg-surface-container-low flex flex-col max-md:border-b max-md:border-outline-variant/30 md:border-r md:border-outline-variant/30">
+        <div className="p-8 pb-4 max-md:hidden">
           <h1 className="text-2xl font-black text-on-surface tracking-tight">Configuration</h1>
           <p className="text-[10px] font-mono text-primary font-bold mt-1 uppercase tracking-widest">System Node: IES-EV</p>
         </div>
-        <div className="overflow-y-auto px-4 py-2 space-y-1 no-scrollbar pb-10">
+        <div className="overflow-y-auto px-4 py-2 space-y-1 no-scrollbar pb-10 max-md:flex max-md:flex-row max-md:overflow-x-auto max-md:overflow-y-hidden max-md:space-y-0 max-md:gap-2 max-md:px-3 max-md:py-3 max-md:pb-3">
           {tabList.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 text-left ${
+              className={`w-full max-md:w-auto flex items-center gap-3 px-4 py-3 max-md:px-3 rounded-xl transition-all duration-200 text-left shrink-0 ${
                 activeTab === tab.id
                   ? 'bg-primary/10 text-primary shadow-sm'
                   : 'text-on-surface-variant hover:bg-surface-variant/40 hover:text-on-surface'
@@ -75,7 +75,7 @@ export default function Settings() {
               <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: activeTab === tab.id ? "'FILL' 1" : "'FILL' 0" }}>
                 {tab.icon}
               </span>
-              <span className={`text-[13px] font-semibold ${activeTab === tab.id ? 'font-black' : ''}`}>
+              <span className={`text-[13px] font-semibold max-md:hidden ${activeTab === tab.id ? 'font-black' : ''}`}>
                 {tab.label}
               </span>
             </button>

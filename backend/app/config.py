@@ -33,8 +33,19 @@ class Settings(BaseSettings):
     
     # DeepSeek AI
     DEEPSEEK_API_KEY: Optional[str] = None
+    DEEPSEEK_IES_API_KEY: Optional[str] = None
     DEEPSEEK_MODEL: str = "deepseek-coder"
-    
+
+    # Groq AI (fast inference)
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_API_URL: str = "https://api.groq.com/openai/v1"
+
+    # Gemini AI
+    GEMINI_API_KEY: Optional[str] = None
+
+    # Sentry error tracking
+    SENTRY_DSN: Optional[str] = None
+
     # External APIs
     ORS_API_KEY: Optional[str] = None
     OPENWEATHER_API_KEY: Optional[str] = None
