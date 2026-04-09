@@ -89,16 +89,18 @@ app.add_middleware(SlowAPIMiddleware)
 ALLOWED_ORIGINS = [
     "http://localhost:3000",   # Vite dev server / Docker frontend
     "http://127.0.0.1:3000",
+    "http://localhost:5173",   # Local Vite
     "http://localhost:8080",   # Adminer (internal tooling)
     "http://127.0.0.1:8080",
+    "https://meridian-ev.vercel.app",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # ── Security headers ──────────────────────────────────────────────────────────
