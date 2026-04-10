@@ -180,14 +180,17 @@ async def proxy_ors_directions(request: Request, body: OrsDirectionsRequest):
 
     async with httpx.AsyncClient() as client:
         try:
+            url = f"https://api.openrouteservice.org/v2/directions/{body.profile}/geojson"
+            payload = body.model_dump(exclude_none=True, exclude={"profile"})
+            headers = {
+                "Authorization": settings.ORS_API_KEY,
+                "Content-Type": "application/json",
+            }
+            
             response = await client.post(
-                "https://api.openrouteservice.org/v2/directions/driving-car/geojson",
-                # Serialise the validated model — never forward raw request bytes
-                json=body.model_dump(exclude_none=True),
-                headers={
-                    "Authorization": settings.ORS_API_KEY,
-                    "Content-Type": "application/json",
-                },
+                url,
+                json=payload,
+                headers=headers,
                 timeout=15.0,
             )
             return JSONResponse(status_code=response.status_code, content=response.json())
