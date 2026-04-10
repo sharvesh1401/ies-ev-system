@@ -34,6 +34,7 @@ class OrsDirectionsRequest(BaseModel):
     alternative_routes: dict | None = Field(default=None)
     instructions: bool | None = Field(default=None)
     geometry: bool | None = Field(default=None)
+    profile: str | None = Field(default="driving-car")
 
     @field_validator("coordinates")
     @classmethod
@@ -48,7 +49,7 @@ class OrsDirectionsRequest(BaseModel):
                 raise ValueError(f"Latitude {lat} out of range [-90, 90]")
         return coords
 
-    model_config = {"extra": "forbid"}
+    model_config = {"extra": "ignore"}
 
 
 class ElevationPoint(BaseModel):
