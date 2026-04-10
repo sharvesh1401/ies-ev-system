@@ -96,6 +96,8 @@ export type PipelineStage =
 
 // ─── API endpoints use our backend proxy to secure API keys ──────────────────
 
+const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 // ─── 1. OpenRouteService — Route Geometry ────────────────────────────────────
 
 export async function getRouteGeometry(
@@ -112,7 +114,7 @@ export async function getRouteGeometry(
     geometry: true,
   }
 
-  const res = await fetch('/api/external/ors/directions', {
+  const res = await fetch(`${baseURL}/api/external/ors/directions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -180,7 +182,7 @@ export async function getElevationProfile(coords: LatLng[]): Promise<ElevationDa
       locations: sampled.map((c) => ({ latitude: c.lat, longitude: c.lng })),
     }
 
-    const res = await fetch('/api/external/elevation/lookup', {
+    const res = await fetch(`${baseURL}/api/external/elevation/lookup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -253,7 +255,7 @@ export async function getElevationProfile(coords: LatLng[]): Promise<ElevationDa
 export async function getWeather(point: LatLng): Promise<WeatherData> {
   try {
     const res = await fetch(
-      `/api/external/weather?lat=${point.lat}&lon=${point.lng}&units=metric`
+      `${baseURL}/api/external/weather?lat=${point.lat}&lon=${point.lng}&units=metric`
     )
     if (!res.ok) throw new Error(`Weather API error ${res.status}`)
 
@@ -307,7 +309,7 @@ export async function getChargingStations(routeCoords: LatLng[]): Promise<Charge
     )
 
     const res = await fetch(
-      `/api/external/ocm/poi?output=json&maxresults=30&compact=true&verbose=false&latitude=${centerLat}&longitude=${centerLng}&distance=${Math.ceil(distance / 2)}&distanceunit=KM`
+      `${baseURL}/api/external/ocm/poi?output=json&maxresults=30&compact=true&verbose=false&latitude=${centerLat}&longitude=${centerLng}&distance=${Math.ceil(distance / 2)}&distanceunit=KM`
     )
 
     if (!res.ok) throw new Error(`OCM error ${res.status}`)
