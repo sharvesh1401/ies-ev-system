@@ -183,3 +183,69 @@
     }
   }
 }
+
+/* ══════════════════════════════════════
+   LIGHT MODE — VEHICLE SELECTOR
+   All rules scoped to html.light
+   ══════════════════════════════════════ */
+
+html.light {
+  .vehicle-selector-button {
+    background: #FFFFFF;
+    border: 1px solid rgba(8,12,20,0.10);
+    border-radius: 12px;
+    color: #080C14;
+    box-shadow: 0 1px 3px rgba(8,12,20,0.06);
+
+    &:hover {
+      border-color: rgba(0,217,255,0.40);
+      box-shadow: 0 4px 12px rgba(8,12,20,0.08);
+    }
+
+    .vehicle-name    { color: #080C14; }
+    .vehicle-subtitle { color: #8B9BB4; }
+    .dropdown-arrow svg { color: #8B9BB4; }
+  }
+
+  .vehicle-dropdown {
+    background: #FFFFFF;
+    border: 1px solid rgba(8,12,20,0.10);
+    border-radius: 12px;
+    box-shadow:
+      0 16px 32px rgba(8,12,20,0.10),
+      0 4px 8px rgba(8,12,20,0.06);
+    z-index: 9999;
+  }
+
+  .vehicle-option {
+    border-bottom: 1px solid rgba(8,12,20,0.06);
+    color: #080C14;
+    background: transparent;
+
+    &:hover {
+      background: #F4F7FC;
+    }
+
+    &.selected {
+      background: rgba(0,217,255,0.06);
+      border-left: 3px solid #00D9FF;
+    }
+
+    .option-name     { color: #080C14; }
+    .option-subtitle { color: #4A5568; }
+    .option-stats    { color: #8B9BB4; }
+    .selected-check  { color: #007A99; }
+  }
+
+  /* Separator between fixed and custom profiles */
+  .dropdown-separator span { color: #8B9BB4; }
+  .dropdown-separator-line { background: rgba(8,12,20,0.08); }
+
+  /* Saved indicator toast */
+  .saved-indicator {
+    background: #00C47A;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(8,12,20,0.10);
+  }
+}
+

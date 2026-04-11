@@ -15,17 +15,29 @@ export default function Sidebar() {
   const location = useLocation()
   const { currentVehicle, switchVehicle, setLabMinimized } = useVehicle()
   const [profileOpen, setProfileOpen] = useState(false)
-  const [isLight, setIsLight] = useState(false)
+  const [isLight, setIsLight] = useState(() => {
+    return localStorage.getItem('theme') === 'light' || document.documentElement.classList.contains('light')
+  })
   const dropdownRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (isLight) {
+      document.documentElement.classList.add('light')
+    } else {
+      document.documentElement.classList.remove('light')
+    }
+  }, [isLight])
 
   const toggleTheme = () => {
     const root = document.documentElement
     if (root.classList.contains('light')) {
       root.classList.remove('light')
+      localStorage.setItem('theme', 'dark')
       setIsLight(false)
     } else {
       root.classList.add('light')
+      localStorage.setItem('theme', 'light')
       setIsLight(true)
     }
   }
@@ -43,7 +55,7 @@ export default function Sidebar() {
   }, [profileOpen])
 
   return (
-    <aside className="w-[260px] hidden md:flex flex-col h-full z-50 shrink-0 bg-[#181c24] border-r border-white/5">
+    <aside className={`w-[260px] hidden md:flex flex-col h-full z-50 shrink-0 border-r ${isLight ? 'bg-white border-outline-variant/10' : 'bg-[#181c24] border-white/5'}`}>
 
       {/* ── Logo ── */}
       <div className="px-4 pt-6">

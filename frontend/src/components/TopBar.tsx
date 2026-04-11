@@ -11,6 +11,15 @@ export default function TopBar() {
     return () => clearInterval(id)
   }, [])
 
+  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains('light'))
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsLight(document.documentElement.classList.contains('light'))
+    })
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    return () => observer.disconnect()
+  }, [])
+
   const hours = time.getHours().toString().padStart(2, '0')
   const minutes = time.getMinutes().toString().padStart(2, '0')
   const seconds = time.getSeconds().toString().padStart(2, '0')
@@ -18,7 +27,7 @@ export default function TopBar() {
   const batteryIcon = soc > 60 ? 'battery_full' : soc > 30 ? 'battery_4_bar' : 'battery_1_bar'
 
   return (
-    <header className="h-16 flex items-center justify-between px-8 z-40 shrink-0 border-b border-outline-variant bg-surface-container-low/80 backdrop-blur-xl">
+    <header className={`h-16 flex items-center justify-between px-8 z-40 shrink-0 border-b ${isLight ? 'bg-white/90 border-outline-variant/10 shadow-sm backdrop-blur-xl' : 'border-outline-variant bg-surface-container-low/80 backdrop-blur-xl'}`}>
       {/* Left: System status */}
       <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-accent-success">
         <span className="w-2 h-2 rounded-full bg-accent-success animate-pulse" />

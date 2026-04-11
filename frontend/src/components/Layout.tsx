@@ -83,16 +83,33 @@ export default function Layout() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 40 }}
             transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-            className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none"
+            className="fixed left-1/2 -translate-x-1/2 z-[9999] pointer-events-none"
+            style={isMobile
+              ? { bottom: 'calc(4.5rem + env(safe-area-inset-bottom))' }
+              : { bottom: '5rem' }
+            }
           >
-            <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-surface-container-highest/90 backdrop-blur-md border border-primary/20 shadow-2xl text-sm font-mono text-on-surface max-w-[90vw] sm:max-w-md">
-              <span className="text-primary text-base shrink-0">⚡</span>
-              <span>
-                Backend waking up from sleep — first load may take up to{' '}
-                <span className="text-primary font-bold">60 s</span>.
-                Thanks for your patience!
-              </span>
-            </div>
+            {isMobile ? (
+              /* ── Mobile: compact pill ── */
+              <div className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-surface-container-highest/95 backdrop-blur-md border border-primary/20 shadow-xl max-w-[80vw]">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+                </span>
+                <span className="text-[11px] font-mono text-on-surface/80 whitespace-nowrap">Backend waking</span>
+                <span className="text-[11px] font-mono text-primary font-bold whitespace-nowrap">~60 s</span>
+              </div>
+            ) : (
+              /* ── Desktop: full banner ── */
+              <div className="flex items-center gap-3 px-5 py-3 rounded-2xl bg-surface-container-highest/90 backdrop-blur-md border border-primary/20 shadow-2xl text-sm font-mono text-on-surface max-w-[90vw] sm:max-w-md">
+                <span className="text-primary text-base shrink-0">⚡</span>
+                <span>
+                  Backend waking up from sleep — first load may take up to{' '}
+                  <span className="text-primary font-bold">60 s</span>.
+                  Thanks for your patience!
+                </span>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

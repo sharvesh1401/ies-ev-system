@@ -45,31 +45,55 @@ export default function Home() {
       <div className={`flex gap-6 ${isMobile ? 'flex-col p-3 shrink-0' : 'flex-1 min-h-0 p-6 overflow-hidden'}`}>
 
         {/* Left Panel – Vehicle Display (55%) */}
-        <section className={`relative flex flex-col justify-center items-center rounded-2xl bg-surface-container-lowest overflow-hidden ${isMobile ? 'w-full' : 'w-[55%]'}`}>
+        <section className={`relative flex flex-col rounded-2xl bg-surface-container-lowest overflow-hidden ${isMobile ? 'w-full items-center' : 'w-[55%] justify-center items-center'}`}>
           {/* Radial glow */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#00d9ff10_0%,_transparent_70%)] pointer-events-none" />
 
-          {/* Vehicle Selector */}
-          <div className="absolute top-6 left-6 z-20">
-            <VehicleSelector />
-            <div className="flex items-center gap-2 mt-2">
-              <div
-                className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono tracking-widest border"
-                style={{
-                  background: `linear-gradient(135deg, ${vehicle.badgeColor}22, ${vehicle.badgeColor}44)`,
-                  borderColor: `${vehicle.badgeColor}55`,
-                  color: vehicle.badgeColor,
-                }}
-              >
-                {vehicle.badge}
+          {/* Vehicle Selector – desktop: absolute; mobile: in-flow at top */}
+          {!isMobile && (
+            <div className="absolute top-6 left-6 z-20">
+              <VehicleSelector />
+              <div className="flex items-center gap-2 mt-2">
+                <div
+                  className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono tracking-widest border"
+                  style={{
+                    background: `linear-gradient(135deg, ${vehicle.badgeColor}22, ${vehicle.badgeColor}44)`,
+                    borderColor: `${vehicle.badgeColor}55`,
+                    color: vehicle.badgeColor,
+                  }}
+                >
+                  {vehicle.badge}
+                </div>
               </div>
+              {vehicle.battery.soh_percent < 85 && (
+                <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tertiary-container/10 border border-tertiary-container/25 text-tertiary-container text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
+                  ⚠ Battery degradation detected ({vehicle.battery.soh_percent}% SoH)
+                </div>
+              )}
             </div>
-            {vehicle.battery.soh_percent < 85 && (
-              <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tertiary-container/10 border border-tertiary-container/25 text-tertiary-container text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
-                ⚠ Battery degradation detected ({vehicle.battery.soh_percent}% SoH)
+          )}
+          {isMobile && (
+            <div className="w-full px-4 pt-4 pb-2 z-20 relative">
+              <VehicleSelector />
+              <div className="flex items-center gap-2 mt-2">
+                <div
+                  className="text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono tracking-widest border"
+                  style={{
+                    background: `linear-gradient(135deg, ${vehicle.badgeColor}22, ${vehicle.badgeColor}44)`,
+                    borderColor: `${vehicle.badgeColor}55`,
+                    color: vehicle.badgeColor,
+                  }}
+                >
+                  {vehicle.badge}
+                </div>
               </div>
-            )}
-          </div>
+              {vehicle.battery.soh_percent < 85 && (
+                <div className="mt-2 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tertiary-container/10 border border-tertiary-container/25 text-tertiary-container text-[10px] font-mono font-bold uppercase tracking-wide max-w-xs">
+                  ⚠ Battery degradation detected ({vehicle.battery.soh_percent}% SoH)
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Carousel area */}
           <div className={`relative w-full flex items-center justify-center ${isMobile ? 'h-[260px]' : 'h-[400px]'}`}>
@@ -138,8 +162,8 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Carousel dots */}
-          <div className="absolute bottom-6 flex gap-3">
+          {/* Carousel dots – desktop: absolute bottom; mobile: in-flow below carousel */}
+          <div className={`flex gap-3 ${isMobile ? 'py-4' : 'absolute bottom-6'}`}>
             {VEHICLE_ORDER.map((id, i) => (
               <span
                 key={id}

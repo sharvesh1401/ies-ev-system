@@ -147,6 +147,114 @@ const PIPELINE_STEPS: { key: PipelineStage; label: string; sublabel: string; ico
   { key: 'physics_validation', label: 'Physics Validation', sublabel: 'Cross-checking result', icon: 'science' },
 ]
 
+// ─── Mobile Pipeline Toast (compact — mobile only) ───────────────────────────
+
+function MobilePipelineToast({
+  stage,
+  prediction,
+}: {
+  stage: PipelineStage
+  prediction: PredictionResult | null
+}) {
+  if (stage === 'idle') return null
+
+  const isRunning = stage !== 'idle' && stage !== 'complete' && stage !== 'error'
+  const isComplete = stage === 'complete'
+  const isError = stage === 'error'
+
+  const activeIdx = isComplete
+    ? PIPELINE_STEPS.length
+    : Math.max(0, PIPELINE_STEPS.findIndex((s) => s.key === stage))
+
+  const progress = isComplete ? 100 : Math.round((activeIdx / PIPELINE_STEPS.length) * 100)
+  const currentStep = PIPELINE_STEPS[activeIdx]
+
+  const completionLabel =
+    prediction?.method === 'ml_validated'
+      ? 'ML Validated · Route Ready'
+      : prediction?.method === 'physics_fallback'
+      ? 'Physics Fallback · Route Ready'
+      : 'Route Ready'
+
+  return (
+    <div style={{ animation: 'slideUp 0.3s ease-out' }}>
+      <div
+        className={`rounded-2xl border backdrop-blur-xl overflow-hidden shadow-2xl ${
+          isComplete
+            ? 'bg-surface-container/95 border-secondary-container/30'
+            : isError
+            ? 'bg-surface-container/95 border-error/30'
+            : 'bg-surface-container/95 border-primary/20'
+        }`}
+      >
+        {/* Thin progress bar at top */}
+        <div className="h-[2px] bg-surface-container-highest">
+          <div
+            className={`h-full transition-all duration-500 rounded-full ${
+              isComplete ? 'bg-secondary-container' : isError ? 'bg-error' : 'bg-primary'
+            }`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        {/* Main row */}
+        <div className="flex items-center gap-3 px-4 py-3">
+          {isRunning && (
+            <div className="w-4 h-4 rounded-full border-2 border-primary/30 border-t-primary animate-spin shrink-0" />
+          )}
+          {isComplete && (
+            <span className="material-symbols-outlined text-secondary-container text-[18px] shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>
+              check_circle
+            </span>
+          )}
+          {isError && (
+            <span className="material-symbols-outlined text-error text-[18px] shrink-0">error</span>
+          )}
+
+          <div className="flex-1 min-w-0">
+            <p className="text-[11px] font-mono font-bold text-on-surface truncate">
+              {isComplete
+                ? completionLabel
+                : isError
+                ? 'Pipeline Error'
+                : currentStep?.label ?? 'Processing…'}
+            </p>
+            {isRunning && currentStep && (
+              <p className="text-[9px] font-mono text-on-surface-variant/60 truncate mt-0.5">
+                {currentStep.sublabel}
+              </p>
+            )}
+          </div>
+
+          {/* Step counter */}
+          <span className="text-[9px] font-mono text-on-surface-variant/50 shrink-0 tabular-nums">
+            {isComplete
+              ? `${PIPELINE_STEPS.length}/${PIPELINE_STEPS.length}`
+              : `${activeIdx + 1}/${PIPELINE_STEPS.length}`}
+          </span>
+        </div>
+
+        {/* Step dots row */}
+        <div className="flex gap-1 px-4 pb-3">
+          {PIPELINE_STEPS.map((step, i) => (
+            <div
+              key={step.key}
+              title={step.label}
+              className={`flex-1 h-[2px] rounded-full transition-all duration-300 ${
+                i < activeIdx || isComplete
+                  ? 'bg-secondary-container/70'
+                  : i === activeIdx && isRunning
+                  ? 'bg-primary animate-pulse'
+                  : 'bg-surface-container-highest'
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function PipelineStepper({
   stage,
   prediction,
@@ -590,16 +698,16 @@ function getStepIcon(type: number, idx: number, total: number): string {
 // Main Component
 // ═════════════════════════════════════════════════════════════════════════════
 
-function useIsDarkTheme() {
-  const [isDark, setIsDark] = useState(() => !document.documentElement.classList.contains('light'))
+function useIsLightTheme() {
+  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains('light'))
   useEffect(() => {
     const observer = new MutationObserver(() => {
-      setIsDark(!document.documentElement.classList.contains('light'))
+      setIsLight(document.documentElement.classList.contains('light'))
     })
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
     return () => observer.disconnect()
   }, [])
-  return isDark
+  return isLight
 }
 
 export default function RoutePlanner() {
@@ -612,7 +720,7 @@ export default function RoutePlanner() {
   const defaultDest = location.state?.destination || ''
   const { isMobile } = useWindowSize()
   const { vehicle } = useVehicle()
-  const isDark = useIsDarkTheme()
+  const isLight = useIsLightTheme()
 
   // ── State
   const [showPanel, setShowPanel] = useState(false)
@@ -653,12 +761,12 @@ export default function RoutePlanner() {
     if (layerControlRef.current) {
       layerControlRef.current.remove()
     }
-    const tileUrl = isDark
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+    const tileUrl = isLight
+      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
 
     layerControlRef.current = L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(leafletMap.current)
-  }, [isDark])
+  }, [isLight])
 
   // ── Clear map layers
   const clearLayers = useCallback(() => {
@@ -984,13 +1092,15 @@ export default function RoutePlanner() {
         )}
 
         {/* ── Pipeline Status Stepper (Center Overlay — persistent) ── */}
-        {pipelineStage !== 'idle' && (
-          <div
-            className={`absolute z-[1000] ${
-              isMobile ? 'bottom-2 left-2 right-2' : 'top-20 lg:left-[calc(50%+210px)] -translate-x-1/2 w-full max-w-[600px] px-5'
-            }`}
-          >
+        {pipelineStage !== 'idle' && !isMobile && (
+          <div className="absolute z-[1000] top-20 lg:left-[calc(50%+210px)] -translate-x-1/2 w-full max-w-[600px] px-5">
             <PipelineStepper stage={pipelineStage} prediction={prediction} />
+          </div>
+        )}
+        {/* ── Mobile Pipeline Toast (compact) ── */}
+        {pipelineStage !== 'idle' && isMobile && (
+          <div className="absolute z-[1100] bottom-3 left-3 right-3">
+            <MobilePipelineToast stage={pipelineStage} prediction={prediction} />
           </div>
         )}
 
@@ -1248,7 +1358,10 @@ export default function RoutePlanner() {
                   : 'bg-gradient-to-r from-primary to-secondary-container hover:brightness-110 text-on-primary shadow-[0_4px_20px_rgba(175,236,255,0.2)]'
               }`}
               aria-label="Start Sequence Vector Calculation"
-              onClick={handlePlanRoute}
+              onClick={() => {
+                if (isMobile) setShowPanel(false)
+                handlePlanRoute()
+              }}
               disabled={
                 pipelineStage !== 'idle' &&
                 pipelineStage !== 'complete' &&
