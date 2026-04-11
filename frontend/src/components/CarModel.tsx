@@ -18,7 +18,7 @@ const DEFAULT_CONFIG = { targetSize: 4.5, yOffset: -0.5, rotationYOffset: 0 }
 /* ═══════════════════════════════════════════════
    Load .glb car model from /models/car.glb
    ═══════════════════════════════════════════════ */
-function CarGLB({ batteryKwh, tempC, modelPath, regenActive, maxPowerKw }: { batteryKwh: number; tempC: number; modelPath: string; regenActive: boolean; maxPowerKw: number }) {
+function CarGLB({ batteryKwh, tempC, modelPath, regenActive, maxPowerKw, showLabels }: { batteryKwh: number; tempC: number; modelPath: string; regenActive: boolean; maxPowerKw: number; showLabels: boolean }) {
   const groupRef = useRef<THREE.Group>(null!)
   const { scene } = useGLTF(modelPath)
   const cfg = MODEL_CONFIG[modelPath] ?? DEFAULT_CONFIG
@@ -90,27 +90,31 @@ function CarGLB({ batteryKwh, tempC, modelPath, regenActive, maxPowerKw }: { bat
     <group ref={groupRef}>
       <primitive object={scene} />
 
-      {/* ═══ Floating Labels ═══ */}
-      <Html position={[-1.2, 1.2, 0.3]} distanceFactor={5} style={{ pointerEvents: 'none' }}>
-        <div className="glass-ivory px-4 py-2  whitespace-nowrap shadow-lg" style={{ animation: 'fadeIn 1s ease-out' }}>
-          <div className="text-[10px] text-brand-primary font-bold uppercase tracking-wider">Front Motor</div>
-          <div className="text-xs font-mono text-surface-900 font-semibold">{maxPowerKw} kW • OK</div>
-        </div>
-      </Html>
+      {/* ═══ Floating Labels — desktop only ═══ */}
+      {showLabels && (
+        <>
+          <Html position={[-1.2, 1.2, 0.3]} distanceFactor={5} style={{ pointerEvents: 'none' }}>
+            <div className="glass-ivory px-4 py-2  whitespace-nowrap shadow-lg" style={{ animation: 'fadeIn 1s ease-out' }}>
+              <div className="text-[10px] text-brand-primary font-bold uppercase tracking-wider">Front Motor</div>
+              <div className="text-xs font-mono text-surface-900 font-semibold">{maxPowerKw} kW • OK</div>
+            </div>
+          </Html>
 
-      <Html position={[0.5, -0.3, -0.7]} distanceFactor={5} style={{ pointerEvents: 'none' }}>
-        <div className="glass-ivory px-4 py-2  whitespace-nowrap shadow-lg" style={{ animation: 'fadeIn 1.5s ease-out' }}>
-          <div className="text-[10px] text-brand-secondary font-bold uppercase tracking-wider">Battery Pack</div>
-          <div className="text-xs font-mono text-surface-900 font-semibold">{batteryKwh} kWh • {tempC}°C</div>
-        </div>
-      </Html>
+          <Html position={[0.5, -0.3, -0.7]} distanceFactor={5} style={{ pointerEvents: 'none' }}>
+            <div className="glass-ivory px-4 py-2  whitespace-nowrap shadow-lg" style={{ animation: 'fadeIn 1.5s ease-out' }}>
+              <div className="text-[10px] text-brand-secondary font-bold uppercase tracking-wider">Battery Pack</div>
+              <div className="text-xs font-mono text-surface-900 font-semibold">{batteryKwh} kWh • {tempC}°C</div>
+            </div>
+          </Html>
 
-      <Html position={[1.3, 0.8, 0.5]} distanceFactor={5} style={{ pointerEvents: 'none' }}>
-        <div className="glass-ivory px-4 py-2  whitespace-nowrap shadow-lg" style={{ animation: 'fadeIn 2s ease-out' }}>
-          <div className={`text-[10px] font-bold uppercase tracking-wider ${regenActive ? 'text-accent-success' : 'text-surface-800/40'}`}>Regen Brake</div>
-          <div className={`text-xs font-mono font-semibold ${regenActive ? 'text-surface-900' : 'text-surface-800/50'}`}>{regenActive ? 'Active' : 'Inactive'}</div>
-        </div>
-      </Html>
+          <Html position={[1.3, 0.8, 0.5]} distanceFactor={5} style={{ pointerEvents: 'none' }}>
+            <div className="glass-ivory px-4 py-2  whitespace-nowrap shadow-lg" style={{ animation: 'fadeIn 2s ease-out' }}>
+              <div className={`text-[10px] font-bold uppercase tracking-wider ${regenActive ? 'text-accent-success' : 'text-surface-800/40'}`}>Regen Brake</div>
+              <div className={`text-xs font-mono font-semibold ${regenActive ? 'text-surface-900' : 'text-surface-800/50'}`}>{regenActive ? 'Active' : 'Inactive'}</div>
+            </div>
+          </Html>
+        </>
+      )}
     </group>
   )
 }
@@ -135,6 +139,7 @@ export default function CarModel({
   modelPath = '/models/car.glb',
   regenActive = true,
   maxPowerKw = 350,
+  showLabels = true,
 }: {
   batteryKwh?: number
   tempC?: number
@@ -142,6 +147,7 @@ export default function CarModel({
   modelPath?: string
   regenActive?: boolean
   maxPowerKw?: number
+  showLabels?: boolean
 }) {
   return (
     <div className="w-full h-full relative">
@@ -173,7 +179,7 @@ export default function CarModel({
         <spotLight position={[0, 8, 0]} angle={0.4} penumbra={0.6} intensity={0.5} color="#fff" />
 
         <Suspense fallback={<Loader />}>
-          <CarGLB batteryKwh={batteryKwh} tempC={tempC} modelPath={modelPath} regenActive={regenActive} maxPowerKw={maxPowerKw} />
+          <CarGLB batteryKwh={batteryKwh} tempC={tempC} modelPath={modelPath} regenActive={regenActive} maxPowerKw={maxPowerKw} showLabels={showLabels} />
         </Suspense>
 
         <ContactShadows

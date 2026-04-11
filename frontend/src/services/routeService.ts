@@ -353,6 +353,11 @@ export async function orchestrateRoute(
   destinationName: string,
   onStageChange: (stage: PipelineStage) => void
 ): Promise<RouteContext> {
+  // Broadcast wakeup detection — same event system as services/api.ts interceptors
+  const slowTimer = setTimeout(() => window.dispatchEvent(new CustomEvent('backend:waking')), 3000)
+  const done = () => { clearTimeout(slowTimer); window.dispatchEvent(new CustomEvent('backend:ready')) }
+
+  try {
   const warnings: string[] = []
 
   // Step 1: Route Geometry
@@ -411,6 +416,7 @@ export async function orchestrateRoute(
   // Attach segments to primary route
   routes[0].segments = segments
 
+  done()
   return {
     routes,
     selectedRouteIndex: 0,
@@ -421,6 +427,7 @@ export async function orchestrateRoute(
     originName,
     destinationName,
   }
+  } catch (err) { done(); throw err }
 }
 
 // ─── Utility ─────────────────────────────────────────────────────────────────

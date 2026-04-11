@@ -112,6 +112,7 @@ export default function Home() {
                   modelPath={vehicle.isCustom ? '/models/custom car.glb' : vehicle.modelPath}
                   regenActive={vehicle.realtime.regen_active}
                   maxPowerKw={vehicle.specs.max_power_kw}
+                  showLabels={!isMobile}
                 />
               </div>
 

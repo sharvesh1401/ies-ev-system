@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useVehicle } from '../../contexts/VehicleContext'
+import { useCallback } from 'react'
 
 const leftItems = [
   { to: '/route-planner',     icon: 'directions_car', label: 'Route'   },
@@ -43,6 +44,14 @@ export default function MobileBottomNav() {
   const { currentVehicle, switchVehicle, setLabMinimized } = useVehicle()
   const isLabActive = currentVehicle === 'custom-lab'
 
+  // Mirror desktop Sidebar behaviour: reset to default vehicle when leaving custom lab
+  const handleHomePress = useCallback(() => {
+    if (isLabActive) {
+      switchVehicle('model-v-performance')
+      setLabMinimized(false)
+    }
+  }, [isLabActive, switchVehicle, setLabMinimized])
+
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-[100] flex items-center bg-surface-100/90 backdrop-blur-xl border-t border-neon-cyan/10 md:hidden"
@@ -56,6 +65,7 @@ export default function MobileBottomNav() {
         to="/"
         end
         aria-label="Navigate to Home"
+        onClick={handleHomePress}
         className={({ isActive }) =>
           `flex flex-col items-center justify-center gap-1 flex-1 min-h-[56px] relative transition-all duration-200 touch-manipulation ${
             isActive && !isLabActive ? 'text-neon-cyan' : 'text-surface-800/50 active:scale-95'
