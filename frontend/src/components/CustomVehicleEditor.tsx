@@ -1,18 +1,6 @@
 import { useVehicle } from '../contexts/VehicleContext';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import useWindowSize from '../hooks/useWindowSize';
-
-function useIsLightTheme() {
-  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains('light'))
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsLight(document.documentElement.classList.contains('light'))
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
-  return isLight
-}
 
 /*
 DEMO SCRIPT — CUSTOM LAB VEHICLE:
@@ -89,18 +77,12 @@ function Section({ title, defaultOpen = false, children }: any) {
 
 /* ─── Blueprint SVG Wireframe ─── */
 function BlueprintWireframe({ soh, regenActive }: { soh: number; regenActive: boolean }) {
-  const isLight = useIsLightTheme();
-  const sohColor = soh >= 80 ? (isLight ? '#007A99' : '#A855F7') : soh >= 65 ? '#FFB800' : '#FF4444';
+  const sohColor = soh >= 80 ? '#A855F7' : soh >= 65 ? '#FFB800' : '#FF4444';
 
   return (
     <div
-      className={`relative mx-4 rounded-xl overflow-hidden border ${isLight ? 'border-[#007A99]/20' : 'border-[#A855F7]/20'}`}
-      style={{
-        height: 160,
-        background: isLight 
-          ? 'linear-gradient(135deg, rgba(0,122,153,0.04) 0%, rgba(255,255,255,0.95) 100%)'
-          : 'linear-gradient(135deg, rgba(168,85,247,0.04) 0%, rgba(10,12,18,0.95) 100%)'
-      }}
+      className="relative mx-4 rounded-xl overflow-hidden border border-[#A855F7]/20"
+      style={{ height: 160, background: 'linear-gradient(135deg, rgba(168,85,247,0.04) 0%, rgba(10,12,18,0.95) 100%)' }}
     >
       <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#A855F7]/60 rounded-tl" />
       <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#A855F7]/60 rounded-tr" />
@@ -108,8 +90,8 @@ function BlueprintWireframe({ soh, regenActive }: { soh: number; regenActive: bo
       <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#A855F7]/60 rounded-br" />
 
       <div className="absolute top-2 left-3 flex items-center gap-1.5 z-10">
-        <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${isLight ? 'bg-[#007A99]' : 'bg-[#A855F7]'}`} />
-        <span className={`text-[8px] font-mono font-bold uppercase tracking-widest ${isLight ? 'text-[#007A99]' : 'text-[#A855F7]'}`}>Research Lab — Model R</span>
+        <div className="w-1.5 h-1.5 rounded-full bg-[#A855F7] animate-pulse" />
+        <span className="text-[8px] font-mono font-bold text-[#A855F7] uppercase tracking-widest">Research Lab — Model R</span>
       </div>
 
       <svg viewBox="0 0 360 120" className="absolute inset-0 w-full h-full" style={{ padding: '24px 16px 28px' }}>
@@ -131,7 +113,7 @@ function BlueprintWireframe({ soh, regenActive }: { soh: number; regenActive: bo
         </text>
       </svg>
 
-      <div className="absolute bottom-2 left-3 flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: isLight ? `${sohColor}12` : `${sohColor}18`, border: `1px solid ${sohColor}40` }}>
+      <div className="absolute bottom-2 left-3 flex items-center gap-1 px-1.5 py-0.5 rounded" style={{ background: `${sohColor}18`, border: `1px solid ${sohColor}40` }}>
         <span className="text-[8px] font-mono font-bold uppercase" style={{ color: sohColor }}>SoH {soh}%</span>
       </div>
       <div
@@ -142,7 +124,7 @@ function BlueprintWireframe({ soh, regenActive }: { soh: number; regenActive: bo
         }}
       >
         <div className={`w-1.5 h-1.5 rounded-full ${regenActive ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}`} />
-        <span className={`text-[8px] font-mono font-bold uppercase ${regenActive ? (isLight ? 'text-green-600' : 'text-green-400') : 'text-slate-500'}`}>
+        <span className={`text-[8px] font-mono font-bold uppercase ${regenActive ? 'text-green-400' : 'text-slate-500'}`}>
           Regen {regenActive ? 'ON' : 'OFF'}
         </span>
       </div>
@@ -155,7 +137,6 @@ export default function CustomVehicleEditor() {
   const { vehicle, isCustomMode, updateCustomVehicle, isLabMinimized, setLabMinimized } = useVehicle();
   const { isMobile } = useWindowSize();
   const [saving, setSaving] = useState(false);
-  const isLight = useIsLightTheme();
 
   if (!isCustomMode || isLabMinimized) return null;
 
@@ -201,7 +182,7 @@ export default function CustomVehicleEditor() {
         />
         {/* Bottom sheet */}
         <div
-          className={`fixed left-0 right-0 bottom-0 z-[150] rounded-t-3xl flex flex-col ${isLight ? 'bg-white border-t border-outline-variant/10 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]' : 'bg-[#181c24]'}`}
+          className="fixed left-0 right-0 bottom-0 z-[150] bg-[#181c24] rounded-t-3xl flex flex-col"
           style={{
             height: '78dvh',
             animation: 'sheetUp 220ms cubic-bezier(0.32,0.72,0,1)',
@@ -340,7 +321,7 @@ export default function CustomVehicleEditor() {
   }
 
   return (
-    <div className={`fixed right-0 top-0 bottom-0 w-[320px] border-l z-[45] flex flex-col pt-14 ${isLight ? 'bg-white border-outline-variant/10 shadow-[-4px_0_20px_rgba(0,0,0,0.05)]' : 'bg-[#181c24] border-white/5'}`}>
+    <div className="fixed right-0 top-0 bottom-0 w-[320px] bg-[#181c24] border-l border-white/5 z-[45] flex flex-col pt-14">
 
       {/* ── Header ── */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-white/5 shrink-0">
@@ -467,31 +448,31 @@ export default function CustomVehicleEditor() {
         </Section>
 
         {/* ── Live Impact Preview ── */}
-        <div className="mx-4 my-4 rounded-xl border border-outline-variant/10 overflow-hidden">
+        <div className="mx-4 my-4 rounded-xl border border-white/8 overflow-hidden">
           <div
-            className="px-4 py-3 border-b border-outline-variant/10"
-            style={{ background: isLight ? 'linear-gradient(135deg, rgba(0,122,153,0.06) 0%, transparent 100%)' : 'linear-gradient(135deg, rgba(168,85,247,0.10) 0%, transparent 100%)' }}
+            className="px-4 py-3 border-b border-white/5"
+            style={{ background: 'linear-gradient(135deg, rgba(168,85,247,0.10) 0%, transparent 100%)' }}
           >
-            <p className={`text-[10px] uppercase tracking-widest font-bold ${isLight ? 'text-[#007A99]' : 'text-[#A855F7]'}`}>Live Impact Preview</p>
+            <p className="text-[10px] text-[#A855F7] uppercase tracking-widest font-bold">Live Impact Preview</p>
           </div>
-          <div className={`px-4 py-4 space-y-3 ${isLight ? 'bg-surface-container/30' : 'bg-white/3'}`}>
+          <div className="px-4 py-4 space-y-3 bg-white/3">
             <div className="flex justify-between text-xs">
-              <span className={isLight ? "text-slate-500" : "text-slate-400"}>Est. Range</span>
-              <span className={`font-mono font-bold ${isLight ? 'text-slate-800' : 'text-white'}`}>{vehicle.range_km} km</span>
+              <span className="text-slate-400">Est. Range</span>
+              <span className="text-white font-mono font-bold">{vehicle.range_km} km</span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className={isLight ? "text-slate-500" : "text-slate-400"}>vs Model V baseline</span>
+              <span className="text-slate-400">vs Model V baseline</span>
               <span className={`font-mono ${rangeDiff >= 0 ? 'text-green-400' : 'text-amber-400'}`}>
                 {rangeDiff >= 0 ? '+' : ''}{rangeDiff} km ({rangePercent >= 0 ? '+' : ''}{rangePercent}%)
               </span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className={isLight ? "text-slate-500" : "text-slate-400"}>Available energy</span>
-              <span className={`font-mono ${isLight ? 'text-slate-800' : 'text-white'}`}>{(vehicle.battery.capacity_kwh * (soh / 100) * (soc / 100)).toFixed(1)} kWh</span>
+              <span className="text-slate-400">Available energy</span>
+              <span className="text-white font-mono">{(vehicle.battery.capacity_kwh * (soh / 100) * (soc / 100)).toFixed(1)} kWh</span>
             </div>
             <div className="flex justify-between text-xs">
-              <span className={isLight ? "text-slate-500" : "text-slate-400"}>Predicted 50 km energy</span>
-              <span className={`font-mono ${isLight ? 'text-slate-800' : 'text-white'}`}>~{predictedEnergy} kWh</span>
+              <span className="text-slate-400">Predicted 50 km energy</span>
+              <span className="text-white font-mono">~{predictedEnergy} kWh</span>
             </div>
             <div className="pt-0.5">
               <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
@@ -508,7 +489,7 @@ export default function CustomVehicleEditor() {
 
           {/* Warning banners */}
           {(soc < 40 || soh < 80 || vehicle.specs.mass_kg > 2500) && (
-            <div className={`px-4 pb-4 space-y-2 ${isLight ? 'bg-surface-container/30' : 'bg-white/3'}`}>
+            <div className="px-4 pb-4 space-y-2 bg-white/3">
               {soc < 20 && (
                 <div className="p-2.5 rounded-lg bg-red-400/10 border border-red-400/20">
                   <p className="text-[10px] text-red-400 font-mono">⚠ Critical charge — find a charger</p>

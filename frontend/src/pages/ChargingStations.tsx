@@ -5,18 +5,6 @@ import useWindowSize from '../hooks/useWindowSize'
 import GeoSearch, { GeoSearchResult } from '../components/GeoSearch'
 import { useVehicle } from '../contexts/VehicleContext'
 
-function useIsLightTheme() {
-  const [isLight, setIsLight] = useState(() => document.documentElement.classList.contains('light'))
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsLight(document.documentElement.classList.contains('light'))
-    })
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    return () => observer.disconnect()
-  }, [])
-  return isLight
-}
-
 /* Amsterdam-area demonstration fallback data */
 const DEMO_STATIONS = [
   { ID: 1, AddressInfo: { Title: 'FastNed Amstel', AddressLine1: 'Julianaplein 1', Town: 'Amsterdam', Latitude: 52.3469, Longitude: 4.9179 }, Connections: [{ PowerKW: 300, LevelID: 3, ConnectionTypeID: 33 }], StatusTypeID: 2, NumberOfPoints: 4 },
@@ -40,7 +28,6 @@ function getStationStatus(station: any) {
 
 export default function ChargingStations() {
   const { vehicle } = useVehicle()
-  const isLight = useIsLightTheme()
   const [stations, setStations] = useState<any[]>(DEMO_STATIONS)
   const [loading, setLoading] = useState(false)
   const [selectedStation, setSelectedStation] = useState<any | null>(null)
@@ -49,7 +36,6 @@ export default function ChargingStations() {
 
   const mapRef = useRef<HTMLDivElement>(null)
   const leafletMap = useRef<L.Map | null>(null)
-  const layerControlRef = useRef<L.TileLayer | null>(null)
   const markersRef = useRef<{ [id: string]: L.Marker }>({})
   const { isMobile } = useWindowSize()
   const [showList, setShowList] = useState(!isMobile)
@@ -63,8 +49,8 @@ export default function ChargingStations() {
       zoom: 12,
       zoomControl: false,
     })
-    
-    layerControlRef.current = L.tileLayer(isLight ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png' : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
     }).addTo(map)
 
@@ -96,13 +82,11 @@ export default function ChargingStations() {
 
     fetchStations(52.3676, 4.9041)
 
-    const timeout = setTimeout(() => {
-      map.invalidateSize()
-    }, 100)
-
+    let timeout: ReturnType<typeof setTimeout>
     map.on('moveend', () => {
-      const center = map.getCenter()
-      setTimeout(() => {
+      clearTimeout(timeout)
+      timeout = setTimeout(() => {
+        const center = map.getCenter()
         fetchStations(center.lat, center.lng)
       }, 750)
     })
@@ -110,24 +94,10 @@ export default function ChargingStations() {
     return () => {
       map.remove()
       leafletMap.current = null
-      layerControlRef.current = null
       markersRef.current = {}
       clearTimeout(timeout)
     }
-  }, []) // Empty dependency array as this should only run once on mount. isLight will be handled by the other effect.
-
-  // ── Update Map Tiles for Theme
-  useEffect(() => {
-    if (!leafletMap.current) return
-    if (layerControlRef.current) {
-      layerControlRef.current.remove()
-    }
-    const tileUrl = isLight
-      ? 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-
-    layerControlRef.current = L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(leafletMap.current)
-  }, [isLight])
+  }, [])
 
   // Update Markers
   useEffect(() => {
