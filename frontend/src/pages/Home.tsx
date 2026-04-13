@@ -72,7 +72,7 @@ export default function Home() {
           </div>
 
           {/* Carousel area */}
-          <div className={`relative w-full flex items-center justify-center ${isMobile ? 'h-[260px] mt-[80px]' : 'h-[400px]'}`}>
+          <div className={`relative w-full flex items-center justify-center ${isMobile ? 'h-[260px] mt-[160px]' : 'h-[400px]'}`}>
             {/* Ghost left */}
             <div className={`absolute -left-20 opacity-20 scale-75 blur-sm grayscale pointer-events-none${isMobile ? ' hidden' : ''}`}>
               <img
