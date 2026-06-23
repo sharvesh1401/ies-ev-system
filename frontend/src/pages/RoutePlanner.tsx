@@ -1133,6 +1133,17 @@ export default function RoutePlanner() {
             )}
           </div>
 
+          {/* Maintenance Notice */}
+          <div className="mx-6 mb-4 p-3.5 bg-error/10 border border-error/30 rounded-xl flex items-start gap-2.5 shrink-0">
+            <span className="material-symbols-outlined text-error text-[18px] mt-0.5">engineering</span>
+            <div className="flex-1">
+              <p className="text-[11px] font-bold text-error uppercase tracking-wider mb-0.5">Maintenance Alert</p>
+              <p className="text-[11px] text-error font-medium leading-relaxed">
+                The routing algorithm is currently under maintenance. We are sorry for the inconvenience.
+              </p>
+            </div>
+          </div>
+
           {/* Origin / Waypoint / Destination — 3-input timeline */}
           <div className="px-6 pb-5 shrink-0">
             <div className="flex gap-4">
