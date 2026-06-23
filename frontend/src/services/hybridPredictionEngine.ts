@@ -355,7 +355,7 @@ function scoreCharger(
 
 function recommendChargerStop(
   arrivalSoc: number,
-  energy: number,
+  _energy: number,
   effCapacity: number,
   initialSoc: number,
   chargers: ChargerInfo[],
