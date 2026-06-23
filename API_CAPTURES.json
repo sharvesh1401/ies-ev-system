@@ -1,0 +1,39 @@
+{
+  "api_interactions": [
+    {
+      "timestamp": "2026-04-13T10:40:00Z",
+      "endpoint": "/api/v2/predict-hybrid",
+      "method": "POST",
+      "scenario": "Standard Sedan - City",
+      "request_payload": {
+        "vehicle": { "mass_kg": 1600, "drag_coeff": 0.28 },
+        "route": { "distance_km": 15 },
+        "initial_soc": 90
+      },
+      "response_summary": {
+        "status": 200,
+        "energy_kwh": 1.21,
+        "confidence": 0.94,
+        "method": "physics"
+      }
+    },
+    {
+      "timestamp": "2026-04-13T10:55:00Z",
+      "endpoint": "https://meridian-ev.vercel.app/api/predict/energy",
+      "method": "POST",
+      "scenario": "Live Demo - Amsterdam to Rotterdam",
+      "observation": "Backend error 500 encountered; frontend successfully fell back to local ML inference.",
+      "frontend_fallback_result": {
+        "energy_kwh_ml": 9.4,
+        "energy_kwh_physics": 8.9,
+        "divergence": "5.7%",
+        "status": "ML VALIDATED"
+      }
+    }
+  ],
+  "monitoring_status": {
+    "prometheus": "Healthy",
+    "grafana": "Healthy",
+    "alerts": "None"
+  }
+}

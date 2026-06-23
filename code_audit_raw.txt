@@ -1,0 +1,642 @@
+FILE: docker-compose.yml
+
+FILE: test_apis.py
+  Imports: urllib, json
+  Classes: 
+  Functions: test_ors, test_elevation, test_weather, test_ocm
+  Entry Point: False
+
+FILE: claude/settings.local.json
+
+FILE: github/workflows/ci.yml
+
+FILE: backend/debug_imports.py
+  Imports: os, app, sys
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/debug_imports_full.py
+  Imports: os, traceback, app, sys
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/pyproject.toml
+
+FILE: backend/verify_keys.py
+  Imports: app, pathlib, sys
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/config.py
+  Imports: pathlib, pydantic_settings, typing
+  Classes: Settings
+  Functions: SQLALCHEMY_DATABASE_URI
+  Entry Point: False
+
+FILE: backend/app/database.py
+  Imports: sqlalchemy, app, redis
+  Classes: 
+  Functions: get_db, get_redis_client
+  Entry Point: False
+
+FILE: backend/app/limiter.py
+  Imports: slowapi
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/main.py
+  Imports: starlette, slowapi, prometheus_fastapi_instrumentator, sentry_sdk, logging, contextlib, app, fastapi
+  Classes: SecurityHeadersMiddleware
+  Functions: _key_status, lifespan, root, dispatch
+  Entry Point: False
+
+FILE: backend/app/__init__.py
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/api/__init__.py
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/api/routes/predict.py
+  Imports: typing, logging, app, pydantic, fastapi
+  Classes: PredictionRequest, PredictionResponse
+  Functions: predict_trip_energy, health_check, list_models
+  Entry Point: False
+
+FILE: backend/app/api/routes/__init__.py
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/config/metric_thresholds.py
+  Imports: 
+  Classes: 
+  Functions: get_critical_metrics, get_high_priority_metrics, check_metric_passes
+  Entry Point: False
+
+FILE: backend/app/config/__init__.py
+  Imports: os, importlib
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/ml/confidence_scorer.py
+  Imports: typing, collections, dataclasses, numpy, math
+  Classes: ConfidenceComponents, ConfidenceResult, ScenarioSignature, MLConfidenceScorer
+  Functions: calculate_overall, to_dict, as_tuple, __init__, _calculate_model_uncertainty_score, _calculate_physics_agreement_score, _calculate_historical_accuracy_score, _calculate_data_quality_score, _get_scenario_signature, _get_interpretation, _generate_recommendations, calculate_confidence, record_validation, get_calibration_stats
+  Entry Point: False
+
+FILE: backend/app/ml/data_generator.py
+  Imports: argparse, typing, pathlib, numpy, dataclasses, random, pandas, app, math
+  Classes: ScenarioFeatures, ScenarioLabels, VehicleSpec, PhysicsDataGenerator
+  Functions: main, to_array, feature_names, to_array, label_names, __init__, _sample_vehicle_params, _sample_route_params, _sample_environment_params, _sample_driver_params, generate_scenario, generate_scenarios, generate_and_save_splits
+  Entry Point: False
+
+FILE: backend/app/ml/hybrid_predictor.py
+  Imports: torch, enum, typing, random, time, dataclasses, datetime, numpy, app, math
+  Classes: PredictionMethod, ScenarioInput, ConfidenceInfo, HybridPredictionResult, HybridPredictor
+  Functions: to_feature_array, from_ml_uncertainty, to_dict, __init__, load_ml_model, _predict_ml, _predict_physics, _should_cross_validate, _cross_validate, get_validation_stats, predict_quick, predict_accurate, predict_hybrid, predict
+  Entry Point: False
+
+FILE: backend/app/ml/model_loader.py
+  Imports: torch, typing, pickle, json, pathlib, numpy, onnxruntime, app
+  Classes: ModelLoader
+  Functions: get_model_loader, get_models, __init__, load_energy_predictor, load_scaler, load_teacher, load_student, load_models, get_model_info, load_driver_classifier, load_traffic_estimator, load_metrics, load_all, verify_models, get_status
+  Entry Point: False
+
+FILE: backend/app/ml/prediction_service.py
+  Imports: torch, typing, logging, model_loader, time, numpy
+  Classes: PredictionService
+  Functions: predict_energy, __init__, _load_models, predict_energy, _prepare_input, _predict_onnx, _predict_student, _predict_teacher, health_check
+  Entry Point: False
+
+FILE: backend/app/ml/validation.py
+  Imports: torch, enum, typing, time, dataclasses, datetime, numpy, app, math
+  Classes: TestStatus, TestResult, ValidationReport, MLValidationSuite
+  Functions: to_dict, to_dict, __init__, set_model, set_physics_engine, _generate_test_scenarios, test_physics_consistency, test_confidence_calibration, test_no_hallucinations, test_uncertainty_correlation, test_monotonicity, test_physics_law_compliance, run_all_tests
+  Entry Point: False
+
+FILE: backend/app/ml/__init__.py
+  Imports: app, typing
+  Classes: 
+  Functions: get_data_generator, get_hybrid_predictor, get_confidence_scorer, get_validation_suite, get_model_loader
+  Entry Point: False
+
+FILE: backend/app/ml/models/driver_classifier.py
+  Imports: torch, typing
+  Classes: DriverClassifierLSTM, DriverClassifierLSTM
+  Functions: __init__, forward, predict_style, __init__
+  Entry Point: False
+
+FILE: backend/app/ml/models/energy_predictor.py
+  Imports: torch, numpy, math, typing
+  Classes: EnergyPredictorNetwork, EnergyPredictorTrainer
+  Functions: gaussian_nll_loss, __init__, set_normalization_params, normalize_input, denormalize_output, forward, predict_with_uncertainty, get_confidence, __init__, _compute_loss, _compute_mape, train_epoch, validate, fit, save_checkpoint, load_checkpoint
+  Entry Point: False
+
+FILE: backend/app/ml/models/tcn_transformer.py
+  Imports: torch
+  Classes: TCNBlock, TeacherModel, StudentModel
+  Functions: __init__, forward, __init__, forward, __init__, forward
+  Entry Point: False
+
+FILE: backend/app/ml/models/__init__.py
+  Imports: app, typing
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/routes/ai.py
+  Imports: app, pydantic, fastapi, typing
+  Classes: ChatRequest, ChatResponse
+  Functions: chat_with_ai
+  Entry Point: False
+
+FILE: backend/app/routes/external_apis.py
+  Imports: typing, httpx, logging, app, pydantic, fastapi
+  Classes: Coordinate, OrsDirectionsRequest, ElevationPoint, ElevationLookupRequest
+  Functions: check_external_apis, proxy_ors_directions, proxy_elevation, proxy_weather, proxy_ocm, validate_coordinate_bounds
+  Entry Point: False
+
+FILE: backend/app/routes/health.py
+  Imports: sqlalchemy, app, fastapi, typing
+  Classes: 
+  Functions: health_check
+  Entry Point: False
+
+FILE: backend/app/routes/prediction_v2.py
+  Imports: typing, traceback, time, app, pydantic, fastapi
+  Classes: HybridPredictionRequest, ConfidenceDetail, HybridPredictionResponse, DrivingProfileRequest, DrivingProfileResponse
+  Functions: predict_hybrid, create_driving_profile, get_confidence_report, _predict_with_profile, _predict_constant_speed, _score_to_level, _generate_recommendations
+  Entry Point: False
+
+FILE: backend/app/routes/simulation.py
+  Imports: typing, traceback, time, app, pydantic, fastapi
+  Classes: SimulationRequest, PredictionRequest, ConfidenceInfo, PredictionResponse
+  Functions: get_engine, get_hybrid_predictor, run_simulation, predict_quick, predict_accurate, predict_hybrid, get_validation_stats
+  Entry Point: False
+
+FILE: backend/app/routes/__init__.py
+  Imports: health, ai, simulation
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/services/ai_service.py
+  Imports: typing, httpx, logging, app, fastapi
+  Classes: AIService
+  Functions: __init__, generate_response
+  Entry Point: False
+
+FILE: backend/app/services/__init__.py
+  Imports: app
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/simulation/battery_model.py
+  Imports: app, math, typing
+  Classes: BatteryModel
+  Functions: __init__, calculate_ocv, calculate_current_from_power, calculate_current, update_state
+  Entry Point: False
+
+FILE: backend/app/simulation/confidence_scorer.py
+  Imports: numpy, app, typing
+  Classes: ConfidenceScorer
+  Functions: calculate_confidence
+  Entry Point: False
+
+FILE: backend/app/simulation/converters.py
+  Imports: 
+  Classes: BatteryEnergyConverter
+  Functions: __init__, soc_to_energy, energy_to_soc, update_soc_from_energy_delta, verify_invertibility
+  Entry Point: False
+
+FILE: backend/app/simulation/driving_profiles.py
+  Imports: enum, typing, abc, dataclasses, random, math
+  Classes: DriverStyle, SpeedPoint, DriverParameters, DrivingProfile, CityDrivingProfile, HighwayDrivingProfile, MixedDrivingProfile
+  Functions: create_profile, speed_profile_to_dict, __init__, generate_speed_profile, _get_driver_params, _calculate_acceleration_distance, _create_acceleration_segment, generate_speed_profile, generate_speed_profile, __init__, generate_speed_profile
+  Entry Point: False
+
+FILE: backend/app/simulation/efficiency.py
+  Imports: 
+  Classes: EfficiencyModel
+  Functions: __init__, battery_power_from_wheel_power, wheel_power_from_battery_power
+  Entry Point: False
+
+FILE: backend/app/simulation/energy_calculator.py
+  Imports: app, typing
+  Classes: EnergyCalculator
+  Functions: __init__, calculate_power_flow, calculate_energy_breakdown
+  Entry Point: False
+
+FILE: backend/app/simulation/environment.py
+  Imports: numpy, app, math, typing
+  Classes: EnvironmentSimulator
+  Functions: __init__, calculate_air_density, extract_road_grade, get_grade_at_distance, calculate_wind_effect
+  Entry Point: False
+
+FILE: backend/app/simulation/integrated_engine.py
+  Imports: datetime, app, math, typing
+  Classes: IntegratedSimulationEngine
+  Functions: __init__, simulate, simulate_with_profile, get_target_speed_at_time
+  Entry Point: False
+
+FILE: backend/app/simulation/schemas.py
+  Imports: pydantic, typing
+  Classes: VehicleParameters, RouteParameters, EnvironmentParameters, SimulationStep, EnergyBreakdown, ValidationResult, ValidationReport, ConfidenceScore, SimulationResult
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/simulation/telemetry.py
+  Imports: numpy, app, typing
+  Classes: TelemetryGenerator
+  Functions: __init__, add_noise_to_trajectory
+  Entry Point: False
+
+FILE: backend/app/simulation/validation.py
+  Imports: app, typing
+  Classes: PhysicsValidationSuite
+  Functions: run_all_tests, test_energy_conservation, test_newtons_second_law, test_power_balance, test_physical_limits, test_numerical_stability
+  Entry Point: False
+
+FILE: backend/app/simulation/variable_speed_engine.py
+  Imports: dataclasses, app, typing
+  Classes: DrivingProfileResult, VariableSpeedResult
+  Functions: generate_driving_profile, simulate_variable_speed
+  Entry Point: False
+
+FILE: backend/app/simulation/vehicle_dynamics.py
+  Imports: numpy, app, math, typing
+  Classes: VehicleDynamicsEngine
+  Functions: __init__, simulate_step, simulate_trajectory
+  Entry Point: False
+
+FILE: backend/app/simulation/__init__.py
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/app/simulation/tests/test_battery_model.py
+  Imports: app, pytest
+  Classes: TestBatteryModel
+  Functions: battery, test_ocv_scaling, test_current_calculation, test_charge_conservation
+  Entry Point: False
+
+FILE: backend/app/simulation/tests/test_comprehensive_validation.py
+  Imports: numpy, app, math, pytest
+  Classes: TestEnergyConservation, TestNewtonsLaws, TestBatteryPhysics, TestPhysicalLimits, TestNumericalStability, TestConfidenceScoring
+  Functions: standard_params, test_flat_road_constant_speed, test_hill_climbing_energy, test_energy_breakdown_consistency, test_force_acceleration_relationship, test_power_balance, test_charge_conservation, test_thermal_equilibrium, test_voltage_current_relationship, test_no_negative_velocity, test_soc_bounds, test_temperature_reasonable, test_no_wild_oscillations, test_no_nan_or_inf, test_high_confidence_normal_conditions, test_lower_confidence_extreme_conditions
+  Entry Point: False
+
+FILE: backend/app/simulation/tests/test_energy_conservation.py
+  Imports: app, pytest
+  Classes: TestEnergyConservation
+  Functions: test_battery_energy_converter_invertibility, test_battery_energy_converter_update, test_efficiency_model_consistency, test_energy_soc_consistency_integration
+  Entry Point: False
+
+FILE: backend/app/simulation/tests/test_integration.py
+  Imports: app, pytest
+  Classes: TestIntegratedEngine
+  Functions: engine, params, test_end_to_end_simulation, test_self_verification_protocol
+  Entry Point: False
+
+FILE: backend/app/simulation/tests/test_validation.py
+  Imports: app, typing
+  Classes: TestValidationSuite
+  Functions: test_detection_of_violations
+  Entry Point: False
+
+FILE: backend/app/simulation/tests/test_vehicle_dynamics.py
+  Imports: app, math, pytest
+  Classes: TestVehicleDynamics
+  Functions: basic_vehicle, basic_env, test_constant_velocity_forces, test_hill_climbing
+  Entry Point: False
+
+FILE: backend/reports/gate_decision.json
+
+FILE: backend/reports/validation_metrics.json
+
+FILE: backend/scripts/benchmark_hybrid.py
+  Imports: os, app, time, sys
+  Classes: 
+  Functions: main
+  Entry Point: False
+
+FILE: backend/scripts/check_phase_gate.py
+  Imports: app, sys, pathlib, json
+  Classes: 
+  Functions: load_metrics, make_gate_decision, print_gate_decision, save_decision, main
+  Entry Point: False
+
+FILE: backend/scripts/generate_report.py
+  Imports: datetime, sys, pathlib, json
+  Classes: 
+  Functions: load_data, generate_markdown_report, main
+  Entry Point: False
+
+FILE: backend/scripts/test_simulation_visual.py
+  Imports: os, matplotlib, numpy, app, sys
+  Classes: 
+  Functions: run_visual_verification
+  Entry Point: False
+
+FILE: backend/scripts/train_ml_model.py
+  Imports: torch, argparse, json, pathlib, datetime, numpy, pandas, app, sys
+  Classes: 
+  Functions: load_or_generate_data, create_data_loaders, evaluate_model, main
+  Entry Point: False
+
+FILE: backend/scripts/validate_metrics.py
+  Imports: os, subprocess, json, pathlib, datetime, app, re, sys
+  Classes: 
+  Functions: run_pytest, run_pytest_with_coverage, parse_test_results, parse_coverage, collect_metrics, check_thresholds, generate_report, main
+  Entry Point: False
+
+FILE: backend/scripts/validate_ml_models.py
+  Imports: torch, argparse, json, pathlib, datetime, numpy, app, sys
+  Classes: 
+  Functions: main
+  Entry Point: False
+
+FILE: backend/scripts/verify_models.py
+  Imports: os, app, pathlib, sys
+  Classes: 
+  Functions: main
+  Entry Point: False
+
+FILE: backend/tests/__init__.py
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/tests/ml/test_confidence_scorer.py
+  Imports: app, pytest
+  Classes: TestConfidenceComponents, TestMLConfidenceScorer, TestScenarioSignature
+  Functions: test_calculate_overall_weighted, test_perfect_scores, test_zero_scores, scorer, test_basic_confidence_calculation, test_interpretation_levels, test_physics_agreement_boosts_confidence, test_record_validation, test_to_dict, test_signature_tuple
+  Entry Point: False
+
+FILE: backend/tests/ml/test_driving_profiles.py
+  Imports: app, pytest
+  Classes: TestProfileGeneration, TestVariableSpeedSimulation
+  Functions: vehicle, route, environment, test_generate_profile_types, test_city_profile_has_stops, test_highway_profile_high_speed, test_driver_styles, test_invalid_profile_type, test_invalid_driver_style, test_reproducibility_with_seed, test_city_simulation, test_energy_breakdown_sums, test_aggressive_uses_more_energy
+  Entry Point: False
+
+FILE: backend/tests/ml/test_hybrid_predictor.py
+  Imports: app, unittest, pytest
+  Classes: TestHybridPredictorPhysicsFallback, TestPredictionResultStructure
+  Functions: vehicle, route, environment, test_physics_only_prediction, test_predict_quick_without_ml_raises, test_hybrid_auto_routes_to_physics, test_result_has_all_fields, test_to_dict_serialisation, test_energy_bounds_reasonable
+  Entry Point: False
+
+FILE: backend/tests/ml/test_prediction_v2_api.py
+  Imports: unittest, os, pytest, app, fastapi, sys
+  Classes: TestPredictHybrid, TestDrivingProfile, TestConfidenceReport
+  Functions: test_constant_speed_prediction, test_variable_speed_city, test_confidence_structure, test_generate_profile, test_invalid_profile_type, test_report_returns_200
+  Entry Point: False
+
+FILE: backend/tests/ml/__init__.py
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: backend/tests/unit/test_main.py
+  Imports: app, unittest, fastapi, pytest
+  Classes: 
+  Functions: mock_get_db, mock_get_redis, test_read_root, test_health_check_success, test_chat_ai_success, test_chat_ai_failure
+  Entry Point: False
+
+FILE: backend/tests/unit/__init__.py
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: frontend/package-lock.json
+
+FILE: frontend/package.json
+
+FILE: frontend/tsconfig.json
+
+FILE: frontend/tsconfig.node.json
+
+FILE: frontend/vite.config.ts
+  Imports: @tailwindcss/vite, vite, @vitejs/plugin-react
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: frontend/src/App.tsx
+  Imports: ./components/Layout, react-router-dom, react, ./contexts/VehicleContext
+  Classes: 
+  Functions: App, Home, RoutePlanner, BatteryAnalytics, ChargingStations, SystemInsights, Profile, Settings
+  Entry Point: False
+
+FILE: frontend/src/main.tsx
+  Imports: react-router-dom, react-dom/client, react, @tanstack/react-query, ./App
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: frontend/src/vite-env.d.ts
+  Imports: 
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: frontend/src/components/AnimatedBackground.tsx
+  Imports: react
+  Classes: 
+  Functions: AnimatedBackground, animate, canvasRef, handleResize
+  Entry Point: False
+
+FILE: frontend/src/components/AnimatedNumber.tsx
+  Imports: react
+  Classes: 
+  Functions: AnimatedNumber, step
+  Entry Point: False
+
+FILE: frontend/src/components/CarModel.tsx
+  Imports: three, @react-three/drei, @react-three/fiber, react
+  Classes: 
+  Functions: CarGLB, Loader, CarModel, cfg, box, scaledBox
+  Entry Point: False
+
+FILE: frontend/src/components/CustomVehicleEditor.tsx
+  Imports: ../contexts/VehicleContext, ../hooks/useWindowSize, react
+  Classes: 
+  Functions: LabSlider, Section, BlueprintWireframe, CustomVehicleEditor, resetToDefaults, saveProfile, snapshot
+  Entry Point: False
+
+FILE: frontend/src/components/GeoSearch.tsx
+  Imports: react
+  Classes: 
+  Functions: GeoSearch, handleClickOutside, wrapperRef, timer
+  Entry Point: False
+
+FILE: frontend/src/components/Layout.tsx
+  Imports: ./Mobile/MobileBottomNav, framer-motion, react-router-dom, react, ./CustomVehicleEditor, ./Sidebar, ./AnimatedBackground, ./Mobile/MobileTopBar, ../contexts/VehicleContext, ./TopBar, ../hooks/useWindowSize
+  Classes: 
+  Functions: Layout, onWaking, onReady
+  Entry Point: False
+
+FILE: frontend/src/components/Sidebar.tsx
+  Imports: ../contexts/VehicleContext, react-router-dom, react
+  Classes: 
+  Functions: Sidebar, handleClick, toggleTheme, root, t
+  Entry Point: False
+
+FILE: frontend/src/components/TopBar.tsx
+  Imports: ../contexts/VehicleContext, react
+  Classes: 
+  Functions: TopBar, soc, id
+  Entry Point: False
+
+FILE: frontend/src/components/VehicleSelector.tsx
+  Imports: react-dom, ../contexts/VehicleContext, react
+  Classes: 
+  Functions: VehicleSelector, handleClickOutside, reposition, dropdownRef, clickedDropdown, rect, handleToggle, rect, handleSelect
+  Entry Point: False
+
+FILE: frontend/src/components/Mobile/MobileBottomNav.tsx
+  Imports: react, react-router-dom, ../../contexts/VehicleContext
+  Classes: 
+  Functions: NavItem, MobileBottomNav, handleHomePress
+  Entry Point: False
+
+FILE: frontend/src/components/Mobile/MobileTopBar.tsx
+  Imports: react-router-dom, react
+  Classes: 
+  Functions: MobileTopBar, toggleTheme, go, navigate, id
+  Entry Point: False
+
+FILE: frontend/src/contexts/VehicleContext.tsx
+  Imports: react
+  Classes: 
+  Functions: VehicleProvider, useVehicle, calculateCustomRange, updateCustomVehicle, prevCustom, saved, baseVehicle, clamp, id, r, switchVehicle
+  Entry Point: False
+
+FILE: frontend/src/hooks/useRealtimeTelemetry.ts
+  Imports: react
+  Classes: 
+  Functions: useRealtimeTelemetry
+  Entry Point: False
+
+FILE: frontend/src/hooks/useWindowSize.ts
+  Imports: react
+  Classes: 
+  Functions: useWindowSize, handleResize
+  Entry Point: False
+
+FILE: frontend/src/lib/api.ts
+  Imports: axios
+  Classes: 
+  Functions: api
+  Entry Point: False
+
+FILE: frontend/src/pages/BatteryAnalytics.tsx
+  Imports: ../contexts/VehicleContext, react
+  Classes: 
+  Functions: useAnimatedValue, generateCellData, BatteryAnalytics, id, diff, id, next, sohPoints, sohPath
+  Entry Point: False
+
+FILE: frontend/src/pages/ChargingStations.tsx
+  Imports: react, leaflet, ../contexts/VehicleContext, ../components/GeoSearch, ../hooks/useWindowSize
+  Classes: 
+  Functions: getStationStatus, ChargingStations, fetchStations, data, center, map, _maxPower, marker, filteredStations, maxPower, maxPower
+  Entry Point: False
+
+FILE: frontend/src/pages/CustomLabPage.tsx
+  Imports: ../hooks/useWindowSize, ../contexts/VehicleContext, ../components/CarModel, ../components/AnimatedNumber
+  Classes: 
+  Functions: CustomLabPage
+  Entry Point: False
+
+FILE: frontend/src/pages/Home.tsx
+  Imports: react-router-dom, ../components/CarModel, react, ../contexts/VehicleContext, ../components/VehicleSelector, ../components/AnimatedNumber, ../hooks/useWindowSize, ./CustomLabPage
+  Classes: 
+  Functions: Home
+  Entry Point: False
+
+FILE: frontend/src/pages/Profile.tsx
+  Imports: react
+  Classes: 
+  Functions: Profile, handleSave, handleCancel, initials
+  Entry Point: False
+
+FILE: frontend/src/pages/RoutePlanner.tsx
+  Imports: react-router-dom, react, ../contexts/VehicleContext, leaflet, ../hooks/useWindowSize
+  Classes: 
+  Functions: createStationIcon, createEndpointIcon, energyToColor, riskToColor, LocationAutocomplete, PipelineStepper, DecisionCard, getStepIcon, useIsDarkTheme, RoutePlanner, timer, activeIdx, observer, clearLayers, drawRoute, primary, latlngs, maxCost, segCoords, latlngs, allPoints, handlePlanRoute, ctx, bestPred, routeSteps, instructions
+  Entry Point: False
+
+FILE: frontend/src/pages/Settings.tsx
+  Imports: ../contexts/VehicleContext, react
+  Classes: 
+  Functions: Settings, Section, ToggleRow, SelectRow, SliderRow, updateSetting
+  Entry Point: False
+
+FILE: frontend/src/pages/SystemInsights.tsx
+  Imports: ../components/VehicleSelector, ../contexts/VehicleContext, react
+  Classes: 
+  Functions: generateLog, useSparkline, SystemInsights, renderSparkline, id, currentMem, id, id, hyb, points
+  Entry Point: False
+
+FILE: frontend/src/services/api.ts
+  Imports: axios
+  Classes: 
+  Functions: _onRequestStart, _onRequestEnd
+  Entry Point: False
+
+FILE: frontend/src/services/hybridPredictionEngine.ts
+  Imports: ./predictions, ./routeService
+  Classes: 
+  Functions: mlFastPath, physicsValidation, computeRouteCost, estimateDegradation, runHybridPrediction, selectBestRoute, available, best
+  Entry Point: False
+
+FILE: frontend/src/services/predictions.ts
+  Imports: ./api
+  Classes: 
+  Functions: predictEnergy, checkModelHealth
+  Entry Point: False
+
+FILE: frontend/src/services/routeService.ts
+  Imports: 
+  Classes: 
+  Functions: getRouteGeometry, sampleCoords, getElevationProfile, getWeather, getChargingStations, orchestrateRoute, haversineKm, features, body, profile, totalHDist, d, data, maxPower, slowTimer, done, fromElev, toElev
+  Entry Point: False
+
+FILE: frontend/tests/vehicle-selection.test.js
+  Imports: 
+  Classes: 
+  Functions: testContextLoaded, testVehicleProfiles, testMLPredictions, testEnergyDifferences, runAllTests, profiles
+  Entry Point: False
+
+FILE: monitoring/prometheus.yml
+
+FILE: scripts/audit_codebase.py
+  Imports: os, re, ast
+  Classes: 
+  Functions: analyze_python, analyze_js, main
+  Entry Point: False
+
+FILE: scripts/get_manifest.py
+  Imports: os
+  Classes: 
+  Functions: 
+  Entry Point: False
+
+FILE: scripts/verify.sh
+

@@ -1,0 +1,69 @@
+{
+  "threshold_sweep": [
+    {
+      "threshold": 0.6,
+      "combined_MAPE": 7.278841980280756,
+      "fallback_rate": 89.86666666666666,
+      "latency_ms": 127.77546666666667
+    },
+    {
+      "threshold": 0.65,
+      "combined_MAPE": 7.278841980280756,
+      "fallback_rate": 89.86666666666666,
+      "latency_ms": 127.77546666666667
+    },
+    {
+      "threshold": 0.7,
+      "combined_MAPE": 7.278841980280756,
+      "fallback_rate": 89.86666666666666,
+      "latency_ms": 127.77546666666667
+    },
+    {
+      "threshold": 0.75,
+      "combined_MAPE": 7.278841980280756,
+      "fallback_rate": 89.86666666666666,
+      "latency_ms": 127.77546666666667
+    },
+    {
+      "threshold": 0.8,
+      "combined_MAPE": 7.278841980280756,
+      "fallback_rate": 89.86666666666666,
+      "latency_ms": 127.77546666666667
+    },
+    {
+      "threshold": 0.85,
+      "combined_MAPE": 7.278841980280756,
+      "fallback_rate": 89.86666666666666,
+      "latency_ms": 127.77546666666667
+    }
+  ],
+  "ablation_latency": {
+    "V1_ML_Only": {
+      "median": 5.628800005069934,
+      "p95": 9.687155010760762
+    },
+    "V2_ML_Conf": {
+      "median": 5.788399983430281,
+      "p95": 10.667130009096576
+    },
+    "V3_ML_Phys_NoDiv": {
+      "median": 5.446000010124408,
+      "p95": 7.930869993288069
+    },
+    "V4_Full_Hybrid": {
+      "median": 5.60334998590406,
+      "p95": 8.598784988862462
+    }
+  },
+  "mlp_accuracy": {
+    "MAPE": 134.15969578611092,
+    "RMSE": 7.188882536207349,
+    "MAE": 5.793663573900859,
+    "R2": 0.16607384231605826
+  },
+  "routing_info": {
+    "physics_percentage_0_75": 89.86666666666666,
+    "ml_percentage_0_75": 10.13333333333334
+  },
+  "timestamp": "2026-04-13T17:48:11.706245"
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -13,6 +13,7 @@ import {
   runHybridPrediction,
   selectBestRoute,
   type PredictionResult,
+  type PredictionOptions,
 } from '../services/hybridPredictionEngine'
 import { useVehicle } from '../contexts/VehicleContext'
 
@@ -627,6 +628,16 @@ export default function RoutePlanner() {
   const [destName, setDestName] = useState(defaultDest || 'Rotterdam Centraal')
   const [modelType, setModelType] = useState<'onnx'|'student'|'teacher'>('onnx')
   const [tollRoads, setTollRoads] = useState(true)
+  const [driverMode, setDriverMode] = useState<'eco'|'normal'|'sport'>('normal')
+  const requestIdRef = useRef(0) // stale-request prevention
+
+  // ── Build prediction options from vehicle context (memoized to prevent re-render loops)
+  const predictionOptions: Partial<PredictionOptions> = useMemo(() => ({
+    initialSoc: vehicle.battery.soc_percent,
+    sohPercent: vehicle.health.soh_percent,
+    driverAggression: driverMode === 'eco' ? 0.2 : driverMode === 'sport' ? 0.8 : 0.5,
+    batteryTempC: vehicle.battery.temperature_c,
+  }), [vehicle.battery.soc_percent, vehicle.health.soh_percent, driverMode, vehicle.battery.temperature_c])
 
   // ── Initialize Map
   useEffect(() => {
@@ -708,7 +719,7 @@ export default function RoutePlanner() {
             battery_capacity_kwh: vehicle.battery.capacity_kwh,
             auxiliary_power_kw: 0.5,
           }
-          const newPred = await runHybridPrediction(newCtx, localEngineVehicle, 85, undefined, modelType)
+          const newPred = await runHybridPrediction(newCtx, localEngineVehicle, vehicle.battery.soc_percent, undefined, modelType, predictionOptions)
           setRouteCtx(newCtx)
           setPrediction(newPred)
           drawRoute(newCtx, newPred, preds)
@@ -884,7 +895,14 @@ export default function RoutePlanner() {
         battery_capacity_kwh: vehicle.battery.capacity_kwh,
         auxiliary_power_kw: 0.5,
       }
-      const { bestIndex, predictions } = await selectBestRoute(ctx, engineVehicle, modelType)
+
+      // Stale-request guard: increment counter before async work
+      const thisRequestId = ++requestIdRef.current
+
+      const { bestIndex, predictions } = await selectBestRoute(ctx, engineVehicle, modelType, predictionOptions)
+
+      // Discard if a newer request was triggered while we were computing
+      if (thisRequestId !== requestIdRef.current) return
 
       // Update context with best route
       ctx.selectedRouteIndex = bestIndex
@@ -907,7 +925,49 @@ export default function RoutePlanner() {
       setError(err.message || 'Route planning failed')
       setPipelineStage('error')
     }
-  }, [originData, destData, originName, destName, drawRoute, vehicle])
+  }, [originData, destData, originName, destName, drawRoute, vehicle, modelType, driverMode, predictionOptions])
+
+  // ── Auto-recalculate when vehicle parameters or driving mode changes ──
+  // Uses a fingerprint of all relevant vehicle params so Custom Lab slider
+  // changes (which don't change vehicle.id) still trigger recalculation.
+  const vehicleFingerprint = `${vehicle.id}|${vehicle.battery.soc_percent}|${vehicle.battery.soh_percent}|${vehicle.battery.capacity_kwh}|${vehicle.battery.temperature_c}|${vehicle.specs.mass_kg}|${vehicle.specs.drag_coefficient}|${vehicle.specs.motor_efficiency}|${vehicle.specs.regen_efficiency}|${vehicle.specs.rolling_resistance}|${vehicle.health.soh_percent}`
+  const prevFingerprintRef = useRef(vehicleFingerprint)
+  const prevDriverModeRef = useRef(driverMode)
+  const recalcTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    const fpChanged = prevFingerprintRef.current !== vehicleFingerprint
+    const modeChanged = prevDriverModeRef.current !== driverMode
+    prevFingerprintRef.current = vehicleFingerprint
+    prevDriverModeRef.current = driverMode
+
+    if ((fpChanged || modeChanged) && routeCtx) {
+      // Debounce 300ms to avoid thrashing during rapid slider adjustments
+      if (recalcTimerRef.current) clearTimeout(recalcTimerRef.current)
+      recalcTimerRef.current = setTimeout(() => {
+        const engineVehicle = {
+          ...vehicle.specs,
+          battery_capacity_kwh: vehicle.battery.capacity_kwh,
+          auxiliary_power_kw: 0.5,
+        }
+        const opts: Partial<PredictionOptions> = {
+          initialSoc: vehicle.battery.soc_percent,
+          sohPercent: vehicle.health.soh_percent,
+          driverAggression: driverMode === 'eco' ? 0.2 : driverMode === 'sport' ? 0.8 : 0.5,
+          batteryTempC: vehicle.battery.temperature_c,
+        }
+        selectBestRoute(routeCtx, engineVehicle, modelType, opts).then(({ bestIndex, predictions }) => {
+          const updatedCtx = { ...routeCtx, selectedRouteIndex: bestIndex }
+          setRouteCtx(updatedCtx)
+          setPrediction(predictions[bestIndex])
+          setAllPredictions(predictions)
+          drawRoute(updatedCtx, predictions[bestIndex], predictions)
+        }).catch(err => console.error('[RoutePlanner] Auto-recalc failed:', err))
+      }, 300)
+    }
+
+    return () => { if (recalcTimerRef.current) clearTimeout(recalcTimerRef.current) }
+  }, [vehicleFingerprint, driverMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Build route step list from ORS instructions
   const routeSteps = routeCtx
@@ -1141,6 +1201,30 @@ export default function RoutePlanner() {
                     onClick={() => setModelType(type)}
                   >
                     {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Driving Mode Selector */}
+            <div className="mt-4">
+              <p className="text-[8px] font-mono font-bold text-on-surface-variant uppercase tracking-widest mb-2">Driving Mode</p>
+              <div className="flex rounded-xl overflow-hidden border border-outline-variant/20">
+                {(['eco', 'normal', 'sport'] as const).map(mode => (
+                  <button
+                    key={mode}
+                    className={`flex-1 py-2.5 text-[10px] font-mono font-bold tracking-widest uppercase transition-all duration-150 ${
+                      driverMode === mode
+                        ? mode === 'eco'
+                          ? 'bg-secondary-container text-on-secondary-container'
+                          : mode === 'sport'
+                          ? 'bg-error text-on-error'
+                          : 'bg-primary text-on-primary'
+                        : 'bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high'
+                    }`}
+                    onClick={() => setDriverMode(mode)}
+                  >
+                    {mode === 'eco' ? '🌿 Eco' : mode === 'sport' ? '🏎️ Sport' : '⚡ Normal'}
                   </button>
                 ))}
               </div>

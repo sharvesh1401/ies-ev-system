@@ -104,49 +104,97 @@ export async function getRouteGeometry(
   origin: LatLng,
   destination: LatLng
 ): Promise<RouteCandidate[]> {
-  const body = {
-    coordinates: [
-      [origin.lng, origin.lat],
-      [destination.lng, destination.lat],
-    ],
-    alternative_routes: { target_count: 3, share_factor: 0.6, weight_factor: 1.6 },
-    instructions: true,
-    geometry: true,
+  // Try ORS backend proxy first
+  try {
+    const body = {
+      coordinates: [
+        [origin.lng, origin.lat],
+        [destination.lng, destination.lat],
+      ],
+      alternative_routes: { target_count: 3, share_factor: 0.6, weight_factor: 1.6 },
+      instructions: true,
+      geometry: true,
+    }
+
+    const res = await fetch(`${baseURL}/api/external/ors/directions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+
+    if (res.ok) {
+      const data = await res.json()
+      const features = data.features || []
+      if (features.length > 0) {
+        return features.map((f: any, idx: number) => {
+          const coords: LatLng[] = f.geometry.coordinates.map((c: number[]) => ({
+            lat: c[1],
+            lng: c[0],
+          }))
+          const props = f.properties || {}
+          const summary = props.summary || {}
+          const segments = props.segments || []
+          const instructions: RouteInstruction[] = []
+          segments.forEach((seg: any) => {
+            (seg.steps || []).forEach((step: any) => {
+              instructions.push({
+                text: step.instruction || '',
+                distance_m: step.distance || 0,
+                duration_s: step.duration || 0,
+                type: step.type || 0,
+                wayPoints: step.way_points || [],
+              })
+            })
+          })
+          return {
+            index: idx,
+            geometry: coords,
+            distance_m: summary.distance || 0,
+            duration_s: summary.duration || 0,
+            instructions,
+            segments: [],
+          } as RouteCandidate
+        })
+      }
+    }
+    console.warn(`[Route] ORS proxy returned ${res.status}, falling back to OSRM`)
+  } catch (err) {
+    console.warn('[Route] ORS proxy failed, falling back to OSRM:', err)
   }
 
-  const res = await fetch(`${baseURL}/api/external/ors/directions`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  })
+  // Fallback: free OSRM demo server (no API key needed)
+  return getRouteFromOSRM(origin, destination)
+}
 
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`OpenRouteService proxy error ${res.status}: ${text}`)
-  }
+/** Free OSRM routing fallback — no API key required */
+async function getRouteFromOSRM(origin: LatLng, destination: LatLng): Promise<RouteCandidate[]> {
+  const url = `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&alternatives=true&steps=true`
+
+  const res = await fetch(url)
+  if (!res.ok) throw new Error(`OSRM routing error ${res.status}`)
 
   const data = await res.json()
-  const features = data.features || []
+  if (!data.routes || data.routes.length === 0) throw new Error('No route found from OSRM')
 
-  return features.map((f: any, idx: number) => {
-    const coords: LatLng[] = f.geometry.coordinates.map((c: number[]) => ({
+  return data.routes.map((route: any, idx: number) => {
+    const coords: LatLng[] = route.geometry.coordinates.map((c: number[]) => ({
       lat: c[1],
       lng: c[0],
     }))
 
-    const props = f.properties || {}
-    const summary = props.summary || {}
-    const segments = props.segments || []
-
+    // Parse OSRM step instructions
     const instructions: RouteInstruction[] = []
-    segments.forEach((seg: any) => {
-      (seg.steps || []).forEach((step: any) => {
+    ;(route.legs || []).forEach((leg: any) => {
+      ;(leg.steps || []).forEach((step: any) => {
+        const maneuver = step.maneuver || {}
         instructions.push({
-          text: step.instruction || '',
+          text: step.name
+            ? `${maneuver.type || 'continue'} on ${step.name}`
+            : maneuver.type || 'continue',
           distance_m: step.distance || 0,
           duration_s: step.duration || 0,
-          type: step.type || 0,
-          wayPoints: step.way_points || [],
+          type: 0,
+          wayPoints: [],
         })
       })
     })
@@ -154,8 +202,8 @@ export async function getRouteGeometry(
     return {
       index: idx,
       geometry: coords,
-      distance_m: summary.distance || 0,
-      duration_s: summary.duration || 0,
+      distance_m: route.distance || 0,
+      duration_s: route.duration || 0,
       instructions,
       segments: [],
     } as RouteCandidate
@@ -174,6 +222,67 @@ function sampleCoords(coords: LatLng[], maxSamples: number = 80): LatLng[] {
   return sampled
 }
 
+/**
+ * Synthetic elevation estimator — generates plausible terrain data when the
+ * Open-Elevation API is unavailable. Uses latitude-based base elevation with
+ * sinusoidal variation proportional to route distance. This ensures energy
+ * calculations always have non-zero elevation data to work with.
+ */
+function syntheticElevation(coords: LatLng[]): ElevationData {
+  if (coords.length === 0) {
+    return { gain: 0, loss: 0, avgGradient: 0, maxGradient: 0, profile: [], isEstimated: true }
+  }
+
+  // Base elevation from latitude (rough continental model)
+  const baseElev = (lat: number) => {
+    const absLat = Math.abs(lat)
+    if (absLat > 60) return 200 + Math.sin(absLat * 0.1) * 100
+    if (absLat > 40) return 150 + Math.sin(absLat * 0.15) * 120
+    return 50 + Math.sin(absLat * 0.2) * 80
+  }
+
+  // Compute total horizontal distance for scaling variation amplitude
+  let totalDistKm = 0
+  for (let i = 1; i < coords.length; i++) {
+    totalDistKm += haversineKm(coords[i - 1], coords[i])
+  }
+
+  // Amplitude scales with distance (longer routes = more elevation variation)
+  const amplitude = Math.min(150, 10 + totalDistKm * 0.8)
+  const frequency = Math.max(2, totalDistKm / 15) // one hill every ~15 km
+
+  let gain = 0
+  let loss = 0
+  let maxGrad = 0
+  const profile = coords.map((c, i) => {
+    const progress = coords.length > 1 ? i / (coords.length - 1) : 0
+    const elevation = baseElev(c.lat) + amplitude * Math.sin(progress * frequency * Math.PI)
+
+    if (i > 0) {
+      const delta = elevation - (baseElev(coords[i - 1].lat) + amplitude * Math.sin(((i - 1) / (coords.length - 1)) * frequency * Math.PI))
+      if (delta > 0) gain += delta
+      else loss += Math.abs(delta)
+
+      const hDist = haversineKm(coords[i - 1], c) * 1000
+      if (hDist > 0) {
+        const grad = (Math.abs(delta) / hDist) * 100
+        if (grad > maxGrad) maxGrad = grad
+      }
+    }
+    return { lat: c.lat, lng: c.lng, elevation: Math.round(elevation) }
+  })
+
+  const totalHDist = totalDistKm * 1000
+  return {
+    gain: Math.round(gain),
+    loss: Math.round(loss),
+    avgGradient: totalHDist > 0 ? Math.round(((gain + loss) / totalHDist) * 100 * 100) / 100 : 0,
+    maxGradient: Math.round(maxGrad * 100) / 100,
+    profile,
+    isEstimated: true,
+  }
+}
+
 export async function getElevationProfile(coords: LatLng[]): Promise<ElevationData> {
   const sampled = sampleCoords(coords, 80)
 
@@ -182,6 +291,10 @@ export async function getElevationProfile(coords: LatLng[]): Promise<ElevationDa
       locations: sampled.map((c) => ({ latitude: c.lat, longitude: c.lng })),
     }
 
+    // AbortController with 15s timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 15000)
+
     const res = await fetch(`${baseURL}/api/external/elevation/lookup`, {
       method: 'POST',
       headers: {
@@ -189,7 +302,9 @@ export async function getElevationProfile(coords: LatLng[]): Promise<ElevationDa
         Accept: 'application/json',
       },
       body: JSON.stringify(body),
+      signal: controller.signal,
     })
+    clearTimeout(timeoutId)
 
     if (!res.ok) throw new Error(`Elevation API error ${res.status}`)
 
@@ -238,15 +353,8 @@ export async function getElevationProfile(coords: LatLng[]): Promise<ElevationDa
       isEstimated: false,
     }
   } catch (err) {
-    console.warn('[Elevation] Fallback to flat profile:', err)
-    return {
-      gain: 0,
-      loss: 0,
-      avgGradient: 0,
-      maxGradient: 0,
-      profile: sampled.map((c) => ({ ...c, elevation: 0 })),
-      isEstimated: true,
-    }
+    console.warn('[Elevation] API failed, using synthetic terrain estimator:', err)
+    return syntheticElevation(sampled)
   }
 }
 
@@ -370,7 +478,7 @@ export async function orchestrateRoute(
   // Step 2: Elevation
   onStageChange('sampling_elevation')
   const elevation = await getElevationProfile(primaryRoute.geometry)
-  if (elevation.isEstimated) warnings.push('Elevation data unavailable — using flat estimate')
+  if (elevation.isEstimated) warnings.push('Elevation data estimated — using synthetic terrain model')
 
   // Step 3: Weather (at origin, destination, midpoint — use midpoint as representative)
   onStageChange('reading_weather')

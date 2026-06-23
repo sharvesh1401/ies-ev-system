@@ -1,0 +1,3 @@
+Scenario,Method,Energy (kWh),Duration (min),Final SOC (%),Confidence,Latency (ms),Execution Time (ms)
+Standard Sedan - City,physics,1.2088969384691672,18.02,87.97,0.9417819068810221,82.09609985351562,70.0
+Heavy SUV - Highway,physics,22.04612936514944,54.7,67.88,0.9224173328745424,182.2652816772461,169.8

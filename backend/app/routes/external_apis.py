@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 from typing import List
 import httpx
+import asyncio
 import logging
 from app.config import settings
 from app.limiter import limiter
@@ -203,17 +204,22 @@ async def proxy_ors_directions(request: Request, body: OrsDirectionsRequest):
 @router.post("/elevation/lookup")
 @limiter.limit("30/minute")
 async def proxy_elevation(request: Request, body: ElevationLookupRequest):
-    """Proxy to Open-Elevation API with retries and GET fallback.
+    """Proxy to Open-Elevation API with retries, alt-provider fallback, and synthetic estimate.
 
     Accepts a validated ElevationLookupRequest (max 512 points) so the upstream
     API is never hit with unbounded or malformed input.
+
+    Fallback chain:
+    1. Open-Elevation POST (3 retries with exponential backoff)
+    2. Open-Elevation GET (for small requests < 30 points)
+    3. OpenTopoData API (alternative free provider)
+    4. Synthetic estimated response (flat with isEstimated flag)
     """
-    # Re-serialise validated locations into the format Open-Elevation expects
     payload = {"locations": [{"latitude": p.latitude, "longitude": p.longitude} for p in body.locations]}
     locations = payload["locations"]
 
     async with httpx.AsyncClient() as client:
-        # Try POST first (up to 3 times)
+        # ── Strategy 1: Open-Elevation POST with exponential backoff ──
         for attempt in range(3):
             try:
                 response = await client.post(
@@ -223,18 +229,25 @@ async def proxy_elevation(request: Request, body: ElevationLookupRequest):
                     timeout=30.0,
                 )
                 if response.status_code == 200:
-                    return JSONResponse(content=response.json())
+                    data = response.json()
+                    # Validate response has the right number of results
+                    results = data.get("results", [])
+                    if len(results) == len(locations):
+                        return JSONResponse(content=data)
+                    logger.warning(f"Elevation API returned {len(results)} results for {len(locations)} points")
 
                 logger.warning(f"Elevation API attempt {attempt+1} failed with status {response.status_code}")
-                if response.status_code == 504:
-                    continue  # Retry on gateway timeout
+                if response.status_code == 504 or response.status_code >= 500:
+                    await asyncio.sleep(0.5 * (2 ** attempt))  # exponential backoff
+                    continue
 
             except (httpx.TimeoutException, httpx.NetworkError) as e:
                 logger.warning(f"Elevation API attempt {attempt+1} network error: {str(e)}")
                 if attempt < 2:
+                    await asyncio.sleep(0.5 * (2 ** attempt))
                     continue
 
-        # Fallback to GET for small requests if POST failed
+        # ── Strategy 2: Open-Elevation GET for small requests ──
         if len(locations) < 30:
             try:
                 loc_str = "|".join([f"{loc['latitude']},{loc['longitude']}" for loc in locations])
@@ -249,9 +262,52 @@ async def proxy_elevation(request: Request, body: ElevationLookupRequest):
             except Exception as e:
                 logger.error(f"Elevation GET fallback failed: {str(e)}")
 
-        raise HTTPException(
-            status_code=502,
-            detail="Error communicating with Open-Elevation after multiple attempts",
+        # ── Strategy 3: OpenTopoData alternative provider ──
+        try:
+            # OpenTopoData accepts up to 100 points per request; chunk if needed
+            all_results = []
+            chunk_size = 100
+            for chunk_start in range(0, len(locations), chunk_size):
+                chunk = locations[chunk_start:chunk_start + chunk_size]
+                loc_str = "|".join([f"{loc['latitude']},{loc['longitude']}" for loc in chunk])
+                response = await client.get(
+                    "https://api.opentopodata.org/v1/srtm90m",
+                    params={"locations": loc_str},
+                    timeout=20.0,
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    chunk_results = data.get("results", [])
+                    # Convert opentopodata format to open-elevation format
+                    for r in chunk_results:
+                        all_results.append({
+                            "latitude": r.get("location", {}).get("lat", chunk[len(all_results) % len(chunk)]["latitude"] if all_results else 0),
+                            "longitude": r.get("location", {}).get("lng", chunk[len(all_results) % len(chunk)]["longitude"] if all_results else 0),
+                            "elevation": r.get("elevation", 0) or 0,
+                        })
+                else:
+                    logger.warning(f"OpenTopoData chunk failed with status {response.status_code}")
+                    break
+
+            if len(all_results) == len(locations):
+                logger.info("Elevation successfully fell back to OpenTopoData")
+                return JSONResponse(content={"results": all_results})
+        except Exception as e:
+            logger.error(f"OpenTopoData fallback failed: {str(e)}")
+
+        # ── Strategy 4: Synthetic estimated response ──
+        logger.warning("All elevation providers failed — returning synthetic estimate")
+        synthetic_results = [
+            {
+                "latitude": loc["latitude"],
+                "longitude": loc["longitude"],
+                "elevation": 0,
+            }
+            for loc in locations
+        ]
+        return JSONResponse(
+            content={"results": synthetic_results, "isEstimated": True},
+            headers={"X-Elevation-Source": "synthetic-estimate"},
         )
 
 

@@ -1,0 +1,251 @@
+{
+  "test_set_size": 750,
+  "accuracy": {
+    "mlp": {
+      "MAPE": 134.1597,
+      "RMSE": 7.1889,
+      "MAE": 5.7937,
+      "R2": 0.1661,
+      "MAPE_95CI": [
+        113.9147,
+        157.531
+      ],
+      "RMSE_95CI": [
+        6.8377,
+        7.5292
+      ],
+      "MAE_95CI": [
+        5.4888,
+        6.0975
+      ],
+      "R2_95CI": [
+        0.0324,
+        0.2732
+      ]
+    },
+    "physics": {
+      "MAPE": 7.0631,
+      "RMSE": 0.8844,
+      "MAE": 0.636,
+      "R2": 0.9874
+    },
+    "hybrid": {
+      "MAPE": 7.2788,
+      "RMSE": 0.9295,
+      "MAE": 0.6688,
+      "R2": 0.9861,
+      "MAPE_95CI": [
+        6.8598,
+        7.7096
+      ],
+      "RMSE_95CI": [
+        0.869,
+        0.9909
+      ],
+      "MAE_95CI": [
+        0.6225,
+        0.7158
+      ],
+      "R2_95CI": [
+        0.9834,
+        0.9882
+      ],
+      "ml_usage_pct": 10.13
+    },
+    "scenario_breakdown": {
+      "Urban": {
+        "n_samples": 171,
+        "hybrid_MAPE": 10.1047,
+        "mlp_MAPE": 205.6938
+      },
+      "Highway": {
+        "n_samples": 112,
+        "hybrid_MAPE": 5.7539,
+        "mlp_MAPE": 330.4917
+      },
+      "Mountain": {
+        "n_samples": 389,
+        "hybrid_MAPE": 6.5601,
+        "mlp_MAPE": 42.3562
+      },
+      "Extreme Cold": {
+        "n_samples": 78,
+        "hybrid_MAPE": 6.858,
+        "mlp_MAPE": 153.2627
+      }
+    }
+  },
+  "latency": {
+    "ml_only": {
+      "min_ms": 2.2642,
+      "median_ms": 3.139,
+      "mean_ms": 3.2585,
+      "p95_ms": 4.2666,
+      "max_ms": 20.2623
+    },
+    "physics_only": {
+      "min_ms": 55.3298,
+      "median_ms": 60.8474,
+      "mean_ms": 62.4334,
+      "p95_ms": 70.8125,
+      "max_ms": 120.6733
+    },
+    "full_hybrid": {
+      "min_ms": 64.8212,
+      "median_ms": 80.2231,
+      "mean_ms": 82.6054,
+      "p95_ms": 101.5841,
+      "max_ms": 149.5183
+    },
+    "end_to_end": {
+      "median_ms": 83.9161,
+      "p95_ms": 103.4637
+    },
+    "routing_split": {
+      "ml_pct": 100.0,
+      "physics_pct": 0.0
+    }
+  },
+  "threshold_sweep": [
+    {
+      "threshold": 0.6,
+      "combined_MAPE_pct": 7.2788,
+      "ml_usage_rate_pct": 10.13,
+      "avg_decision_latency_ms": 0.001426
+    },
+    {
+      "threshold": 0.65,
+      "combined_MAPE_pct": 7.2788,
+      "ml_usage_rate_pct": 10.13,
+      "avg_decision_latency_ms": 0.001358
+    },
+    {
+      "threshold": 0.7,
+      "combined_MAPE_pct": 7.2788,
+      "ml_usage_rate_pct": 10.13,
+      "avg_decision_latency_ms": 0.001292
+    },
+    {
+      "threshold": 0.75,
+      "combined_MAPE_pct": 7.2788,
+      "ml_usage_rate_pct": 10.13,
+      "avg_decision_latency_ms": 0.001247
+    },
+    {
+      "threshold": 0.8,
+      "combined_MAPE_pct": 7.2788,
+      "ml_usage_rate_pct": 10.13,
+      "avg_decision_latency_ms": 0.000972
+    },
+    {
+      "threshold": 0.85,
+      "combined_MAPE_pct": 7.2788,
+      "ml_usage_rate_pct": 10.13,
+      "avg_decision_latency_ms": 0.001207
+    }
+  ],
+  "ablation": {
+    "V1_ML_Only": {
+      "MAPE": 134.1597,
+      "median_ms": 2.7819,
+      "p95_ms": 3.3544
+    },
+    "V2_ML_Conf": {
+      "MAPE": 134.1597,
+      "median_ms": 4.4868,
+      "p95_ms": 5.2107
+    },
+    "V3_ML_Phys_NoDiv": {
+      "MAPE": 120.3663,
+      "median_ms": 4.492,
+      "p95_ms": 4.787
+    },
+    "V4_Full_Hybrid": {
+      "MAPE": 7.2788,
+      "median_ms": 81.2443,
+      "p95_ms": 100.4725
+    }
+  },
+  "battery_health_routing": {
+    "n_trips": 3000,
+    "soh_loss_per_trip": {
+      "baseline": {
+        "mean": 1.718e-05,
+        "95CI": [
+          1.669e-05,
+          1.767e-05
+        ]
+      },
+      "ies_health_aware": {
+        "mean": 1.365e-05,
+        "95CI": [
+          1.328e-05,
+          1.403e-05
+        ]
+      },
+      "improvement_pct": 20.51
+    },
+    "energy_by_scenario": {
+      "Urban": {
+        "n_trips": 717,
+        "baseline_mean_kwh": 4.383,
+        "ies_mean_kwh": 4.3633,
+        "savings_pct": 0.45
+      },
+      "Highway": {
+        "n_trips": 461,
+        "baseline_mean_kwh": 6.8096,
+        "ies_mean_kwh": 6.4543,
+        "savings_pct": 5.22
+      },
+      "Mountain": {
+        "n_trips": 1535,
+        "baseline_mean_kwh": 14.2501,
+        "ies_mean_kwh": 13.8535,
+        "savings_pct": 2.78
+      },
+      "Extreme Cold": {
+        "n_trips": 287,
+        "baseline_mean_kwh": 10.3156,
+        "ies_mean_kwh": 9.9742,
+        "savings_pct": 3.31
+      }
+    },
+    "route_length_diff_pct": 2.0,
+    "charging_detour_rate_pct": 0.23
+  },
+  "hardware": {
+    "ml_path": {
+      "avg_cpu_pct": 22.13,
+      "peak_ram_mb": 469.26
+    },
+    "physics_path": {
+      "avg_cpu_pct": 15.15,
+      "peak_ram_mb": 469.26
+    },
+    "hybrid_path": {
+      "avg_cpu_pct": 61.58,
+      "peak_ram_mb": 469.26
+    },
+    "model_sizes": {
+      "student_pth_mb": 1.68,
+      "student_onnx_mb": 0.19,
+      "scaler_pkl_kb": 0.77
+    },
+    "max_qps_batch1": 318.9
+  },
+  "scaler_provenance": {
+    "scaler_type": "StandardScaler",
+    "scaler_n_features": 14,
+    "model_retrained": false,
+    "description": "The scaler fix was a VERSION REPLACEMENT ONLY (no retraining). The scaler.pkl was regenerated to match the 14-feature TCN input format. The model weights in student.pth were NOT retrained \u2014 they are the original trained weights. The scaler was corrected to properly scale the 14-dimensional trajectory features that the StudentModel expects. This means the model weights remain unchanged; only the preprocessing pipeline (scaler) was fixed to align with the model's expected input distribution."
+  },
+  "metadata": {
+    "timestamp": "2026-04-24T03:19:16.475732",
+    "python_version": "3.14.2 (tags/v3.14.2:df79316, Dec  5 2025, 17:18:21) [MSC v.1944 64 bit (AMD64)]",
+    "torch_version": "2.10.0+cpu",
+    "seed": 42,
+    "test_set_size": 750,
+    "note": "Test set has 750 samples (not 5000). Total dataset across all splits is 5000 samples."
+  }
+}
